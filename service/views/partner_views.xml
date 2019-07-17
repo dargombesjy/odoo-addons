@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_partner_insurance_form" model="ir.ui.view">
+      <field name="name">partner.insurance</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <notebook position="inside">
+          <page string='Insurance'>
+            <group>
+              <field name="is_insurance"/>
+            </group>
+          </page>
+        </notebook>
+      </field>
+    </record>
+
+    <!-- <record id="action_partner_insurance_form" model="ir.actions.act_window">
+      <field name="name">Insurance</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_partner_insurance"
+      parent="menu_service_order"
+      name="Add Insurance"
+      action="action_partner_insurance_form"/> -->
+  </data>
+</odoo>

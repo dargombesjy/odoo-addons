@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="group_service_user" model="res.groups">
+      <field name="name">Service / User</field>
+    </record>
+
+    <!-- <record model="ir.rule" id="service_rule">
+      <field name="name">service multi-company</field>
+      <field name="model_id" search="[('model','=','service.order')]" model="ir.model"/>
+      <field name="global" eval="True"/>
+      <field name="domain_force">['|',('company_id','child_of',['user.company_id']),('company_id','=','False')]</field>
+    </record> -->
+  </data>
+</odoo>

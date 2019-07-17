@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_equipment_tree" model="ir.ui.view">
+      <field name="name">Equipment</field>
+      <field name="model">service.equipment</field>
+      <field name="arch" type="xml">
+        <tree string="Equipment">
+          <field name="name"/>
+          <field name="make"/>
+          <field name="model"/>
+          <field name="partner_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- <record id="action_equipment_tree" model="ir.actions.act_window">
+      <field name="name">Equipment</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">service.equipment</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">Create Service Equipment</p>
+      </field>
+    </record>
+
+    <menuitem id="menu_service_equipment"
+      parent="menu_service_order"
+      name="Service Equipment"
+      action="action_equipment_tree"/> -->
+
+  </data>
+</odoo>
