@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api
+from odoo.exceptions import UserError, ValidationError
 
 class Partner(models.Model):
     _inherit = 'res.partner'
@@ -20,10 +21,13 @@ class ServiceOrder(models.Model):
         default=lambda self: self.env['ir.sequence'].next_by_code('service.order'),
         copy=False, required=True)
     # states={'confirmed': [('readonly', True)]})
+    bill_type = fields.Selection([
+        ('self', 'Bill to Customer'),
+        ('claim', 'Bill to Insurance')], string="Billing Type", copy=False, required=True)
     claim_reference = fields.Char('AMC')
     claim_id = fields.Char('Claim ID')
     equipment_id = fields.Many2one(
-        'service.equipment', 'Equipment to Repair', copy=False, required=True)
+        'service.equipment', 'Equipment', copy=False, required=True)
     # readonly=True, states={'draft': [('readonly', False)]})
     partner_id = fields.Many2one(
         'res.partner', 'Customer', index=True,
@@ -35,7 +39,7 @@ class ServiceOrder(models.Model):
     state = fields.Selection([
         ('draft', 'Quotation'),
         ('cancel', 'Cancelled'),
-        ('confirm', 'Confirmed'),
+        ('confirmed', 'Confirmed'),
         ('under_repair', 'Under Repair'),
         ('ready', 'Ready to Repair'),
         ('2binvoiced', 'To be Invoiced'),
@@ -71,15 +75,68 @@ class ServiceOrder(models.Model):
     amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True)
     amount_total = fields.Float('Total', compute='_amount_total', store=True)
 
+    @api.onchange('equipment_id')
+    def onchange_equipment_id(self):
+        self.partner_id = self.equipment_id.partner_id.id
+
+    @api.one
+    @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal')
     def _amount_untaxed(self):
-        pass
+        total = sum(operation.price_subtotal for operation in self.operations)
+        total += sum(fee.price_subtotal for fee in self.fees_lines)
+        self.amount_untaxed = total
 
+    @api.one
+    @api.depends('operations.price_unit', 'operations.product_uom_qty', 'operations.product_id',
+                 'fees_lines.price_unit', 'fees_lines.product_uom_qty', 'fees_lines.product_id',
+                 'currency_id', 'partner_id')
     def _amount_tax(self):
-        pass
+        val = 0.0
+        for operation in self.operations:
+            if operation.tax_id:
+                tax_calculate = operation.tax_id.compute_all(operation.price_unit, self.currency_id, operation.product_uom_qty, operation.product_id, self.partner_id)
+                for c in tax_calculate['taxes']:
+                    val += c['amount']
+        for fee in self.fees_lines:
+            if fee.tax_id:
+                tax_calculate = fee.tax_id.compute_all(fee.price_unit, self.currency_id, fee.product_uom_qty, fee.product_id, self.partner_id)
+                for c in tax_calculate['taxes']:
+                    val += c['amount']
+        self.amount_tax = val
 
+    @api.one
+    @api.depends('amount_untaxed', 'amount_tax')
     def _amount_total(self):
+        self.amount_total = self.currency_id.round(self.amount_untaxed + self.amount_tax)
+
+    _sql_constraints = [
+        ('name', 'unique (name)', 'The name of the Service Order must be unique!')
+    ]
+
+    @api.multi
+    def button_dummy(self):
+        # TDE FIXME: this button is very interesting
+        return True
+
+    @api.multi
+    def action_service_confirm(self):
+        if self.filtered(lambda service: service.state != 'draft'):
+            raise UserError(_("Only draft repair can be confirmed."))
+        before_repair = self.filtered(lambda service: service.invoice_method == 'b4repair')
+        before_repair.write({'state': '2binvoiced'})
+        to_confirm = self - before_repair
+        to_confirm_operations = to_confirm.mapped('operations')
+        to_confirm_operations.write({'state': 'confirmed'})
+        to_confirm.write({'state': 'confirmed'})
+        return True
+
+    @api.multi
+    def action_send_mail(self):
         pass
 
+    @api.multi
+    def action_print_service_order(self):
+        return self.env.ref('service.action_report_service_order').report_action(self)
 
 class ServiceLine(models.Model):
     _name = 'service.line'
@@ -89,9 +146,12 @@ class ServiceLine(models.Model):
     service_id = fields.Many2one(
         'service.order', 'Service Order reference',
         index=True, ondelete='cascade')
-    type = fields.Selection([
-        ('add', "Add"),
-        ('remove', "Remove")], 'Type', required=True)
+    # type = fields.Selection([
+    #     ('add', "Add"),
+    #     ('remove', "Remove")], 'Type', required=True)
+    supply_type = fields.Selection([
+        ('self', 'Self Supply'),
+        ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True)
     product_id = fields.Many2one('product.product', 'Sparepart', required=True)
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
@@ -105,9 +165,9 @@ class ServiceLine(models.Model):
         'account.invoice.line', 'Invoice Line', copy=False)
 
     @api.one
-    @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id') #, 'service_id.invoice_method')
+    @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id', 'tax_id') #, 'service_id.invoice_method')
     def _compute_price_subtotal(self):
-        taxes = self.tax_id.compute_all(self.price_unit, self.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
+        taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
         self.price_subtotal = taxes['total_excluded']
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
@@ -115,8 +175,14 @@ class ServiceLine(models.Model):
         """ On change of product it sets product quantity, tax, name, uom, price
         and price subtotal. """
         partner = self.service_id.partner_id
+
         if not self.product_id or not self.product_uom_qty:
             return
+        if self.product_id:
+            self.name = self.product_id.display_name
+            self.product_uom = self.product_id.uom_id.id
+        if partner and self.product_id:
+            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
 class ServiceFee(models.Model):
     _name = 'service.fee'
@@ -136,5 +202,21 @@ class ServiceFee(models.Model):
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 
+    @api.one
+    @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
     def _compute_price_subtotal(self):
-        pass
+        taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
+        self.price_subtotal = taxes['total_excluded']
+
+    @api.onchange('service_id', 'product_id', 'product_uom_qty')
+    def onchange_product_id(self):
+        if not self.product_id:
+            return
+
+        partner = self.service_id.partner_id
+
+        if partner and self.product_id:
+            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+        if self.product_id:
+            self.name = self.product_id.display_name
+            self.product_uom = self.product_id.uom_id.id

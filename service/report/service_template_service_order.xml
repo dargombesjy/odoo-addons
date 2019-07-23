@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Main template -->
+    <template id="report_serviceorder">
+      <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="service.report_serviceorder_document" t-lang="doc.partner_id.lang"/>
+        </t>
+      </t>
+    </template>
+
+    <!-- Translatable template -->
+    <template id="report_serviceorder_document">
+      <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+      <t t-call="web.external_layout">
+        <div class="page">
+          <h2>Report title</h2>
+          <p>This object's name is <span t-field="doc.name"/></p>
+        </div>
+      </t>
+    </template>
+
+  </data>
+</odoo>

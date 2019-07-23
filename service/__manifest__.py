@@ -13,6 +13,8 @@
         'views/equipment_views.xml',
         'views/partner_views.xml',
         'data/ir_sequence_data.xml',
+        'report/service_reports.xml',
+        'report/service_template_service_order.xml',
         ],
     'images': [],
     'license': 'AGPL-3',

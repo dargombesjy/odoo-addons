@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_work_user,work user,model_work_order,group_work_user,1,1,1,1
-access_work_fee_user,work.fee user,model_work_fee,group_work_user,1,1,1,1
+access_work_user,work user,model_service_order,group_work_user,1,1,0,0
+access_work_line_user,work.line user,model_service_line,group_work_user,1,1,0,0
+access_work_fee_user,work.fee user,model_service_fee,group_work_user,1,1,0,0
+access_work_equip_user,work_equip user,service.model_service_equipment,group_work_user,1,1,0,0
+access_work_equip_make_user,work_equip.make user,service.model_service_equipment_make,group_work_user,1,1,0,0

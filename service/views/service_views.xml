@@ -23,7 +23,7 @@
         <form string="Service Order">
           <header>
             <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/>
-            <button name="print_service_order" states="draft" string="Print Quotation" type="object"/>
+            <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
@@ -42,10 +42,12 @@
               <group>
                 <field name="claim_reference"/>
                 <field name="claim_id"/>
+                <field name="bill_type"/>
               </group>
               <group>
                 <field name="equipment_id"/>
-                <field name="insurance_id"/>
+                <field name="partner_id"/>
+                <field name="insurance_id" domain="[('is_insurance','=','True')]"/>
                 <field name="invoice_method"/>
               </group>
             </group>
@@ -57,14 +59,14 @@
                       <page string="Sparepart Line">
                         <group>
                           <group>
-                            <field name="product_id"/>
+                            <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
                             <field name="name"/>
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
-                              <field name="product_uom"/>
+                              <field name="product_uom" groups="uom.group_uom"/>
                             </div>
-                            <field name="type" invisible="1"/>
+                            <!-- <field name="type" invisible="1"/> -->
                             <field name="price_unit"/>
                             <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                             <field name="price_subtotal" widget="monetary"/>
@@ -81,11 +83,11 @@
                     </notebook>
                   </form>
                   <tree string="Spareparts" editable="bottom">
-                    <field name="type"/>
-                    <field name="product_id"/>
+                    <!-- <field name="type"/> -->
+                    <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="price_subtotal" widget="monetary"/>
@@ -96,7 +98,7 @@
                   <field name="amount_tax"/>
                   <div class="oe_subtotal_footer_separator oe_inline">
                     <label for="amount_total" />
-                    <buttom name="button_dummy" string="(update)" type="object" class="oe_edit_only oe_link"/>
+                    <button name="button_dummy" string="(update)" states="draft" type="object" class="oe_edit_only oe_link"/>
                   </div>
                   <field name="amount_total" nolabel="1" sum="Total amount" class="oe_subtotal_footer_separator"/>
                 </group>
@@ -106,7 +108,7 @@
                 <field name="fees_lines">
                   <form string="Fees">
                     <group>
-                      <field name="product_id"/>
+                      <field name="product_id" domain="[('type', '=', 'service')]"/>
                       <field name="name"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -119,10 +121,10 @@
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
-                    <field name="product_id" domain="[('type','=','service')]" required="True"/>
+                    <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="price_subtotal" widget="monetary"/>
@@ -153,7 +155,7 @@
     </record>
 
     <menuitem id="menu_service_order"
-      name="Service" sequence="36"/>
+      name="Service" sequence="36" groups="service.group_service_user"/>
 
     <menuitem id="menu_service_order_form"
       parent="menu_service_order"
