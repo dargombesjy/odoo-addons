@@ -9,6 +9,8 @@
     'data': [
         'security/work_security.xml',
         'security/ir.model.access.csv',
+        # 'wizard/stock_warn_insufficient_qty_views.xml',
+        # 'views/repair_views.xml',
         'views/work_views.xml',
         ],
     'images': [],

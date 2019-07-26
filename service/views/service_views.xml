@@ -48,6 +48,7 @@
                 <field name="equipment_id"/>
                 <field name="partner_id"/>
                 <field name="insurance_id" domain="[('is_insurance','=','True')]"/>
+                <field name="partner_invoice_id"/>
                 <field name="invoice_method"/>
               </group>
             </group>
@@ -66,7 +67,7 @@
                               <field name="product_uom_qty"/>
                               <field name="product_uom" groups="uom.group_uom"/>
                             </div>
-                            <!-- <field name="type" invisible="1"/> -->
+                            <field name="supply_type" invisible="1"/>
                             <field name="price_unit"/>
                             <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                             <field name="price_subtotal" widget="monetary"/>
@@ -83,7 +84,7 @@
                     </notebook>
                   </form>
                   <tree string="Spareparts" editable="bottom">
-                    <!-- <field name="type"/> -->
+                    <field name="supply_type"/>
                     <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
@@ -133,8 +134,9 @@
               </page>
               <!-- <page string="Extra Info">
               </page> -->
-              <!-- <page string="Notes">
-              </page> -->
+              <page string="Notes">
+                <field name="quotation_notes" placeholder="Add quotation notes..."/>
+              </page>
             </notebook>
           </sheet>
           <div class="oe_chatter">

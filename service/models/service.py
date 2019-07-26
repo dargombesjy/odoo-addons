@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models, api
+from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
 
 class Partner(models.Model):
     _inherit = 'res.partner'
 
     is_insurance = fields.Boolean('Insurance', default=False)
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    service_id = fields.Many2one('service.order')
 
 class ServiceOrder(models.Model):
     _name = 'service.order'
@@ -30,11 +35,11 @@ class ServiceOrder(models.Model):
         'service.equipment', 'Equipment', copy=False, required=True)
     # readonly=True, states={'draft': [('readonly', False)]})
     partner_id = fields.Many2one(
-        'res.partner', 'Customer', index=True,
-        domain=[('is_insurance', '=', True)])
+        'res.partner', 'Customer', index=True)
+    # domain=[('is_insurance', '=', False)])
     insurance_id = fields.Many2one(
         'res.partner', 'Insurance', index=True,
-        domain=[('is_insurance', '=', False)])
+        domain=[('is_insurance', '=', True)])
     # states={'confirmed': [('readonly', True)]})
     state = fields.Selection([
         ('draft', 'Quotation'),
@@ -59,6 +64,10 @@ class ServiceOrder(models.Model):
     fees_lines = fields.One2many(
         'service.fee', 'service_id', copy=True)
     # readonly=True states={'draft': [('readonly', False)]})
+    quotation_notes = fields.Text('Quotation Notes')
+    company_id = fields.Many2one(
+        'res.company', 'Company',
+        default=lambda self: self.env['res.company']._company_default_get('service.order'))
     partner_invoice_id = fields.Many2one('res.partner', 'Invoicing Address')
     invoice_method = fields.Selection([
         ("none", "No Invoice"),
@@ -71,9 +80,27 @@ class ServiceOrder(models.Model):
     invoice_id = fields.Many2one(
         'account.invoice', 'Invoice',
         copy=False, readonly=True, track_visibility="onchange")
+    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    repaired = fields.Boolean('Repaired', copy=False, readonly=True)
     amount_untaxed = fields.Float('Untaxed Amount', compute='_amount_untaxed', store=True)
     amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True)
     amount_total = fields.Float('Total', compute='_amount_total', store=True)
+
+    # ------ Operation --------- #
+    work_stage = fields.Selection([
+        ('antri', 'Dalam Antrian'),
+        ('bongkar', 'Pembongkaran'),
+        ('ketok', 'Ketok'),
+        ('dempul', 'Dempul'),
+        ('cat', 'Pengecatan'),
+        ('finishing', 'Finishing')], string='Stage', default="antri")
+    cost_untaxed = fields.Float('Untaxed cost', compute='_cost_untaxed', store=True)
+    cost_tax = fields.Float('Taxes', compute='_cost_tax', store=True)
+    cost_total = fields.Float('Total cost', compute='_cost_total', store=True)
+    purchased = fields.Boolean('PO Created', copy=False, readonly=True)
+    purchase_id = fields.Many2one(
+        'purchase.order', 'Purchase Order',
+        copy=False, readonly=True, track_visibility="onchange")
 
     @api.onchange('equipment_id')
     def onchange_equipment_id(self):
@@ -113,6 +140,21 @@ class ServiceOrder(models.Model):
         ('name', 'unique (name)', 'The name of the Service Order must be unique!')
     ]
 
+    @api.onchange('partner_id', 'insurance_id')
+    def onchange_partner_id(self):
+        if not self.partner_id:
+            # self.address_id = False
+            self.partner_invoice_id = False
+            # self.pricelist_id = self.env['product.pricelist'].search([], limit=1).id
+        else:
+            if self.bill_type == 'self':
+                addresses = self.partner_id.address_get(['delivery', 'invoice', 'contact'])
+            else:
+                addresses = self.insurance_id.address_get(['delivery', 'invoice', 'contact'])
+            # self.address_id = addresses['delivery'] or addresses['contact']
+            self.partner_invoice_id = addresses['invoice']
+            # self.pricelist_id = self.partner_id.property_product_pricelist.id
+
     @api.multi
     def button_dummy(self):
         # TDE FIXME: this button is very interesting
@@ -138,6 +180,136 @@ class ServiceOrder(models.Model):
     def action_print_service_order(self):
         return self.env.ref('service.action_report_service_order').report_action(self)
 
+    def action_service_invoice_create(self):
+        for service in self:
+            service.action_invoice_create()
+            if service.invoice_method == 'b4repair':
+                service.action_service_ready()
+            elif service.invoice_method == 'after_repair':
+                service.write({'state': 'done'})
+        return True
+
+    def action_service_ready(self):
+        self.mapped('operations').write({'state': 'confirmed'})
+        return self.write({'state': 'ready'})
+
+    @api.multi
+    def action_invoice_create(self, group=False):
+        """ Creates invoice(s) for service order
+        @param group: It is set to true when group invoice is to be generated.
+        @return: Invoice Ids.
+        """
+        res = dict.fromkeys(self.ids, False)
+        invoices_group = {}
+        InvoiceLine = self.env['account.invoice.line']
+        Invoice = self.env['account.invoice']
+        for service in self.filtered(lambda service: service.state not in ('draft', 'cancel') and not service.invoice_id):
+            if not service.partner_id.id and not service.partner_invoice_id.id:
+                raise UserError(_('You have to select an invoice address in the service form.'))
+            comment = service.quotation_notes
+            if service.invoice_method != 'none':
+                if group and service.partner_invoice_id.id in invoices_group:
+                    invoice = invoices_group[service.partner_invoice_id.id]
+                    invoice.write({
+                        'name': invoice.name + ', ' + service.name,
+                        'origin': invoice.origin + ', ' + service.name,
+                        'comment': (comment and (invoice.comment and invoice.comment + "\n" + comment or comment)) or (invoice.comment and invoice.comment or ''),
+                    })
+                else:
+                    # if not service.partner_id.property_account_receivable_id:
+                    if not service.partner_invoice_id.property_account_receivable_id:
+                        raise UserError(_('No sccount defined for partner "%s%"') % service.partner_invoice_id.name)
+                        # raise UserError(_('No account defined for parner "%s%"') % service.partner_id.name)
+                    invoice = Invoice.create({
+                        'name': service.name,
+                        'origin': service.name,
+                        'type': 'out_invoice',
+                        # 'account_id': service.partner_id.property_account_receivable_id.id,
+                        'account_id': service.partner_invoice_id.property_account_receivable_id.id,
+                        # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
+                        'partner_id': service.partner_invoice_id.id,
+                        'currency_id': service.currency_id.id,
+                        # 'comment': service.quotation_notes,
+                        # 'fiscal_position_id': service.partner_id.property_account_position_id
+                        'fiscal_position_id': service.partner_invoice_id.property_account_position_id
+                    })
+                    invoices_group[service.partner_invoice_id.id] = invoice
+
+                service.write({'invoiced': True, 'invoice_id': invoice.id})
+
+                for operation in service.operations:
+                    if group:
+                        name = service.name + '-' + operation.name
+                    else:
+                        name = operation.name
+
+                    if operation.product_id.property_account_income_id:
+                        account_id = operation.property_account_income_id.id
+                    elif operation.product_id.categ_id.property_account_income_categ_id:
+                        account_id = operation.product_id.categ_id.property_account_income_categ_id.id
+                    else:
+                        raise UserError(_('No account defined for product "%s%".') % operation.product_id.name)
+
+                    invoice_line = InvoiceLine.create({
+                        'invoice_id': invoice.id,
+                        'name': name,
+                        'origin': service.name,
+                        'account_id': account_id,
+                        'quantity': operation.product_uom_qty,
+                        'invoice_line_tax_ids': [(6, 0, [x.id for x in operation.tax_id])],
+                        'uom_id': operation.product_uom.id,
+                        'price_unit': operation.price_unit,
+                        'price_subtotal': operation.product_uom_qty * operation.price_unit,
+                        'product_id': operation.product_id and operation.product_id.id or False
+                    })
+                    operation.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
+
+                for fee in service.fees_lines:
+                    if group:
+                        name = service.name + '-' + fee.name
+                    else:
+                        name = fee.name
+                    if not fee.product_id:
+                        raise UserError(_('No product defined on fees.'))
+
+                    if fee.product_id.property_account_income_id:
+                        account_id = fee.property_account_income_id.id
+                    elif fee.product_id.categ_id.property_account_income_categ_id:
+                        account_id = fee.product_id.categ_id.property_account_income_categ_id.id
+                    else:
+                        raise UserError(_('No account defined for product "%s%".') % fee.product_id.name)
+
+                    invoice_line = InvoiceLine.create({
+                        'invoice_id': invoice.id,
+                        'name': name,
+                        'origin': service.name,
+                        'account_id': account_id,
+                        'quantity': fee.product_uom_qty,
+                        'invoice_line_tax_ids': [(6, 0, [x.id for x in fee.tax_id])],
+                        'uom_id': fee.product_uom.id,
+                        'product_id': fee.product_id and fee.product_id.id or False,
+                        'price_unit': fee.price_unit,
+                        'price_subtotal': fee.product_uom_qty * fee.price_unit
+                    })
+                    fee.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
+
+                invoice.compute_taxes()
+                res[service.id] = invoice.id
+        return res
+
+    @api.multi
+    def action_created_invoice(self):
+        self.ensure_one()
+        return {
+            'name': _('Invoice created'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'account_invoice',
+            'view_id': self.env.ref('account.invoice_form').id,
+            'target': 'current',
+            'res_id': self.invoice_id.id,
+        }
+
 class ServiceLine(models.Model):
     _name = 'service.line'
     _description = 'Service Line (Part)'
@@ -161,8 +333,34 @@ class ServiceLine(models.Model):
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    # repaired = fields.Boolean('Repaired', copy=False, readonly=True)
     invoice_line_id = fields.Many2one(
         'account.invoice.line', 'Invoice Line', copy=False)
+
+    # Production line ---- #
+    received = fields.Boolean('Received', copy=False)
+    location_id = fields.Many2one(
+        'stock.location', 'Source Location', index=True)
+    location_dest_id = fields.Many2one(
+        'stock.location', 'Dest. Location', index=True)
+    move_id = fields.Many2one(
+        'stock.move', 'Inventory Move', copy=False, readonly=True)
+    lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial')
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('confirmed', 'Confirmed'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled')], 'Status', default='draft',
+        copy=False, readonly=True, required=True,
+        help='The status of a repair line is set automatically to the one of the linked repair order.')
+    cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
+    cost_tax_id = fields.Many2many(
+        'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    purchased = fields.Boolean('Purchased', copy=False, required=True)
+    purchase_line_id = fields.Many2one(
+        'purchase.order.line', 'Purchase Line', copy=False)
+    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id', 'tax_id') #, 'service_id.invoice_method')
@@ -170,11 +368,35 @@ class ServiceLine(models.Model):
         taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
         self.price_subtotal = taxes['total_excluded']
 
+    @api.onchange('service_id')
+    def onchange_operation_type(self):
+        """ On change of operation type it sets source location, destination location
+        and to invoice field.
+        @param product: Changed operation type.
+        @param guarantee_limit: Guarantee limit of current record.
+        @return: Dictionary of values.
+        """
+        # if not self.type:
+        #     self.location_id = False
+        #     self.location_dest_id = False
+        # elif self.type == 'add':
+        self.onchange_product_id()
+        args = self.service_id.company_id and [('company_id', '=', self.service_id.company_id.id)] or []
+        warehouse = self.env['stock.warehouse'].search(args, limit=1)
+        self.location_id = warehouse.lot_stock_id
+        self.location_dest_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
+        # else:
+        #     self.price_unit = 0.0
+        #     self.tax_id = False
+        #     self.location_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
+        #     self.location_dest_id = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
+
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
     def onchange_product_id(self):
         """ On change of product it sets product quantity, tax, name, uom, price
         and price subtotal. """
         partner = self.service_id.partner_id
+        self.lot_id = False
 
         if not self.product_id or not self.product_uom_qty:
             return
@@ -201,6 +423,16 @@ class ServiceFee(models.Model):
     tax_id = fields.Many2many('account.tax', 'repair_fee_line_tax', 'repair_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+
+    # ------ Production ------ #
+    cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
+    cost_tax_id = fields.Many2many(
+        'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    purchased = fields.Boolean('Purchased', copy=False, required=True)
+    purchase_line_id = fields.Many2one(
+        'purchase.order.line', 'Purchase Line', copy=False)
+    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
