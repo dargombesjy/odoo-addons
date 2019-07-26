@@ -65,8 +65,8 @@ class ServiceOrder(models.Model):
             service.write({'repaired': True})
             vals = {'state': 'done'}
             # vals['move_id'] = service.action_service_done().get(service.id)
-            if not service.action_service_done():
-                raise UserError('Service not Done')
+            # if not service.action_service_done():
+                # raise UserError('Service not Done')
             if not service.invoiced and service.invoice_method == 'after_repair':
                 vals['state'] = '2binvoiced'
             service.write(vals)

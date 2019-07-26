@@ -37,6 +37,10 @@ class ServiceOrder(models.Model):
     partner_id = fields.Many2one(
         'res.partner', 'Customer', index=True)
     # domain=[('is_insurance', '=', False)])
+    address_id = fields.Many2one(
+        'res.partner', 'Delivery Address',
+        domain="[('parent_id','=',partner_id)]",
+        states={'confirmed': [('readonly', True)]})
     insurance_id = fields.Many2one(
         'res.partner', 'Insurance', index=True,
         domain=[('is_insurance', '=', True)])
@@ -143,7 +147,7 @@ class ServiceOrder(models.Model):
     @api.onchange('partner_id', 'insurance_id')
     def onchange_partner_id(self):
         if not self.partner_id:
-            # self.address_id = False
+            self.address_id = False
             self.partner_invoice_id = False
             # self.pricelist_id = self.env['product.pricelist'].search([], limit=1).id
         else:
@@ -151,7 +155,7 @@ class ServiceOrder(models.Model):
                 addresses = self.partner_id.address_get(['delivery', 'invoice', 'contact'])
             else:
                 addresses = self.insurance_id.address_get(['delivery', 'invoice', 'contact'])
-            # self.address_id = addresses['delivery'] or addresses['contact']
+            self.address_id = addresses['delivery'] or addresses['contact']
             self.partner_invoice_id = addresses['invoice']
             # self.pricelist_id = self.partner_id.property_product_pricelist.id
 
@@ -376,10 +380,6 @@ class ServiceLine(models.Model):
         @param guarantee_limit: Guarantee limit of current record.
         @return: Dictionary of values.
         """
-        # if not self.type:
-        #     self.location_id = False
-        #     self.location_dest_id = False
-        # elif self.type == 'add':
         self.onchange_product_id()
         args = self.service_id.company_id and [('company_id', '=', self.service_id.company_id.id)] or []
         warehouse = self.env['stock.warehouse'].search(args, limit=1)

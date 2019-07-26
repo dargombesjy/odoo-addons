@@ -88,6 +88,7 @@
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
+                    <field name="location_id"/>
                     <field name="received"/>
                   </tree>
                 </field>
