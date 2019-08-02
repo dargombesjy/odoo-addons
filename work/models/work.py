@@ -31,7 +31,7 @@ class ServiceOrder(models.Model):
                     'order_id': purchase.id,
                     'name': fee.product_id.name,
                     'product_id': fee.product_id.id,
-                    'product_uom_qty': fee.product_uom_qty,
+                    'product_qty': fee.product_uom_qty,
                     'product_uom': fee.product_uom.id,
                     'price_unit': fee.price_unit,
                     'taxes_id': fee.tax_id,
@@ -60,10 +60,11 @@ class ServiceOrder(models.Model):
 
             for operation in service.operations:
                 Move_Line.create({
+                    'name': service.name,
                     'picking_id': picking.id,
                     'product_id': operation.product_id.id,
                     'product_uom_qty': operation.product_uom_qty,
-                    'product_uom_id': operation.product_uom.id,
+                    'product_uom': operation.product_uom.id,
                     'package_id': False,
                     'package_level_id': False,
                     'location_id': 12,  # operation.location_id.id,
@@ -72,10 +73,11 @@ class ServiceOrder(models.Model):
 
             for other in service.others_lines:
                 Move_Line.create({
+                    'name': service.name,
                     'picking_id': picking.id,
                     'product_id': other.product_id.id,
                     'product_uom_qty': other.product_uom_qty,
-                    'product_uom_id': other.product_uom.id,
+                    'product_uom': other.product_uom.id,
                     'package_id': False,
                     'package_level_id': False,
                     'location_id': 12,  # other.location_id.id,

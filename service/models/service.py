@@ -448,7 +448,7 @@ class ServiceLine(models.Model):
         if not self.product_id or not self.product_uom_qty:
             return
         if self.product_id:
-            # self.name = self.product_id.display_name
+            self.name = self.product_id.display_name
             self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
@@ -459,7 +459,7 @@ class ServiceFee(models.Model):
     _description = 'Service Fees'
     # _inherits = {'work.fee': 'workfee_id'}
 
-    name = fields.Text('Description', index=True, required=True)
+    name = fields.Text('Description', index=True)
     fee_code = fields.Char('Service Code')
     service_id = fields.Many2one(
         'service.order', 'Service Order Reference',
@@ -501,7 +501,7 @@ class ServiceFee(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            # self.name = self.product_id.display_name
+            self.name = self.product_id.display_name
             self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
@@ -551,7 +551,7 @@ class ServiceOther(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            # self.name = self.product_id.display_name
+            self.name = self.product_id.display_name
             self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
@@ -565,7 +565,22 @@ class ServiceConsumable(models.Model):
         index=True, ondelete='cascade', required=True)
     product_id = fields.Many2one('product.product', 'Jasa Service', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
+    product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
     cost_tax_id = fields.Many2many(
         'account.tax', 'service_consumable_line_tax', 'service_consumable_line_id', 'tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+
+    @api.onchange('service_id', 'product_id', 'product_uom_qty')
+    def onchange_product_id(self):
+        if not self.product_id:
+            return
+
+        # partner = self.service_id.partner_id
+        #
+        # if partner and self.product_id:
+        #     self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+        if self.product_id:
+            self.name = self.product_id.display_name
+            # self.other_code = self.product_id.default_code
+            self.product_uom = self.product_id.uom_id.id

@@ -22,8 +22,8 @@
       <field name="arch" type="xml">
         <form string="Work Order">
           <header>
-            <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
-            <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/>
+            <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}" type="object" string="Start Repair" class="oe_highlight"/>
+            <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
             <button name="action_create_material_transfer" states="under_repair" string="Request Material" type="object"/>
             <button name="action_service_end" states="under_repair" string="End Repair" type="object" class="oe_highlight"/>
             <button name="action_create_purchase_fee" states="2binvoiced" string="Create PO" type="object"/>
@@ -51,7 +51,8 @@
                 <field name="planned_date"/>
                 <field name="work_stage"/>
                 <field name="finish_date"/>
-                <!-- <field name="invoice_method" invisible="1"/> -->
+                <field name="vendor_id" string="Repair Vendor"/>
+                <field name="invoice_method" invisible="1"/>
               </group>
             </group>
             <notebook>
@@ -91,7 +92,7 @@
                     <field name="product_id"/>
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
+                    <field name="product_uom" string="Unit of Measure"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
@@ -157,7 +158,7 @@
                     <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
                     <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
+                    <field name="product_uom" string="Unit of Measure"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
@@ -165,11 +166,11 @@
                 </field>
               </page>
               <page string="Consumables">
-                <field name="cosumable_lines">
+                <field name="consumable_lines">
                   <form string="Consumables">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service')]"/>
-                      <field name="other_code"/>
+                      <!-- <field name="other_code"/> -->
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -182,9 +183,9 @@
                   </form>
                   <tree string="Consumables" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
-                    <field name="other_code"/>
+                    <!-- <field name="other_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
+                    <field name="product_uom" string="Unit of Measure"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
