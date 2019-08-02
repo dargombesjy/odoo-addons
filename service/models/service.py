@@ -5,7 +5,18 @@ from odoo.exceptions import UserError, ValidationError
 class Partner(models.Model):
     _inherit = 'res.partner'
 
-    is_insurance = fields.Boolean('Insurance', default=False)
+    # is_insurance = fields.Boolean('Insurance', default=False)
+    partner_type = fields.Selection([
+        ('internal', 'Internal'),
+        ('customer', 'Customer'),
+        ('vendor', 'Vendor'),
+        ('insurance', 'Insurance')], string='Partner Type'
+    )
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    service_id = fields.Many2one('service.order')
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -28,12 +39,34 @@ class ServiceOrder(models.Model):
     # states={'confirmed': [('readonly', True)]})
     bill_type = fields.Selection([
         ('self', 'Bill to Customer'),
-        ('claim', 'Bill to Insurance')], string="Billing Type", copy=False, required=True)
+        ('claim', 'Bill to Insurance')], string="Billing Type", copy=False, required=True,
+        default='claim')
     claim_reference = fields.Char('AMC')
     claim_id = fields.Char('Claim ID')
+    policy_no = fields.Char('Policy No.')
+    register_date = fields.Datetime('Register Date')
+    planned_date = fields.Date('Planned Finish Date')
     equipment_id = fields.Many2one(
-        'service.equipment', 'Equipment', copy=False, required=True)
-    # readonly=True, states={'draft': [('readonly', False)]})
+        'service.equipment', 'Equipment', copy=False, required=True, readonly=True,
+        states={'draft': [('readonly', False)]})
+    make = fields.Char('Manufacturer', compute='_compute_equipment')
+    model = fields.Char('Model', compute='_compute_equipment')
+    manuf_year = fields.Char('Year', compute='_compute_equipment')
+    chassis_no = fields.Char('Chassis No.', compute='_compute_equipment')
+    engine_no = fields.Char('Engine No.', compute='_compute_equipment')
+    base_colour = fields.Char('Base Colour', compute='_compute_equipment')
+
+    @api.one
+    @api.depends('equipment_id')
+    def _compute_equipment(self):
+        details = self.equipment_id.get_details()
+        self.make = details['make']
+        self.model = details['model']
+        self.manuf_year = details['manuf_year']
+        self.chassis_no = details['chassis_no']
+        self.engine_no = details['engine_no']
+        self.base_colour = details['base_colour']
+
     partner_id = fields.Many2one(
         'res.partner', 'Customer', index=True)
     # domain=[('is_insurance', '=', False)])
@@ -43,7 +76,7 @@ class ServiceOrder(models.Model):
         states={'confirmed': [('readonly', True)]})
     insurance_id = fields.Many2one(
         'res.partner', 'Insurance', index=True,
-        domain=[('is_insurance', '=', True)])
+        domain=[('partner_type', '=', 'insurance')])
     # states={'confirmed': [('readonly', True)]})
     state = fields.Selection([
         ('draft', 'Quotation'),
@@ -67,6 +100,9 @@ class ServiceOrder(models.Model):
     # readonly=True, states={'draft': [('readonly', False)]})
     fees_lines = fields.One2many(
         'service.fee', 'service_id', copy=True)
+    # readonly=True states={'draft': [('readonly', False)]})
+    others_lines = fields.One2many(
+        'service.other', 'service_id', copy=True)
     # readonly=True states={'draft': [('readonly', False)]})
     quotation_notes = fields.Text('Quotation Notes')
     company_id = fields.Many2one(
@@ -111,15 +147,17 @@ class ServiceOrder(models.Model):
         self.partner_id = self.equipment_id.partner_id.id
 
     @api.one
-    @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal')
+    @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal', 'others_lines.price_subtotal')
     def _amount_untaxed(self):
         total = sum(operation.price_subtotal for operation in self.operations)
         total += sum(fee.price_subtotal for fee in self.fees_lines)
+        total += sum(other.price_subtotal for other in self.others_lines)
         self.amount_untaxed = total
 
     @api.one
     @api.depends('operations.price_unit', 'operations.product_uom_qty', 'operations.product_id',
                  'fees_lines.price_unit', 'fees_lines.product_uom_qty', 'fees_lines.product_id',
+                 'others_lines.price_unit', 'others_lines.product_uom_qty', 'others_lines.product_id',
                  'currency_id', 'partner_id')
     def _amount_tax(self):
         val = 0.0
@@ -131,6 +169,11 @@ class ServiceOrder(models.Model):
         for fee in self.fees_lines:
             if fee.tax_id:
                 tax_calculate = fee.tax_id.compute_all(fee.price_unit, self.currency_id, fee.product_uom_qty, fee.product_id, self.partner_id)
+                for c in tax_calculate['taxes']:
+                    val += c['amount']
+        for other in self.others_lines:
+            if other.tax_id:
+                tax_calculate = other.tax_id.compute_all(other.price_unit, self.currency_id, other.product_uom_qty, other.product_id, self.partner_id)
                 for c in tax_calculate['taxes']:
                     val += c['amount']
         self.amount_tax = val
@@ -318,7 +361,8 @@ class ServiceLine(models.Model):
     _name = 'service.line'
     _description = 'Service Line (Part)'
 
-    name = fields.Text('Description', required=True)
+    name = fields.Text('Description')
+    part_number = fields.Char('Part Number')
     service_id = fields.Many2one(
         'service.order', 'Service Order reference',
         index=True, ondelete='cascade')
@@ -327,17 +371,20 @@ class ServiceLine(models.Model):
     #     ('remove', "Remove")], 'Type', required=True)
     supply_type = fields.Selection([
         ('self', 'Self Supply'),
-        ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True)
+        ('customer', 'Customer Supply'),
+        ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True,
+        default='vendor')
     product_id = fields.Many2one('product.product', 'Sparepart', required=True)
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
     price_unit = fields.Float('Unit Price', required=True)
+    price_accepted = fields.Float('Accepted Price')
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
-    # repaired = fields.Boolean('Repaired', copy=False, readonly=True)
+    rejected = fields.Boolean('Repaired', copy=False, readonly=True)
     invoice_line_id = fields.Many2one(
         'account.invoice.line', 'Invoice Line', copy=False)
 
@@ -401,7 +448,8 @@ class ServiceLine(models.Model):
         if not self.product_id or not self.product_uom_qty:
             return
         if self.product_id:
-            self.name = self.product_id.display_name
+            # self.name = self.product_id.display_name
+            self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
@@ -412,22 +460,25 @@ class ServiceFee(models.Model):
     # _inherits = {'work.fee': 'workfee_id'}
 
     name = fields.Text('Description', index=True, required=True)
+    fee_code = fields.Char('Service Code')
     service_id = fields.Many2one(
         'service.order', 'Service Order Reference',
         index=True, ondelete='cascade', required=True)
-    product_id = fields.Many2one('product.product', 'Jasa Service', required=True)
+    product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
     price_unit = fields.Float('Unit Price', required=True)
+    price_accepted = fields.Float('Accepted Price')
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
-    tax_id = fields.Many2many('account.tax', 'repair_fee_line_tax', 'repair_fee_line_id', 'tax_id', 'Taxes')
+    tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    rejected = fields.Boolean('Repaired', copy=False, readonly=True)
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
     cost_tax_id = fields.Many2many(
-        'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
+        'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
@@ -450,5 +501,71 @@ class ServiceFee(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            self.name = self.product_id.display_name
+            # self.name = self.product_id.display_name
+            self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
+
+class ServiceOther(models.Model):
+    _name = 'service.other'
+    _description = 'Service Others lines'
+
+    name = fields.Text('Description')
+    other_code = fields.Char('Item Code')
+    service_id = fields.Many2one(
+        'service.order', 'Service Order Reference',
+        index=True, ondelete='cascade', required=True)
+    product_id = fields.Many2one('product.product', 'Jasa Other', required=True)
+    product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
+    price_unit = fields.Float('Unit Price', required=True)
+    price_accepted = fields.Float('Accepted Price')
+    product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
+    price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
+    tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
+    invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
+    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    rejected = fields.Boolean('Repaired', copy=False, readonly=True)
+
+    # ------ Production ------ #
+    cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
+    cost_tax_id = fields.Many2many(
+        'account.tax', 'service_others_cost_tax', 'service_others_line_id', 'tax_id', 'Taxes')
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    purchased = fields.Boolean('Purchased', copy=False, required=True)
+    purchase_line_id = fields.Many2one(
+        'purchase.order.line', 'Purchase Line', copy=False)
+    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+
+    @api.one
+    @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
+    def _compute_price_subtotal(self):
+        taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
+        self.price_subtotal = taxes['total_excluded']
+
+    @api.onchange('service_id', 'product_id', 'product_uom_qty')
+    def onchange_product_id(self):
+        if not self.product_id:
+            return
+
+        partner = self.service_id.partner_id
+
+        if partner and self.product_id:
+            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+        if self.product_id:
+            # self.name = self.product_id.display_name
+            self.other_code = self.product_id.default_code
+            self.product_uom = self.product_id.uom_id.id
+
+class ServiceConsumable(models.Model):
+    _name = 'service.consumable'
+    _description = 'Consumable lines'
+
+    name = fields.Text('Description')
+    service_id = fields.Many2one(
+        'service.order', 'Service Order Reference',
+        index=True, ondelete='cascade', required=True)
+    product_id = fields.Many2one('product.product', 'Jasa Service', required=True)
+    product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
+    cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
+    cost_tax_id = fields.Many2many(
+        'account.tax', 'service_consumable_line_tax', 'service_consumable_line_id', 'tax_id', 'Taxes')
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)

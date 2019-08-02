@@ -7,9 +7,9 @@
       <field name="inherit_id" ref="base.view_partner_form"/>
       <field name="arch" type="xml">
         <notebook position="inside">
-          <page string='Insurance'>
+          <page string='Partner Type'>
             <group>
-              <field name="is_insurance"/>
+              <field name="partner_type"/>
             </group>
           </page>
         </notebook>

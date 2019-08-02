@@ -10,6 +10,7 @@
           <field name="claim_reference"/>
           <field name="equipment_id"/>
           <field name="insurance_id"/>
+          <field name="claim_id"/>
           <field name="state"/>
         </tree>
       </field>
@@ -27,7 +28,8 @@
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
-            <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
+            <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
+            <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
           </header>
@@ -40,16 +42,26 @@
             </h1>
             <group>
               <group>
+                <field name="bill_type"/>
                 <field name="claim_reference"/>
                 <field name="claim_id"/>
-                <field name="bill_type"/>
+                <field name="policy_no"/>
+                <field name="insurance_id" domain="[('partner_type','=','insurance')]"/>
+                <field name="partner_id"/>
+                <field name="address_id"/>
               </group>
               <group>
+                <field name="register_date"/>
+                <field name="planned_date"/>
                 <field name="equipment_id"/>
-                <field name="partner_id"/>
-                <field name="insurance_id" domain="[('is_insurance','=','True')]"/>
-                <field name="partner_invoice_id"/>
-                <field name="invoice_method"/>
+                <field name="make"/>
+                <field name="model"/>
+                <field name="manuf_year"/>
+                <field name="chassis_no"/>
+                <field name="engine_no"/>
+                <field name="base_colour"/>
+                <!-- <field name="partner_invoice_id"/> -->
+                <!-- <field name="invoice_method"/> -->
               </group>
             </group>
             <notebook>
@@ -61,7 +73,7 @@
                         <group>
                           <group>
                             <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
-                            <field name="name"/>
+                            <field name="part_number"/>
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
@@ -86,7 +98,7 @@
                   <tree string="Spareparts" editable="bottom">
                     <field name="supply_type"/>
                     <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
-                    <field name="name"/>
+                    <field name="part_number"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
@@ -110,7 +122,7 @@
                   <form string="Fees">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service')]"/>
-                      <field name="name"/>
+                      <field name="fee_code"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -123,7 +135,34 @@
                   </form>
                   <tree string="Fees" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
-                    <field name="name"/>
+                    <field name="fee_code"/>
+                    <field name="product_uom_qty" string="Quantity"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
+                    <field name="price_unit"/>
+                    <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <field name="price_subtotal" widget="monetary"/>
+                  </tree>
+                </field>
+              </page>
+              <page string="Others">
+                <field name="others_lines">
+                  <form string="Others">
+                    <group>
+                      <field name="product_id" domain="[('type', '=', 'service')]"/>
+                      <field name="other_code"/>
+                      <label for="product_uom_qty"/>
+                      <div class="o_row">
+                        <field name="product_uom_qty" string="Quantity"/>
+                        <field name="product_uom" string="Unit of Measure"/>
+                      </div>
+                      <field name="price_unit"/>
+                      <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                      <field name="price_subtotal" widget="monetary"/>
+                    </group>
+                  </form>
+                  <tree string="Others" editable="bottom">
+                    <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
+                    <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>

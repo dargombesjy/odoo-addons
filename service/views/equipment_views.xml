@@ -7,8 +7,8 @@
       <field name="arch" type="xml">
         <tree string="Equipment">
           <field name="name"/>
-          <field name="make"/>
-          <field name="model"/>
+          <field name="make_id"/>
+          <field name="model_id"/>
           <field name="partner_id"/>
         </tree>
       </field>

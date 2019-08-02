@@ -6,31 +6,84 @@ from odoo.tools import float_compare
 class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
-    # @api.multi
-    # def action_validate(self):
-    #     self.ensure_one()
-    #     for op in self.operations:
-    #         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-    #         available_qty_owner = self.env['stock.quant']._get_available_quantity(op.product_id, op.location_id, op.lot_id, owner_id=self.partner_id, strict=True)
-    #         available_qty_noown = self.env['stock.quant']._get_available_quantity(op.product_id, op.location_id, op.lot_id, strict=True)
-    #         for available_qty in [available_qty_owner, available_qty_noown]:
-    #             if float_compare(available_qty, op.product_uom_qty, precision_digits=precision) >= 0:
-    #                 return True
-    #             else:
-    #                 return {
-    #                     'name': _('Insufficient Quantity'),
-    #                     'view_type': 'form',
-    #                     'view_mode': 'form',
-    #                     'res_model': 'stock.warn.insufficient.qty.service',
-    #                     'view_id': self.env.ref('service.stock_warn_insufficient_qty_form_view').id,
-    #                     'type': 'ir.actions.act_window',
-    #                     'context': {
-    #                         'default_product_id': op.product_id.id,
-    #                         'default_location_id': op.location_id.id,
-    #                         'default_service_id': op.service_id
-    #                     },
-    #                     'target': 'new'
-    #                 }
+    received_date = fields.Datetime('Doc. Receive Date')
+    finish_date = fields.Datetime('Finish Date')
+    picking_id = fields.Many2one('stock.picking', 'Material transfer ID', copy=False, index=True)
+    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
+    consumable_lines = fields.One2many(
+        'service.consumable', 'service_id', copy=True)
+    # readonly=True states={'draft': [('readonly', False)]})
+
+    @api.multi
+    def action_create_purchase_fee(self):
+        Purchase = self.env['purchase.order']
+        Purchase_Line = self.env['purchase.order.line']
+        for service in self:
+            purchase = Purchase.create({
+                'name': service.name,
+                'origin': service.name,
+                'partner_id': service.vendor_id.id,
+                'state': 'draft',
+            })
+
+            for fee in service.fees_lines:
+                Purchase_Line.create({
+                    'order_id': purchase.id,
+                    'name': fee.product_id.name,
+                    'product_id': fee.product_id.id,
+                    'product_uom_qty': fee.product_uom_qty,
+                    'product_uom': fee.product_uom.id,
+                    'price_unit': fee.price_unit,
+                    'taxes_id': fee.tax_id,
+                })
+
+    @api.multi
+    def action_create_material_transfer(self):
+        # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')
+        Picking = self.env['stock.picking']
+        Move_Line = self.env['stock.move']
+        partner = self.partner_id
+        for service in self:
+            if service.picking_id:
+                raise UserError('Material request already created')
+            picking = Picking.create({
+                # 'name': '',
+                'service_id': service.id,
+                'origin': service.name,
+                'move_type': 'one',
+                'partner_id': partner.id,
+                'picking_type_id': 2,
+                'location_id': 12,
+                'location_dest_id': 9,
+                'state': 'draft',
+            })
+
+            for operation in service.operations:
+                Move_Line.create({
+                    'picking_id': picking.id,
+                    'product_id': operation.product_id.id,
+                    'product_uom_qty': operation.product_uom_qty,
+                    'product_uom_id': operation.product_uom.id,
+                    'package_id': False,
+                    'package_level_id': False,
+                    'location_id': 12,  # operation.location_id.id,
+                    'location_dest_id': 9,  # operation.location_dest_id.id
+                })
+
+            for other in service.others_lines:
+                Move_Line.create({
+                    'picking_id': picking.id,
+                    'product_id': other.product_id.id,
+                    'product_uom_qty': other.product_uom_qty,
+                    'product_uom_id': other.product_uom.id,
+                    'package_id': False,
+                    'package_level_id': False,
+                    'location_id': 12,  # other.location_id.id,
+                    'location_dest_id': 9,  # other.location_dest_id.id
+                })
+
+            service.write({'picking_id': picking.id})
+
     @api.one
     def _cost_untaxed(self):
         pass
@@ -155,6 +208,20 @@ class ServiceLine(models.Model):
 
 class ServiceFee(models.Model):
     _inherit = 'service.fee'
+
+    @api.one
+    def _compute_cost_subtotal(self):
+        pass
+
+class ServiceOther(models.Model):
+    _inherit = 'service.other'
+
+    @api.one
+    def _compute_cost_subtotal(self):
+        pass
+
+class ServiceConsumable(models.Model):
+    _inherit = 'service.consumable'
 
     @api.one
     def _compute_cost_subtotal(self):
