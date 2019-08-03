@@ -128,12 +128,17 @@ class ServiceOrder(models.Model):
 
     # ------ Operation --------- #
     work_stage = fields.Selection([
-        ('antri', 'Dalam Antrian'),
         ('bongkar', 'Pembongkaran'),
         ('ketok', 'Ketok'),
         ('dempul', 'Dempul'),
+        ('epoxy', 'Epoxy'),
         ('cat', 'Pengecatan'),
-        ('finishing', 'Finishing')], string='Stage', default="antri")
+        ('poles', 'Poles'),
+        ('part_wait', 'Tunggu Part'),
+        ('pasang', 'Pemasangan'),
+        ('finishing', 'Finishing'),
+        ('done', 'Selesai'),
+        ('delivered', 'Delivered')], string='Stage', default="bongkar")
     cost_untaxed = fields.Float('Untaxed cost', compute='_cost_untaxed', store=True)
     cost_tax = fields.Float('Taxes', compute='_cost_tax', store=True)
     cost_total = fields.Float('Total cost', compute='_cost_total', store=True)
@@ -265,7 +270,7 @@ class ServiceOrder(models.Model):
                 else:
                     # if not service.partner_id.property_account_receivable_id:
                     if not service.partner_invoice_id.property_account_receivable_id:
-                        raise UserError(_('No sccount defined for partner "%s%"') % service.partner_invoice_id.name)
+                        raise UserError(_('No sccount defined for partner "%s%"' % service.partner_invoice_id.name))
                         # raise UserError(_('No account defined for parner "%s%"') % service.partner_id.name)
                     invoice = Invoice.create({
                         'name': service.name,

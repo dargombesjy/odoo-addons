@@ -7,7 +7,7 @@
       model="service.order"
       name="service.report_serviceorder"
       file="service.report_serviceorder"
-      report_type="qweb-pdf"
+      report_type="qweb-html"
       print_report_name="(object.state == 'draft' and 'Service Quotation - %s' % (object.name) or 'Service Order - %s' % (object.name))"/>
   </data>
 </odoo>

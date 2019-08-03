@@ -8,8 +8,14 @@
         <tree string="Work Order" decoration-muted="state in ('done','cancel')" decoration-info="state=='draft'">
         <!-- <tree string="Work Order"> -->
           <field name="name"/>
+          <field name="register_date"/>
           <field name="claim_reference"/>
+          <field name="equipment_id"/>
+          <field name="insurance_id"/>
+          <field name="claim_id"/>
           <field name="state"/>
+          <field name="received_date"/>
+          <field name="planned_date"/>
           <field name="work_stage"/>
         </tree>
       </field>
@@ -92,7 +98,7 @@
                     <field name="product_id"/>
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
@@ -147,7 +153,7 @@
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
-                        <field name="product_uom" string="Unit of Measure"/>
+                        <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="cost_unit"/>
                       <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
@@ -158,7 +164,7 @@
                     <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
                     <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
@@ -174,7 +180,7 @@
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
-                        <field name="product_uom" string="Unit of Measure"/>
+                        <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="cost_unit"/>
                       <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
@@ -185,7 +191,7 @@
                     <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
                     <!-- <field name="other_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
-                    <field name="product_uom" string="Unit of Measure"/>
+                    <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
@@ -200,6 +206,9 @@
             </notebook>
           </sheet>
           <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="activity_ids" widget="mail_activity"/>
+            <field name="message_ids" widget="mail_thread"/>
           </div>
         </form>
       </field>

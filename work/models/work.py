@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
@@ -7,7 +8,7 @@ class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
     received_date = fields.Datetime('Doc. Receive Date')
-    finish_date = fields.Datetime('Finish Date')
+    finish_date = fields.Datetime('Actual Finish Date')
     picking_id = fields.Many2one('stock.picking', 'Material transfer ID', copy=False, index=True)
     vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
     consumable_lines = fields.One2many(
@@ -30,11 +31,12 @@ class ServiceOrder(models.Model):
                 Purchase_Line.create({
                     'order_id': purchase.id,
                     'name': fee.product_id.name,
+                    'date_planned': datetime.today(),
                     'product_id': fee.product_id.id,
                     'product_qty': fee.product_uom_qty,
                     'product_uom': fee.product_uom.id,
-                    'price_unit': fee.price_unit,
-                    'taxes_id': fee.tax_id,
+                    'price_unit': fee.cost_unit,
+                    'taxes_id': fee.cost_tax_id,
                 })
 
     @api.multi
@@ -116,6 +118,8 @@ class ServiceOrder(models.Model):
     def action_service_end(self):
         if self.filtered(lambda service: service.state != 'under_repair'):
             raise UserError(_("Service must be under repair in order to end."))
+        if self.filtered(lambda service: service.stage != 'done'):
+            raise UserError(_('Stage must "Selesai" to end Service.'))
         for service in self:
             service.write({'repaired': True})
             vals = {'state': 'done'}
