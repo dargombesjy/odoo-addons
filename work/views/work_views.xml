@@ -79,9 +79,9 @@
                               <field name="product_uom_qty"/>
                               <field name="product_uom" groups="uom.group_uom"/>
                             </div>
-                            <field name="cost_unit"/>
-                            <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
-                            <field name="cost_subtotal" widget="monetary"/>
+                            <!-- <field name="cost_unit"/> -->
+                            <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/> -->
+                            <!-- <field name="cost_subtotal" widget="monetary"/> -->
                             <field name="received"/>
                           </group>
                           <group>
@@ -101,10 +101,10 @@
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
-                    <field name="cost_unit"/>
-                    <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
-                    <field name="cost_subtotal" widget="monetary"/>
-                    <field name="location_id"/>
+                    <!-- <field name="cost_unit"/> -->
+                    <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/> -->
+                    <!-- <field name="cost_subtotal" widget="monetary"/> -->
+                    <!-- <field name="location_id"/> -->
                     <field name="received"/>
                   </tree>
                 </field>

@@ -8,7 +8,7 @@ class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
     received_date = fields.Datetime('Doc. Receive Date')
-    finish_date = fields.Datetime('Actual Finish Date')
+    # finish_date = fields.Datetime('Actual Finish Date')
     picking_id = fields.Many2one('stock.picking', 'Material transfer ID', copy=False, index=True)
     vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
     consumable_lines = fields.One2many(
@@ -120,7 +120,7 @@ class ServiceOrder(models.Model):
     def action_service_end(self):
         if self.filtered(lambda service: service.state != 'under_repair'):
             raise UserError(_("Service must be under repair in order to end."))
-        if self.filtered(lambda service: service.stage != 'done'):
+        if self.filtered(lambda service: service.work_stage != 'done'):
             raise UserError(_('Stage must "Selesai" to end Service.'))
         for service in self:
             service.write({'repaired': True})

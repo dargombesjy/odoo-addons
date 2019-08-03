@@ -44,8 +44,9 @@ class ServiceOrder(models.Model):
     claim_reference = fields.Char('AMC')
     claim_id = fields.Char('Claim ID')
     policy_no = fields.Char('Policy No.')
-    register_date = fields.Datetime('Register Date')
+    register_date = fields.Date('Register Date')
     planned_date = fields.Date('Planned Finish Date')
+    finish_date = fields.Date('Actual Finish Date')
     equipment_id = fields.Many2one(
         'service.equipment', 'Equipment', copy=False, required=True, readonly=True,
         states={'draft': [('readonly', False)]})
@@ -55,6 +56,12 @@ class ServiceOrder(models.Model):
     chassis_no = fields.Char('Chassis No.', compute='_compute_equipment')
     engine_no = fields.Char('Engine No.', compute='_compute_equipment')
     base_colour = fields.Char('Base Colour', compute='_compute_equipment')
+    status_unit = fields.Selection([
+        ('tla', 'TLA'),
+        ('estimasi', 'Jasa Estimasi'),
+        ('batal_klaim', 'Batal Klaim'),
+        ('new', 'Unit In'),
+        ('order_part', 'Order Part')], index=True)
 
     @api.one
     @api.depends('equipment_id')
