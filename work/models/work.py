@@ -39,6 +39,8 @@ class ServiceOrder(models.Model):
                     'taxes_id': fee.cost_tax_id,
                 })
 
+            service.write({'purchased': True, 'purchase_id': purchase.id})
+
     @api.multi
     def action_create_material_transfer(self):
         # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')

@@ -58,6 +58,8 @@
                 <field name="work_stage"/>
                 <field name="finish_date"/>
                 <field name="vendor_id" string="Repair Vendor"/>
+                <field name="purchase_id"/>
+                <field name="picking_id"/>
                 <field name="invoice_method" invisible="1"/>
               </group>
             </group>
@@ -158,6 +160,7 @@
                       <field name="cost_unit"/>
                       <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                       <field name="cost_subtotal" widget="monetary"/>
+                      <field name="vendor_id"/>
                     </group>
                   </form>
                   <tree string="Others" editable="bottom">
@@ -168,6 +171,7 @@
                     <field name="cost_unit"/>
                     <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                     <field name="cost_subtotal" widget="monetary"/>
+                    <field name="vendor_id"/>
                   </tree>
                 </field>
               </page>

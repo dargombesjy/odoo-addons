@@ -45,7 +45,7 @@
             </div>
             <div class="col-3 bm-2">
               <strong>Model:</strong>
-              <p t-field="o.equipment_id.model"/>
+              <p t-field="o.equipment_id.model_id.name"/>
             </div>
             <div class="col-3 bm-2">
               <strong>Customer:</strong>
