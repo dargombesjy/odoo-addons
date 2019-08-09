@@ -17,7 +17,7 @@
         <div class="page">
           <div class="oe_structure"/>
           <h3 class="text-center">
-            <span>SPAREPART REQUEST</span>
+            <span>SURAT PERMINTAAN BARANG</span>
           </h3>
 
           <div class="row">
@@ -26,7 +26,55 @@
 
           <!-- Looping item content -->
           <table class="table o_main_table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Parts Number</th>
+                <th>Description</th>
+                <th>Qty DMD</th>
+                <th>Qty Sup</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-if="o.operations">
+                <t t-set="i" t-value="0"/>
+                <tr t-foreach="o.operations" t-as="line">
+                  <td><span t-esc="i + 1"/></td>
+                  <td><span t-field="line.part_number"/></td>
+                  <td><span t-field="line.name"/></td>
+                  <td><span t-field="product_uom_qty"/></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </t>
+            <tbody>
+            </tbody>
           </table>
+
+          <div class="row">
+            <div class="col-3">
+              <span>Pemohon</span>
+              <div height="100px"/>
+              <span>....</span>
+            </div>
+            <div class="col-3">
+              <span>Disetujui</span>
+              <div height="100px"/>
+              <span>Ka. Bengkel</span>
+            </div>
+            <div class="col-3">
+              <span>Disiapkan</span>
+              <div height="100px"/>
+              <span>Gudang</span>
+            </div>
+            <div class="col-3">
+              <span>Diterima</span>
+              <div height="100px"/>
+              <span></span>
+            </div>
+          </div>
+
           <div class="oe_structure"/>
         </div>
       <!-- </t> -->

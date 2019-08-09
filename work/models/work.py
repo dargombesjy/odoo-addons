@@ -76,7 +76,10 @@ class ServiceOrder(models.Model):
                         'location_dest_id': 9,  # operation.location_dest_id.id
                     })
                 service.write({'sparepart_picking_id': picking.id})
-            # return self.env.ref('service.action_work_sparepart_request').report_action(self)
+
+    @api.multi
+    def action_print_sparepart_request(self):
+        return self.env.ref('work.action_work_sparepart_request').report_action(self)
 
     @api.multi
     def action_create_consumable_transfer(self):
@@ -113,7 +116,9 @@ class ServiceOrder(models.Model):
                     })
 
                 service.write({'consumable_picking_id': picking.id})
-            # return self.env.ref('service.action_work_consumable_request').report_action(self)
+    @api.multi
+    def action_print_consumable_request(self):
+        return self.env.ref('work.action_work_consumable_request').report_action(self)
 
     @api.one
     def _cost_untaxed(self):

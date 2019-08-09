@@ -30,10 +30,11 @@
           <header>
             <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}" type="object" string="Start Repair" class="oe_highlight"/>
             <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
-            <!-- <button name="action_print_sparepart_request" states="under_repair" string="Request Sparepart" type="object"/> -->
-            <button name="action_create_sparepart_transfer" states="under_repair" string="Request Sparepart" type="object"/>
-            <button name="action_create_consumable_transfer" states="under_repair" string="Request Consumable" type="object"/>
+            <button name="action_print_sparepart_request" states="under_repair" string="Request Sparepart" type="object"/>
+            <button name="action_print_consumable_request" states="under_repair" string="Request Consumables" type="object"/>
             <button name="action_service_end" states="under_repair" string="End Repair" type="object" class="oe_highlight"/>
+            <button name="action_create_sparepart_transfer" states="2binvoiced" string="Receive Sparepart" type="object"/>
+            <button name="action_create_consumable_transfer" states="2binvoiced" string="Receive Consumables" type="object"/>
             <button name="action_create_purchase_fee" states="2binvoiced" string="Create PO" type="object"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,repaired,done"/>
           </header>
