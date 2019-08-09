@@ -8,8 +8,8 @@ class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
     received_date = fields.Datetime('Doc. Receive Date')
-    # finish_date = fields.Datetime('Actual Finish Date')
-    picking_id = fields.Many2one('stock.picking', 'Material transfer ID', copy=False, index=True)
+    sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart transfer ID', copy=False, index=True)
+    consumable_picking_id = fields.Many2one('stock.picking', 'Consumable transfer ID', copy=False, index=True)
     vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
     consumable_lines = fields.One2many(
         'service.consumable', 'service_id', copy=True)
@@ -28,7 +28,7 @@ class ServiceOrder(models.Model):
             })
 
             for fee in service.fees_lines:
-                Purchase_Line.create({
+                purchase_line = Purchase_Line.create({
                     'order_id': purchase.id,
                     'name': fee.product_id.name,
                     'date_planned': datetime.today(),
@@ -38,57 +38,82 @@ class ServiceOrder(models.Model):
                     'price_unit': fee.cost_unit,
                     'taxes_id': fee.cost_tax_id,
                 })
-
+                fee.write({'purchased': True, 'purchase_line_id': purchase_line.id})
+            purchase.button_confirm()
             service.write({'purchased': True, 'purchase_id': purchase.id})
 
     @api.multi
-    def action_create_material_transfer(self):
+    def action_create_sparepart_transfer(self):
         # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')
         Picking = self.env['stock.picking']
         Move_Line = self.env['stock.move']
         partner = self.partner_id
         for service in self:
-            if service.picking_id:
-                raise UserError('Material request already created')
-            picking = Picking.create({
-                # 'name': '',
-                'service_id': service.id,
-                'origin': service.name,
-                'move_type': 'one',
-                'partner_id': partner.id,
-                'picking_type_id': 2,
-                'location_id': 12,
-                'location_dest_id': 9,
-                'state': 'draft',
-            })
-
-            for operation in service.operations:
-                Move_Line.create({
-                    'name': service.name,
-                    'picking_id': picking.id,
-                    'product_id': operation.product_id.id,
-                    'product_uom_qty': operation.product_uom_qty,
-                    'product_uom': operation.product_uom.id,
-                    'package_id': False,
-                    'package_level_id': False,
-                    'location_id': 12,  # operation.location_id.id,
-                    'location_dest_id': 9,  # operation.location_dest_id.id
+            if not service.sparepart_picking_id:
+                # raise UserError('Sparepart request already created')
+                picking = Picking.create({
+                    # 'name': '',
+                    'service_id': service.id,
+                    'origin': service.name,
+                    'move_type': 'one',
+                    'partner_id': partner.id,
+                    'picking_type_id': 2,
+                    'location_id': service.location_id,  # 12,
+                    'location_dest_id': 9,
+                    'state': 'draft',
                 })
 
-            for other in service.others_lines:
-                Move_Line.create({
-                    'name': service.name,
-                    'picking_id': picking.id,
-                    'product_id': other.product_id.id,
-                    'product_uom_qty': other.product_uom_qty,
-                    'product_uom': other.product_uom.id,
-                    'package_id': False,
-                    'package_level_id': False,
-                    'location_id': 12,  # other.location_id.id,
-                    'location_dest_id': 9,  # other.location_dest_id.id
+                for operation in service.operations:
+                    Move_Line.create({
+                        'name': service.name,
+                        'picking_id': picking.id,
+                        'product_id': operation.product_id.id,
+                        'product_uom_qty': operation.product_uom_qty,
+                        'product_uom': operation.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
+                        'location_dest_id': 9,  # operation.location_dest_id.id
+                    })
+                service.write({'sparepart_picking_id': picking.id})
+            return self.env.ref('service.action_work_sparepart_request').report_action(self)
+
+    @api.multi
+    def action_create_consumable_transfer(self):
+        # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')
+        Picking = self.env['stock.picking']
+        Move_Line = self.env['stock.move']
+        partner = self.partner_id
+        for service in self:
+            if not service.consumable_picking_id:
+                # raise UserError('Consumable request already created')
+                picking = Picking.create({
+                    # 'name': '',
+                    'service_id': service.id,
+                    'origin': service.name,
+                    'move_type': 'one',
+                    'partner_id': partner.id,
+                    'picking_type_id': 2,
+                    'location_id': service.location_id, # 12,
+                    'location_dest_id': 9,
+                    'state': 'draft',
                 })
 
-            service.write({'picking_id': picking.id})
+                for other in service.others_lines:
+                    Move_Line.create({
+                        'name': service.name,
+                        'picking_id': picking.id,
+                        'product_id': other.product_id.id,
+                        'product_uom_qty': other.product_uom_qty,
+                        'product_uom': other.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': other.service_id.location_id.id, # 12,  # other.location_id.id,
+                        'location_dest_id': 9,  # other.location_dest_id.id
+                    })
+
+                service.write({'consumable_picking_id': picking.id})
+            return self.env.ref('service.action_work_consumable_request').report_action(self)
 
     @api.one
     def _cost_untaxed(self):
@@ -125,62 +150,9 @@ class ServiceOrder(models.Model):
         for service in self:
             service.write({'repaired': True})
             vals = {'state': 'done'}
-            # vals['move_id'] = service.action_service_done().get(service.id)
-            # if not service.action_service_done():
-                # raise UserError('Service not Done')
             if not service.invoiced and service.invoice_method == 'after_repair':
                 vals['state'] = '2binvoiced'
             service.write(vals)
-        return True
-
-    @api.multi
-    def action_service_done(self):
-        """ Creates stock move for operation.
-        @return: Move  ids of ...
-
-        """
-        if self.filtered(lambda service: not service.repaired):
-            raise UserError(_('Service must be performed in order to make product moves.'))
-        # res = {}
-        # precision = self.env['decimal.precission'].precission_get('Product Unit of Measure')
-        Move = self.env['stock.move']
-        for service in self:
-            moves = self.env['stock.move']
-            for operation in service.operations:
-                # temporarily commented for testing purposes
-                # if operation.filtered(lambda line: not line.received):
-                    # raise UserError(_('All line sparepart must be received in order to done reparation.'))
-                move = Move.create({
-                    'name': service.name,
-                    'product_id': operation.product_id.id,
-                    'product_uom_qty': operation.product_uom_qty,
-                    'product_uom': operation.product_uom.id,
-                    'partner_id': service.partner_id.id, # service.address_id.id
-                    'location_id': operation.location_id.id,
-                    'location_dest_id': operation.location_dest_id.id,
-                    'move_line_ids': [(0, 0, {
-                        'product_id': operation.product_id.id,
-                        'product_uom_qty': 0,
-                        'product_uom_id': operation.product_uom.id,
-                        'qty_done': operation.product_uom_qty,
-                        'package_id': False,
-                        'result_package_id': False,
-                        # 'owner_id': owner_id,
-                        'location_id': operation.location_id.id,
-                        'location_dest_id': operation.location_dest_id,
-                    })],
-                    'repair_id': service.id,
-                    'origin': service.name,
-                })
-                moves |= move
-                operation.write({'move_id': move.id, 'state': 'done'})
-            consumed_lines = moves.mapped('move_line_ids')
-            # produced_lines = move.move_line_ids
-            # moves |= move
-            moves._action_done()
-            # produced_lines.write({'consume_line_ids': [(6, 0, consume_lines.ids)]})
-        #     res[service.id] = move.id
-        # return res
         return True
 
 class ServiceLine(models.Model):

@@ -7,6 +7,7 @@
       <field name="arch" type="xml">
         <tree string="Service Order">
           <field name="name"/>
+          <field name="company_id"/>
           <field name="register_date"/>
           <field name="claim_reference"/>
           <field name="equipment_id"/>
@@ -14,8 +15,8 @@
           <field name="insurance_id"/>
           <field name="claim_id"/>
           <field name="state"/>
-          <field name="planned_date"/>
-          <field name="finish_date"/>
+          <field name="planned_date" string="Pln. Finish"/>
+          <field name="finish_date" string="Act. Finish"/>
         </tree>
       </field>
     </record>
@@ -27,7 +28,7 @@
       <field name="arch" type="xml">
         <form string="Service Order">
           <header>
-            <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/>
+            <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
             <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
@@ -46,6 +47,7 @@
             </h1>
             <group>
               <group>
+                <field name="company_id"/>
                 <field name="bill_type"/>
                 <field name="claim_reference"/>
                 <field name="claim_id"/>
@@ -65,7 +67,7 @@
                 <field name="chassis_no"/>
                 <field name="engine_no"/>
                 <field name="base_colour"/>
-                <!-- <field name="partner_invoice_id"/> -->
+                <field name="location_id"/>
                 <!-- <field name="invoice_method"/> -->
               </group>
             </group>
@@ -77,7 +79,8 @@
                       <page string="Sparepart Line">
                         <group>
                           <group>
-                            <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
+                            <!-- <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/> -->
+                            <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                             <field name="part_number"/>
                             <label for="product_uom_qty"/>
                             <div class="o_row">
@@ -86,8 +89,8 @@
                             </div>
                             <field name="supply_type" invisible="1"/>
                             <field name="price_unit"/>
-                            <field name="price_accepted"/>
-                            <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                            <!-- <field name="price_accepted"/> -->
+                            <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                             <field name="price_subtotal" widget="monetary"/>
                           </group>
                           <group>
@@ -103,19 +106,19 @@
                   </form>
                   <tree string="Spareparts" editable="bottom">
                     <field name="supply_type"/>
-                    <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/>
+                    <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                     <field name="part_number"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <field name="price_accepted"/>
-                    <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <!-- <field name="price_accepted"/> -->
+                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
                 <group class="oe_subtotal_footer oe_right">
                   <field name="amount_untaxed" sum="Untaxed amount"/>
-                  <field name="amount_tax"/>
+                  <!-- <field name="amount_tax"/> -->
                   <div class="oe_subtotal_footer_separator oe_inline">
                     <label for="amount_total" />
                     <button name="button_dummy" string="(update)" states="draft" type="object" class="oe_edit_only oe_link"/>
@@ -128,7 +131,7 @@
                 <field name="fees_lines">
                   <form string="Fees">
                     <group>
-                      <field name="product_id" domain="[('type', '=', 'service')]"/>
+                      <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]"/>
                       <field name="fee_code"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -136,18 +139,18 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="price_unit"/>
-                      <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                      <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                       <field name="price_subtotal" widget="monetary"/>
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
-                    <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
+                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id.name', '=', 5)]" required="True"/>
                     <field name="fee_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <field name="price_accepted"/>
-                    <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <!-- <field name="price_accepted"/> -->
+                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
@@ -156,7 +159,7 @@
                 <field name="others_lines">
                   <form string="Others">
                     <group>
-                      <field name="product_id" domain="[('type', '=', 'service')]"/>
+                      <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]"/>
                       <field name="other_code"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -164,19 +167,19 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="price_unit"/>
-                      <field name="price_accepted"/>
-                      <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                      <!-- <field name="price_accepted"/> -->
+                      <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                       <field name="price_subtotal" widget="monetary"/>
                     </group>
                   </form>
                   <tree string="Others" editable="bottom">
-                    <field name="product_id" domain="[('type', '=', 'service')]" required="True"/>
+                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]" required="True"/>
                     <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <field name="price_accepted"/>
-                    <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <!-- <field name="price_accepted"/> -->
+                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
@@ -197,12 +200,24 @@
       </field>
     </record>
 
+    <record id="view_service_order_form_filter" model="ir.ui.view">
+      <field name="name">service.select</field>
+      <field name="model">service.order</field>
+      <field name="arch" type="xml">
+        <search string="Search Service Orders">
+          <field name="name" string="Service Orders"/>
+          <field name="equipment_id"/>
+        </search>
+      </field>
+    </record>
+
     <record id="action_service_order_tree" model="ir.actions.act_window">
       <field name="name">Service Order</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">service.order</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,kanban,form</field>
+      <field name="search_view_id" ref="view_service_order_form_filter"/>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">Create Service Order</p>
       </field>
@@ -215,5 +230,10 @@
       parent="menu_service_order"
       action="action_service_order_tree"
       name="Services"/>
+
+    <!-- <menuitem id="menu_service_order_report"
+      parent="menu_service_order"
+      action="action_report_service_order"
+      name="Reports"/> -->
   </data>
 </odoo>

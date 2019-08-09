@@ -32,6 +32,14 @@ class ServiceOrder(models.Model):
     def _get_default_currency_id(self):
         return self.env.user.company_id.currency_id.id
 
+    @api.model
+    def _default_stock_location(self):
+        args = self.company_id and [('company_id', '=', self.company_id.id)] or []
+        warehouse = self.env['stock.warehouse'].search(args, limit=1)
+        if warehouse:
+            return warehouse.lot_stock_id.id
+        return False
+
     name = fields.Char(
         'Service reference',
         default=lambda self: self.env['ir.sequence'].next_by_code('service.order'),
@@ -85,6 +93,12 @@ class ServiceOrder(models.Model):
         'res.partner', 'Insurance', index=True,
         domain=[('partner_type', '=', 'insurance')])
     # states={'confirmed': [('readonly', True)]})
+    location_id = fields.Many2one(
+        'stock.location', 'Stock Location',
+        default=_default_stock_location,
+        index=True, readonly=True, required=True)
+        # help="This is the location where the product to repair is located.",
+        # states={'draft': [('readonly', False)], 'confirmed': [('readonly', True)]})
     state = fields.Selection([
         ('draft', 'Quotation'),
         ('cancel', 'Cancelled'),
@@ -391,7 +405,7 @@ class ServiceLine(models.Model):
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
     price_unit = fields.Float('Unit Price', required=True)
-    price_accepted = fields.Float('Accepted Price')
+    # price_accepted = fields.Float('Accepted Price')
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal")
@@ -431,7 +445,7 @@ class ServiceLine(models.Model):
         taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
         self.price_subtotal = taxes['total_excluded']
 
-    @api.onchange('service_id')
+    @api.onchange('suppy_type', 'service_id')
     def onchange_operation_type(self):
         """ On change of operation type it sets source location, destination location
         and to invoice field.
@@ -443,7 +457,7 @@ class ServiceLine(models.Model):
         args = self.service_id.company_id and [('company_id', '=', self.service_id.company_id.id)] or []
         warehouse = self.env['stock.warehouse'].search(args, limit=1)
         self.location_id = warehouse.lot_stock_id
-        self.location_dest_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
+        self.location_dest_id = self.env['stock.location'].search([('usage', '=', 'customer')], limit=1).id
         # else:
         #     self.price_unit = 0.0
         #     self.tax_id = False
@@ -460,7 +474,7 @@ class ServiceLine(models.Model):
         if not self.product_id or not self.product_uom_qty:
             return
         if self.product_id:
-            self.name = self.product_id.display_name
+            self.name = self.product_id.name
             self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
@@ -479,7 +493,7 @@ class ServiceFee(models.Model):
     product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
     price_unit = fields.Float('Unit Price', required=True)
-    price_accepted = fields.Float('Accepted Price')
+    # price_accepted = fields.Float('Accepted Price')
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
@@ -513,7 +527,7 @@ class ServiceFee(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            self.name = self.product_id.display_name
+            self.name = self.product_id.name
             self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
@@ -529,7 +543,7 @@ class ServiceOther(models.Model):
     product_id = fields.Many2one('product.product', 'Jasa Other', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
     price_unit = fields.Float('Unit Price', required=True)
-    price_accepted = fields.Float('Accepted Price')
+    # price_accepted = fields.Float('Accepted Price')
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
@@ -563,7 +577,7 @@ class ServiceOther(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            self.name = self.product_id.display_name
+            self.name = self.product_id.name
             self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
@@ -593,6 +607,6 @@ class ServiceConsumable(models.Model):
         # if partner and self.product_id:
         #     self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
-            self.name = self.product_id.display_name
+            self.name = self.product_id.name
             # self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
