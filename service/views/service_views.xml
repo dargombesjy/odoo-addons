@@ -67,7 +67,7 @@
                 <field name="chassis_no"/>
                 <field name="engine_no"/>
                 <field name="base_colour"/>
-                <field name="location_id"/>
+                <!-- <field name="location_id"/> -->
                 <!-- <field name="invoice_method"/> -->
               </group>
             </group>
@@ -81,6 +81,7 @@
                           <group>
                             <!-- <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/> -->
                             <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
+                            <field name="name" invisible="1"/>
                             <field name="part_number"/>
                             <label for="product_uom_qty"/>
                             <div class="o_row">
@@ -107,6 +108,7 @@
                   <tree string="Spareparts" editable="bottom">
                     <field name="supply_type"/>
                     <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
+                    <field name="name" invisible="1"/>
                     <field name="part_number"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
@@ -133,6 +135,7 @@
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]"/>
                       <field name="fee_code"/>
+                      <field name="name" invisible="1"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -144,7 +147,8 @@
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
-                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id.name', '=', 5)]" required="True"/>
+                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]" required="True"/>
+                    <field name="name" invisible="1"/>
                     <field name="fee_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
@@ -160,6 +164,7 @@
                   <form string="Others">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]"/>
+                      <field name="name" invisible="1"/>
                       <field name="other_code"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -174,6 +179,7 @@
                   </form>
                   <tree string="Others" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]" required="True"/>
+                    <field name="name" invisible="1"/>
                     <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>

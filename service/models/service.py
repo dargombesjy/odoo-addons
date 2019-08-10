@@ -469,10 +469,10 @@ class ServiceLine(models.Model):
         """ On change of product it sets product quantity, tax, name, uom, price
         and price subtotal. """
         partner = self.service_id.partner_id
-        self.lot_id = False
+        # self.lot_id = False
 
-        if not self.product_id or not self.product_uom_qty:
-            return
+        # if not self.product_id or not self.product_uom_qty:
+        # return
         if self.product_id:
             self.name = self.product_id.name
             self.part_number = self.product_id.default_code
@@ -523,13 +523,13 @@ class ServiceFee(models.Model):
             return
 
         partner = self.service_id.partner_id
-
-        if partner and self.product_id:
-            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
             self.name = self.product_id.name
             self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
+
+        if partner and self.product_id:
+            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
 class ServiceOther(models.Model):
     _name = 'service.other'
@@ -573,13 +573,13 @@ class ServiceOther(models.Model):
             return
 
         partner = self.service_id.partner_id
-
-        if partner and self.product_id:
-            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
         if self.product_id:
             self.name = self.product_id.name
             self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
+
+        if partner and self.product_id:
+            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
 class ServiceConsumable(models.Model):
     _name = 'service.consumable'

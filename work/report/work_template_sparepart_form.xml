@@ -21,7 +21,58 @@
           </h3>
 
           <div class="row">
-            <span>Here goes Information section</span>
+            <div class="col-5 bm-2">
+              <table class="table table-sm">
+                <tr>
+                  <td style="width:30%">No. Estimasi</td>
+                  <td>:</td>
+                  <td><span t-field="o.name"/></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Asuransi</td>
+                  <td>:</td>
+                  <td><span t-field="o.insurance_id.name"/></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Customer</td>
+                  <td>:</td>
+                  <td><span t-field="o.partner_id.name"/></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Tipe Kendaraan</td>
+                  <td>:</td>
+                  <td><span t-field="o.model"/></td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-2 bm-2">
+              <table class="table table-sm">
+              </table>
+            </div>
+            <div class="col-5 bm-2">
+              <table class="table table-sm">
+                <tr>
+                  <td style="width:30%">Warna</td>
+                  <td>:</td>
+                  <td><span t-field="o.base_colour"/></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Dempul / Cat</td>
+                  <td>:</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Las / Ketok</td>
+                  <td>:</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td style="width:30%">Estimasi Selesai</td>
+                  <td>:</td>
+                  <td><span t-field="o.planned_date"/></td>
+                </tr>
+              </table>
+            </div>
           </div>
 
           <!-- Looping item content -->
@@ -43,12 +94,11 @@
                   <td><span t-esc="i + 1"/></td>
                   <td><span t-field="line.part_number"/></td>
                   <td><span t-field="line.name"/></td>
-                  <td><span t-field="product_uom_qty"/></td>
+                  <td><span t-field="line.product_uom_qty"/></td>
                   <td></td>
                   <td></td>
                 </tr>
               </t>
-            <tbody>
             </tbody>
           </table>
 
