@@ -13,7 +13,7 @@
     <!-- Translatable template -->
     <template id="sparepart_request_document">
       <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
-      <!-- <t t-call="web.external_layout"> -->
+      <t t-call="web.external_layout">
         <div class="page">
           <div class="oe_structure"/>
           <h3 class="text-center">
@@ -127,8 +127,7 @@
 
           <div class="oe_structure"/>
         </div>
-      <!-- </t> -->
+      </t>
     </template>
-
   </data>
 </odoo>

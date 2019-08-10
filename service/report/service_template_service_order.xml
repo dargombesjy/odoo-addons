@@ -13,10 +13,10 @@
     <!-- Translatable template -->
     <template id="report_serviceorder_document">
       <!-- <t t-set="o" t-value="doc"/> -->
-      <!-- <t t-call="web.external_layout"> -->
+      <t t-call="web.external_layout">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
         <div class="page" style="font-size:0.9rem">
-          <div class="oe_structure" style="height:150px"/>
+          <div class="oe_structure" style="height:50px"/>
           <h4 class="text-center">
             <span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
             <span t-if="o.state != 'draft'">SURAT PERINTAH KERJA BENGKEL</span>
@@ -77,7 +77,7 @@
             </div>
           </div>
 
-          <table class="table table-sm o_main_table">
+          <table class="table table-sm o_main_table border-all">
             <thead>
               <tr>
                 <th>No.</th>
@@ -209,43 +209,45 @@
                 </table>
               </div>
               <div class="oe_structure"/>
-              <div>
+            </div>
+            <div class="row>">
+              <div class="col-3">
                 <p>Est. Pemakaian Cat: ........... Gram</p>
                 <table class="table">
                 </table>
                 <p>Total Formula Cat: ............ Gram</p>
               </div>
-              <div>
+              <div class="col-3">
                 <table>
                   <tr><td>ACC WARNA</td><td>TTD</td></tr>
-                  <tr><td></td><td></td></tr>
-                  <tr><td></td><td></td></tr>
+                  <tr style="height:20px"><td></td><td></td></tr>
+                  <tr style="height:20px"><td></td><td></td></tr>
                 </table>
               </div>
-              <div>
+              <div class="col-3">
                 <h4>PART SUPPLY</h4>
                 <p></p>
               </div>
             </div>
             <div class="row">
               <div class="col-3">
-                <span t-field="o.reveiced_date"/>
-                <div height="100px"/>
+                <span t-field="o.received_date"/>
+                <div style="height:100px"/>
                 <span>( Foreman )</span>
               </div>
               <div class="col-3">
                 <span>Disiapkan Oleh</span>
-                <div height="100px"/>
+                <div style="height:100px"/>
                 <span>( Foreman )</span>
               </div>
               <div class="col-3">
                 <span>Pengecekan</span>
-                <div height="100px"/>
+                <div style="height:100px"/>
                 <span>( QC )</span>
               </div>
               <div class="col-3">
                 <span>Diterima Oleh</span>
-                <div height="100px"/>
+                <div style="height:100px"/>
                 <span>( Service Advisor )</span>
               </div>
             </div>
@@ -254,7 +256,7 @@
           <p t-field="o.quotation_notes"/>
           <div class="oe_structure"/>
         </div>
-      <!-- </t> -->
+      </t>
     </template>
 
   </data>

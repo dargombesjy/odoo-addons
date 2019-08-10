@@ -54,7 +54,8 @@
                 <field name="policy_no"/>
                 <field name="insurance_id" domain="[('partner_type','=','insurance')]"/>
                 <field name="partner_id"/>
-                <field name="address_id"/>
+                <field name="address_id" invisible="1"/>
+                <field name="partner_invoice_id" invisible="1"/>
               </group>
               <group>
                 <field name="register_date"/>

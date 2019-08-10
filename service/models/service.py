@@ -97,8 +97,8 @@ class ServiceOrder(models.Model):
         'stock.location', 'Stock Location',
         default=_default_stock_location,
         index=True, readonly=True, required=True)
-        # help="This is the location where the product to repair is located.",
-        # states={'draft': [('readonly', False)], 'confirmed': [('readonly', True)]})
+    # help="This is the location where the product to repair is located.",
+    # states={'draft': [('readonly', False)], 'confirmed': [('readonly', True)]})
     state = fields.Selection([
         ('draft', 'Quotation'),
         ('cancel', 'Cancelled'),
@@ -291,7 +291,7 @@ class ServiceOrder(models.Model):
                 else:
                     # if not service.partner_id.property_account_receivable_id:
                     if not service.partner_invoice_id.property_account_receivable_id:
-                        raise UserError(_('No sccount defined for partner "%s%"' % service.partner_invoice_id.name))
+                        raise UserError(_('No account defined for partner "%s"' % service.partner_invoice_id.name))
                         # raise UserError(_('No account defined for parner "%s%"') % service.partner_id.name)
                     invoice = Invoice.create({
                         'name': service.name,
