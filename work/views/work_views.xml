@@ -8,6 +8,7 @@
         <tree string="Work Order" decoration-muted="state in ('done','cancel')" decoration-info="state=='draft'">
         <!-- <tree string="Work Order"> -->
           <field name="name"/>
+          <field name="company_id" groups="base.group_multi_company" invisible="1"/>
           <field name="register_date"/>
           <field name="claim_reference"/>
           <field name="equipment_id"/>
@@ -29,6 +30,7 @@
         <form string="Work Order">
           <header>
             <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}" type="object" string="Start Repair" class="oe_highlight"/>
+            <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
             <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
             <button name="action_print_sparepart_request" states="under_repair" string="Request Sparepart" type="object"/>
             <button name="action_print_consumable_request" states="under_repair" string="Request Consumables" type="object"/>
@@ -47,6 +49,7 @@
             </h1>
             <group>
               <group>
+                <field name="company_id"/>
                 <field name="bill_type"/>
                 <field name="claim_reference"/>
                 <field name="claim_id"/>
@@ -60,7 +63,7 @@
                 <field name="planned_date"/>
                 <field name="work_stage"/>
                 <field name="finish_date"/>
-                <field name="vendor_id" string="Repair Vendor"/>
+                <field name="vendor_id" string="Repair Vendor" domain="[('supplier', '=', True)]"/>
                 <field name="purchase_id"/>
                 <field name="sparepart_picking_id"/>
                 <field name="consumable_picking_id"/>
@@ -137,7 +140,7 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="cost_unit"/>
-                      <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
+                      <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/> -->
                       <field name="cost_subtotal" widget="monetary"/>
                     </group>
                   </form>
@@ -147,7 +150,7 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
-                    <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/>
+                    <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]"/> -->
                     <field name="cost_subtotal" widget="monetary"/>
                   </tree>
                 </field>
@@ -166,7 +169,7 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="cost_unit"/>
-                      <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                      <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                       <field name="cost_subtotal" widget="monetary"/>
                       <field name="vendor_id"/>
                     </group>
@@ -177,7 +180,7 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
-                    <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="cost_subtotal" widget="monetary"/>
                     <field name="vendor_id"/>
                   </tree>
@@ -195,7 +198,7 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="cost_unit"/>
-                      <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                      <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                       <field name="cost_subtotal" widget="monetary"/>
                     </group>
                   </form>
@@ -205,7 +208,7 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
-                    <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                    <!-- <field name="cost_tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="cost_subtotal" widget="monetary"/>
                   </tree>
                 </field>

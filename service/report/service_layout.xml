@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- <template id="service_import_assets" inherit_id="web.assets_common">
+      <xpath expr="." position="inside">
+        <link rel="stylesheet" href="/service/static/css/zstyle.css"/>
+      </xpath>
+    </template> -->
+    <template id="service_layout" inherit_id="web.external_layout_standard">
+      <xpath expr="//div[@class='header']" position="replace">
+        <div class="header">
+        </div>
+      </xpath>
+
+      <xpath  expr="//div[@class='footer o_standard_footer']" position="replace">
+        <div class="footer o_standard_footer">
+          <div class="text-center" style="border-top:1px solid black">
+            <div t-if="report_type == 'pdf'" class="text-muted">
+              Page: <span class="page"/> / <span class="topage"/>
+              <span id="print-date"></span>
+            </div>
+            <script>
+              var d = new Date();
+              document.getElementById("print-date").innerHTML = d;
+            </script>
+          </div>
+        </div>
+      </xpath>
+
+    </template>
+  </data>
+</odoo>

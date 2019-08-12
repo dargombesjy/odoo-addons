@@ -134,7 +134,7 @@
             </tbody>
           </table>
 
-          <div id="total" class="row justify-content-end">
+          <div id="total" class="row justify-content-end mb32">
             <div class="col-4">
               <table class="table table-sm">
                 <t t-if="o.invoice_method != 'none'">
@@ -148,13 +148,13 @@
               </table>
             </div>
           </div>
-
+          <div class="oe_structure"/>
           <t t-if="o.state != 'draft'">
-            <div id="spk-footer" class="row">
-              <div class="col-8">
+            <div id="spk-footer" class="row mb32">
+              <div class="col-12">
                 <table class="table">
                   <thead>
-                    <tr>
+                    <tr style="vertical-align:middle">
                       <th>Proses</th>
                       <th>Dikerjakan oleh</th>
                       <th>Tanggal Paraf</th>
@@ -210,18 +210,21 @@
               </div>
               <div class="oe_structure"/>
             </div>
-            <div class="row>">
-              <div class="col-3">
+            <div class="row mb32">
+              <div class="col-4">
                 <p>Est. Pemakaian Cat: ........... Gram</p>
                 <table class="table">
+                  <tr><td></td><td></td></tr>
+                  <tr><td></td><td></td></tr>
+                  <tr><td></td><td></td></tr>
                 </table>
                 <p>Total Formula Cat: ............ Gram</p>
               </div>
               <div class="col-3">
                 <table>
                   <tr><td>ACC WARNA</td><td>TTD</td></tr>
-                  <tr style="height:20px"><td></td><td></td></tr>
-                  <tr style="height:20px"><td></td><td></td></tr>
+                  <tr><td></td><td></td></tr>
+                  <tr><td></td><td></td></tr>
                 </table>
               </div>
               <div class="col-3">
@@ -230,22 +233,23 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-3">
-                <span t-field="o.received_date"/>
+              <div class="col-3 text-center">
+                <!-- <span t-field="o.received_date"/> -->
+                <span>............,......</span>
                 <div style="height:100px"/>
-                <span>( Foreman )</span>
+                <span>( ........ )</span>
               </div>
-              <div class="col-3">
+              <div class="col-3 text-center">
                 <span>Disiapkan Oleh</span>
                 <div style="height:100px"/>
                 <span>( Foreman )</span>
               </div>
-              <div class="col-3">
+              <div class="col-3 text-center">
                 <span>Pengecekan</span>
                 <div style="height:100px"/>
                 <span>( QC )</span>
               </div>
-              <div class="col-3">
+              <div class="col-3 text-center">
                 <span>Diterima Oleh</span>
                 <div style="height:100px"/>
                 <span>( Service Advisor )</span>

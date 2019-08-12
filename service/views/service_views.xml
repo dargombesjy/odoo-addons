@@ -7,7 +7,7 @@
       <field name="arch" type="xml">
         <tree string="Service Order">
           <field name="name"/>
-          <field name="company_id"/>
+          <field name="company_id" groups="base.group_multi_company" invisible="1"/>
           <field name="register_date"/>
           <field name="claim_reference"/>
           <field name="equipment_id"/>
@@ -31,11 +31,11 @@
             <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
             <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
-            <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
+            <!-- <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/> -->
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
             <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
-            <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/>
+            <!-- <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/> -->
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
           </header>
           <sheet>
@@ -231,7 +231,7 @@
     </record>
 
     <menuitem id="menu_service_order"
-      name="Service" sequence="36" groups="service.group_service_user"/>
+      name="Service" sequence="36" groups="service.group_service_menu"/>
 
     <menuitem id="menu_service_order_form"
       parent="menu_service_order"

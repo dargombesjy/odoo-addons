@@ -76,17 +76,17 @@
           </div>
 
           <!-- Looping item content -->
-          <table class="table o_main_table">
+          <table class="table o_main_table text-center" style="vertical-align:middle">
             <thead>
               <tr>
-                <th rowspan="2">Tanggal</th>
+                <th rowspan="2" style="vertical-align:middle">Tanggal</th>
                 <th colspan="8">Amplas Besi</th>
-                <th rowspan="2">Kertas Lem</th>
-                <th rowspan="2">Epoxy</th>
-                <th rowspan="2">Dempul</th>
-                <th rowspan="2">Pernish</th>
+                <th rowspan="2" style="vertical-align:middle">Kertas Lem</th>
+                <th rowspan="2" style="vertical-align:middle">Epoxy</th>
+                <th rowspan="2" style="vertical-align:middle">Dempul</th>
+                <th rowspan="2"> style="vertical-align:middle"Pernish</th>
                 <th colspan="2">Thinner</th>
-                <th rowspan="2">Paraf</th>
+                <th rowspan="2" style="vertical-align:middle">Paraf</th>
               </tr>
               <tr>
                 <th>60</th><th>120</th><th>240</th><th>400</th><th>800</th><th>1200</th><th>2000</th><th></th><th>PU</th><th>CPI</th>
@@ -114,12 +114,12 @@
             </tbody>
           </table>
 
-          <table class="table">
+          <table class="table text-center" style="vertical-align:middle">
             <thead>
               <tr>
-                <th rowspan="2">TGL</th>
-                <th rowspan="2">NAMA BARANG</th>
-                <th rowspan="2">SATUAN</th>
+                <th rowspan="2" style="vertical-align:middle">TGL</th>
+                <th rowspan="2" style="vertical-align:middle">NAMA BARANG</th>
+                <th rowspan="2" style="vertical-align:middle">SATUAN</th>
                 <th colspan="2">PARAF / NAMA</th>
               </tr>
               <tr>
@@ -128,6 +128,21 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td></td><td></td><td></td><td></td><td></td>
+              </tr>
               <tr>
                 <td></td><td></td><td></td><td></td><td></td>
               </tr>

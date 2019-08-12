@@ -4,7 +4,7 @@
     <!-- Main template -->
     <template id="sparepart_request">
       <t t-call="web.html_container">
-        <t t-foreach="docs"  t-as="o">
+        <t t-foreach="docs" t-as="o">
           <t t-call="work.sparepart_request_document" t-lang="o.partner_id.lang"/>
         </t>
       </t>
@@ -103,24 +103,24 @@
           </table>
 
           <div class="row">
-            <div class="col-3">
+            <div class="col-3 text-center">
               <span>Pemohon</span>
-              <div height="100px"/>
+              <div style="height:100px"/>
               <span>....</span>
             </div>
-            <div class="col-3">
+            <div class="col-3 text-center">
               <span>Disetujui</span>
-              <div height="100px"/>
+              <div style="height:100px"/>
               <span>Ka. Bengkel</span>
             </div>
-            <div class="col-3">
+            <div class="col-3 text-center">
               <span>Disiapkan</span>
-              <div height="100px"/>
+              <div style="height:100px"/>
               <span>Gudang</span>
             </div>
-            <div class="col-3">
+            <div class="col-3 text-center">
               <span>Diterima</span>
-              <div height="100px"/>
+              <div style="height:100px"/>
               <span></span>
             </div>
           </div>

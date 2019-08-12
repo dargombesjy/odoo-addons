@@ -7,7 +7,7 @@ from odoo.tools import float_compare
 class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
-    received_date = fields.Datetime('Doc. Receive Date')
+    # received_date = fields.Datetime('Doc. Receive Date')
     sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart transfer ID', copy=False, index=True)
     consumable_picking_id = fields.Many2one('stock.picking', 'Consumable transfer ID', copy=False, index=True)
     vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
@@ -163,9 +163,9 @@ class ServiceOrder(models.Model):
 class ServiceLine(models.Model):
     _inherit = 'service.line'
 
-    @api.one
-    def _compute_cost_subtotal(self):
-        pass
+    # @api.one
+    # def _compute_cost_subtotal(self):
+    #     pass
 
     @api.onchange('received')
     def onchange_received(self):

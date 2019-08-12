@@ -53,6 +53,7 @@ class ServiceOrder(models.Model):
     claim_id = fields.Char('Claim ID')
     policy_no = fields.Char('Policy No.')
     register_date = fields.Date('Register Date')
+    received_date = fields.Datetime('Doc. Receive Date')
     planned_date = fields.Date('Planned Finish Date')
     finish_date = fields.Date('Actual Finish Date')
     equipment_id = fields.Many2one(
@@ -83,7 +84,7 @@ class ServiceOrder(models.Model):
         self.base_colour = details['base_colour']
 
     partner_id = fields.Many2one(
-        'res.partner', 'Customer', index=True)
+        'res.partner', 'Customer', index=True, readonly=True)
     # domain=[('is_insurance', '=', False)])
     address_id = fields.Many2one(
         'res.partner', 'Delivery Address',
@@ -392,9 +393,6 @@ class ServiceLine(models.Model):
     service_id = fields.Many2one(
         'service.order', 'Service Order reference',
         index=True, ondelete='cascade')
-    # type = fields.Selection([
-    #     ('add', "Add"),
-    #     ('remove', "Remove")], 'Type', required=True)
     supply_type = fields.Selection([
         ('self', 'Self Supply'),
         ('customer', 'Customer Supply'),
@@ -405,7 +403,6 @@ class ServiceLine(models.Model):
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
     price_unit = fields.Float('Unit Price', required=True)
-    # price_accepted = fields.Float('Accepted Price')
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal")
@@ -430,10 +427,10 @@ class ServiceLine(models.Model):
         ('cancel', 'Cancelled')], 'Status', default='draft',
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
-    cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
-    cost_tax_id = fields.Many2many(
-        'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
-    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    # cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
+    # cost_tax_id = fields.Many2many(
+    #     'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
+    # cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
@@ -493,7 +490,6 @@ class ServiceFee(models.Model):
     product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
     price_unit = fields.Float('Unit Price', required=True)
-    # price_accepted = fields.Float('Accepted Price')
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
