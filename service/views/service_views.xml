@@ -33,7 +33,7 @@
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <!-- <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/> -->
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
-            <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
+            <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/> -->
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
@@ -52,10 +52,10 @@
                 <field name="claim_reference"/>
                 <field name="claim_id"/>
                 <field name="policy_no"/>
-                <field name="insurance_id" domain="[('partner_type','=','insurance')]"/>
-                <field name="partner_id"/>
-                <field name="address_id" invisible="1"/>
-                <field name="partner_invoice_id" invisible="1"/>
+                <field name="insurance_id" domain="[('customer', '=', True)]"/>
+                <field name="partner_id" domain="[('customer', '=', True)]"/>
+                <field name="address_id" invisible="0"/>
+                <field name="partner_invoice_id" invisible="0"/>
               </group>
               <group>
                 <field name="register_date"/>
@@ -69,18 +69,16 @@
                 <field name="engine_no"/>
                 <field name="base_colour"/>
                 <!-- <field name="location_id"/> -->
-                <!-- <field name="invoice_method"/> -->
               </group>
             </group>
             <notebook>
               <page string="Spareparts">
-                <field name="operations">
+                <field name="operations" attrs="{'readonly':[('state', 'not in', ('draft', 'confirmed'))]}">
                   <form string="Spareparts">
                     <notebook>
                       <page string="Sparepart Line">
                         <group>
                           <group>
-                            <!-- <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"/> -->
                             <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                             <field name="name" invisible="1"/>
                             <field name="part_number"/>
@@ -91,8 +89,6 @@
                             </div>
                             <field name="supply_type" invisible="1"/>
                             <field name="price_unit"/>
-                            <!-- <field name="price_accepted"/> -->
-                            <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                             <field name="price_subtotal" widget="monetary"/>
                           </group>
                           <group>
@@ -114,24 +110,23 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <!-- <field name="price_accepted"/> -->
-                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
                 <group class="oe_subtotal_footer oe_right">
                   <field name="amount_untaxed" sum="Untaxed amount"/>
                   <!-- <field name="amount_tax"/> -->
-                  <div class="oe_subtotal_footer_separator oe_inline">
+                  <!-- <div class="oe_subtotal_footer_separator oe_inline">
                     <label for="amount_total" />
                     <button name="button_dummy" string="(update)" states="draft" type="object" class="oe_edit_only oe_link"/>
                   </div>
-                  <field name="amount_total" nolabel="1" sum="Total amount" class="oe_subtotal_footer_separator"/>
+                  <field name="amount_total" nolabel="1" sum="Total amount" class="oe_subtotal_footer_separator"/> -->
+                  <field name="amount_own_risk" sum="Own Risk amount"/>
                 </group>
                 <div class="oe_clear"/>
               </page>
               <page string="Operations">
-                <field name="fees_lines">
+                <field name="fees_lines" attrs="{'readonly':[('state', 'not in', ('draft', 'confirmed'))]}">
                   <form string="Fees">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]"/>
@@ -154,17 +149,17 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <!-- <field name="price_accepted"/> -->
+                    <field name="cost_unit" invisible="1"/>
                     <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
               </page>
               <page string="Others">
-                <field name="others_lines">
+                <field name="others_lines" attrs="{'readonly':[('state', 'not in', ('draft', 'confirmed'))]}">
                   <form string="Others">
                     <group>
-                      <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]"/>
+                      <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]"/>
                       <field name="name" invisible="1"/>
                       <field name="other_code"/>
                       <label for="product_uom_qty"/>
@@ -179,13 +174,13 @@
                     </group>
                   </form>
                   <tree string="Others" editable="bottom">
-                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 7)]" required="True"/>
+                    <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" required="True"/>
                     <field name="name" invisible="1"/>
                     <field name="other_code"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <!-- <field name="price_accepted"/> -->
+                    <field name="cost_unit" invisible="1"/>
                     <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>

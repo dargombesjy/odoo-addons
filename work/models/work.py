@@ -28,6 +28,8 @@ class ServiceOrder(models.Model):
             })
 
             for fee in service.fees_lines:
+                if fee.cost_unit == 0:
+                    raise UserError(_('Cost not updated'))
                 purchase_line = Purchase_Line.create({
                     'order_id': purchase.id,
                     'name': fee.product_id.name,
@@ -120,18 +122,6 @@ class ServiceOrder(models.Model):
     def action_print_consumable_request(self):
         return self.env.ref('work.action_work_consumable_request').report_action(self)
 
-    @api.one
-    def _cost_untaxed(self):
-        pass
-
-    @api.one
-    def _cost_tax(self):
-        pass
-
-    @api.one
-    def _cost_total(self):
-        pass
-
     def action_service_ready(self):
         self.mapped('operations').write({'state': 'confirmed'})
         return self.write({'state': 'ready'})
@@ -194,20 +184,20 @@ class ServiceLine(models.Model):
 class ServiceFee(models.Model):
     _inherit = 'service.fee'
 
-    @api.one
-    def _compute_cost_subtotal(self):
-        pass
-
+#     @api.one
+#     def _compute_cost_subtotal(self):
+#         pass
+#
 class ServiceOther(models.Model):
     _inherit = 'service.other'
 
-    @api.one
-    def _compute_cost_subtotal(self):
-        pass
-
+#     @api.one
+#     def _compute_cost_subtotal(self):
+#         pass
+#
 class ServiceConsumable(models.Model):
     _inherit = 'service.consumable'
 
-    @api.one
-    def _compute_cost_subtotal(self):
-        pass
+#     @api.one
+#     def _compute_cost_subtotal(self):
+#         pass
