@@ -6,10 +6,10 @@ access_service_other_user,service.other user,model_service_other,group_service_u
 access_equipment_user,equipment user,model_service_equipment,group_service_user,1,1,1,0
 access_equipment_make_user,equipment.make user,model_service_equipment_make,group_service_user,1,1,1,0
 access_equipment_variant_user,equipment.variant user,model_service_equipment_variant,group_service_user,1,1,1,0
-access_service_fin,service finance,model_service_order,group_service_finance,1,0,0,0
-access_service_line_fin,service.line finance,model_service_line,group_service_finance,1,0,0,0
-access_service_fee_fin,service.fee finance,model_service_fee,group_service_finance,1,0,0,0
-access_service_other_fin,service.other finance,model_service_other,group_service_finance,1,0,0,0
+access_service_fin,service finance,model_service_order,group_service_finance,1,1,0,0
+access_service_line_fin,service.line finance,model_service_line,group_service_finance,1,1,0,0
+access_service_fee_fin,service.fee finance,model_service_fee,group_service_finance,1,1,0,0
+access_service_other_fin,service.other finance,model_service_other,group_service_finance,1,1,0,0
 access_equipment_fin,equipment finance,model_service_equipment,group_service_finance,1,0,0,0
 access_equipment_make_fin,equipment.make finance,model_service_equipment_make,group_service_finance,1,0,0,0
 access_equipment_variant_fin,equipment.variant finance,model_service_equipment_variant,group_service_finance,1,0,0,0
