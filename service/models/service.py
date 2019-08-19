@@ -338,9 +338,10 @@ class ServiceOrder(models.Model):
                         'quantity': operation.product_uom_qty,
                         'invoice_line_tax_ids': [(6, 0, [x.id for x in operation.tax_id])],
                         'uom_id': operation.product_uom.id,
+                        'product_id': operation.product_id and operation.product_id.id or False,
+                        'product_category': operation.product_id.categ_id.name,
                         'price_unit': operation.price_unit,
-                        'price_subtotal': operation.product_uom_qty * operation.price_unit,
-                        'product_id': operation.product_id and operation.product_id.id or False
+                        'price_subtotal': operation.product_uom_qty * operation.price_unit
                     })
                     operation.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
 
@@ -368,6 +369,7 @@ class ServiceOrder(models.Model):
                         'invoice_line_tax_ids': [(6, 0, [x.id for x in fee.tax_id])],
                         'uom_id': fee.product_uom.id,
                         'product_id': fee.product_id and fee.product_id.id or False,
+                        'product_category': fee.product_id.categ_id.name,
                         'price_unit': fee.price_unit,
                         'price_subtotal': fee.product_uom_qty * fee.price_unit
                     })
@@ -471,7 +473,7 @@ class ServiceLine(models.Model):
     def onchange_product_id(self):
         """ On change of product it sets product quantity, tax, name, uom, price
         and price subtotal. """
-        partner = self.service_id.partner_id
+        partner = self.service_id.partner_invoice_id
         # self.lot_id = False
 
         # if not self.product_id or not self.product_uom_qty:
@@ -534,7 +536,7 @@ class ServiceFee(models.Model):
         if not self.product_id:
             return
 
-        partner = self.service_id.partner_id
+        partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
             self.fee_code = self.product_id.default_code
@@ -593,7 +595,7 @@ class ServiceOther(models.Model):
         if not self.product_id:
             return
 
-        partner = self.service_id.partner_id
+        partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
             self.other_code = self.product_id.default_code

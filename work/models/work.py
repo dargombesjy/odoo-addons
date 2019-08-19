@@ -60,7 +60,7 @@ class ServiceOrder(models.Model):
                     'move_type': 'one',
                     'partner_id': partner.id,
                     'picking_type_id': 2,
-                    'location_id': service.location_id,  # 12,
+                    'location_id': service.location_id.id,  # 12,
                     'location_dest_id': 9,
                     'state': 'draft',
                 })
@@ -99,7 +99,7 @@ class ServiceOrder(models.Model):
                     'move_type': 'one',
                     'partner_id': partner.id,
                     'picking_type_id': 2,
-                    'location_id': service.location_id, # 12,
+                    'location_id': service.location_id.id, # 12,
                     'location_dest_id': 9,
                     'state': 'draft',
                 })
@@ -149,6 +149,10 @@ class ServiceOrder(models.Model):
                 vals['state'] = '2binvoiced'
             service.write(vals)
         return True
+
+    @api.multi
+    def action_service_cancel_draft(self):
+        return self.write({'state': 'draft'})
 
 class ServiceLine(models.Model):
     _inherit = 'service.line'

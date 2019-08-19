@@ -64,7 +64,7 @@
                 <field name="received_date" required="True"/>
                 <field name="work_stage"/>
                 <field name="finish_date"/>
-                <field name="vendor_id" string="Repair Vendor" required="True" domain="[('supplier', '=', True)]"/>
+                <field name="vendor_id" string="Repair Vendor" domain="[('supplier', '=', True)]"/>
                 <field name="purchase_id"/>
                 <field name="sparepart_picking_id"/>
                 <field name="consumable_picking_id"/>

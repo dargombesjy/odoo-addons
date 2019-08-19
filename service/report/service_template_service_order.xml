@@ -23,7 +23,7 @@
           </h4>
 
           <div id="informations" class="row mt32 mb32">
-            <div class="col-5 bm-2">
+            <div class="col-6 bm-2">
               <table class="table table-sm">
                 <tr>
                   <td style="width:30%">No. Estimasi</td>
@@ -47,11 +47,11 @@
                 </tr>
               </table>
             </div>
-            <div class="col-2 bm-2">
+            <!-- <div class="col-2 bm-2">
               <table class="table table-sm">
               </table>
-            </div>
-            <div class="col-5 bm-2">
+            </div> -->
+            <div class="col-6 bm-2">
               <table class="table table-sm">
                 <tr>
                   <td style="width:30%">Warna</td>

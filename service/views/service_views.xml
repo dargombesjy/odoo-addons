@@ -5,7 +5,7 @@
       <field name="name">service.form</field>
       <field name="model">service.order</field>
       <field name="arch" type="xml">
-        <tree string="Service Order">
+        <tree string="Service Order" decoration-muted="state in ('done','cancel')" decoration-info="state=='draft'">
           <field name="name"/>
           <field name="company_id" groups="base.group_multi_company" invisible="1"/>
           <field name="register_date"/>
@@ -89,6 +89,7 @@
                             </div>
                             <field name="supply_type" invisible="1"/>
                             <field name="price_unit"/>
+                            <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                             <field name="price_subtotal" widget="monetary"/>
                           </group>
                           <group>
@@ -110,6 +111,8 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
+                    <field name="tax_id" invisible="1"/>
+                    <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
@@ -138,7 +141,7 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="price_unit"/>
-                      <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
+                      <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                       <field name="price_subtotal" widget="monetary"/>
                     </group>
                   </form>
@@ -150,7 +153,8 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="cost_unit" invisible="1"/>
-                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
+                    <field name="tax_id" invisible="1"/>
+                    <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
@@ -168,8 +172,7 @@
                         <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                       </div>
                       <field name="price_unit"/>
-                      <!-- <field name="price_accepted"/> -->
-                      <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
+                      <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                       <field name="price_subtotal" widget="monetary"/>
                     </group>
                   </form>
@@ -181,7 +184,8 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="cost_unit" invisible="1"/>
-                    <!-- <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/> -->
+                    <field name="tax_id" invisible="1"/>
+                    <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>
                 </field>
