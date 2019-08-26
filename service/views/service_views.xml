@@ -30,6 +30,7 @@
           <header>
             <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
             <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
+            <button name="action_export_xls" states="draft" string="Export to Excel" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <!-- <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/> -->
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
@@ -53,9 +54,9 @@
                 <field name="claim_id"/>
                 <field name="policy_no"/>
                 <field name="insurance_id" domain="[('customer', '=', True)]"/>
-                <field name="partner_id" domain="[('customer', '=', True)]"/>
-                <field name="address_id" invisible="0"/>
-                <field name="partner_invoice_id" invisible="0"/>
+                <field name="partner_id" domain="[('customer', '=', True)]" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                <field name="address_id" invisible="1"/>
+                <field name="partner_invoice_id" invisible="1"/>
               </group>
               <group>
                 <field name="register_date"/>
@@ -103,8 +104,8 @@
                       </page> -->
                     </notebook>
                   </form>
-                  <tree string="Spareparts" editable="bottom">
-                    <field name="supply_type"/>
+                  <tree string="Spareparts" editable="bottom" accesskey="s">
+                    <field name="supply_type" accesskey="q"/>
                     <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                     <field name="name" invisible="1"/>
                     <field name="part_number"/>

@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Custom Invoicing',
+    'name': 'Custom purchase',
     'version': '1.0',
-    'depends': ['account'],
+    'depends': ['product', 'purchase'],
     'author': 'Dargombes Djaja',
     'category': 'Uncategorized',
     'description': """
-    Custom Invoicing
+    Custom Purchasing
     """,
     'data': [
-        'views/partner_views.xml',
-        'views/zaccount_invoice_views.xml',
+        'views/zpurchase_views.xml',
     ],
     'installable': True,
     'auto_install': True,

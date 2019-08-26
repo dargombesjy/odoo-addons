@@ -5,7 +5,7 @@
     'category': 'Manufacturing',
     'summary': 'Service Order',
     'description': 'Service Order Repair',
-    'depends': ['stock', 'sale_management', 'account'],
+    'depends': ['stock', 'sale_management', 'account', 'zaccount'],
     'data': [
         'security/service_security.xml',
         'security/ir.model.access.csv',

@@ -1,0 +1,6 @@
+option 1
+1. group line amount by product category, save service fee amount
+2. get wht = field wht per customer (saved on create) * ( service fee amount * field wht_proportion per customer )
+3. insert record on account.invoice.tax with this value
+
+option 2

@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
+import xlsxwriter
+import base64
 from odoo import fields, models, api, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 
-# class Partner(models.Model):
-#     _inherit = 'res.partner'
-#
-#     # is_insurance = fields.Boolean('Insurance', default=False)
-#     partner_type = fields.Selection([
-#         ('internal', 'Internal'),
-#         ('customer', 'Customer'),
-#         ('vendor', 'Vendor'),
-#         ('insurance', 'Insurance')], string='Partner Type'
-#     )
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -283,6 +275,7 @@ class ServiceOrder(models.Model):
         invoices_group = {}
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
+        own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
         for service in self.filtered(lambda service: service.state not in ('draft', 'cancel') and not service.invoice_id):
             if not service.partner_id.id and not service.partner_invoice_id.id:
                 raise UserError(_('You have to select an invoice address in the service form.'))
@@ -313,6 +306,22 @@ class ServiceOrder(models.Model):
                         # 'fiscal_position_id': service.partner_id.property_account_position_id
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                     })
+
+                    if own_risk:
+                        invoice_or = Invoice.create({
+                            'name': service.name,
+                            'origin': service.name,
+                            'type': 'out_invoice',
+                            'account_id': service.partner_id.property_account_receivable_id.id,
+                            # 'account_id': service.partner_invoice_id.property_account_receivable_id.id,
+                            # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
+                            'partner_id': service.partner_id.id,
+                            'currency_id': service.currency_id.id,
+                            # 'comment': service.quotation_notes,
+                            'fiscal_position_id': service.partner_id.property_account_position_id
+                            # 'fiscal_position_id': service.partner_invoice_id.property_account_position_id
+                        })
+                        invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
 
                 service.write({'invoiced': True, 'invoice_id': invoice.id})
@@ -375,7 +384,53 @@ class ServiceOrder(models.Model):
                     })
                     fee.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
 
+                for other in service.others_lines:
+                    if group:
+                        name = service.name + '-' + other.name
+                    else:
+                        name = other.name
+                    if not other.product_id:
+                        raise UserError(_('No product defined on fees.'))
+
+                    if other.product_id.property_account_income_id:
+                        account_id = other.property_account_income_id.id
+                    elif other.product_id.categ_id.property_account_income_categ_id:
+                        account_id = other.product_id.categ_id.property_account_income_categ_id.id
+                    else:
+                        raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
+
+                    if other.name != 'Own Risk':
+                        invoice_line = InvoiceLine.create({
+                            'invoice_id': invoice.id,
+                            'name': name,
+                            'origin': other.name,
+                            'account_id': account_id,
+                            'quantity': other.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+                            'uom_id': other.product_uom.id,
+                            'product_id': other.product_id and other.product_id.id or False,
+                            'product_category': other.product_id.categ_id.name,
+                            'price_unit': other.price_unit,
+                            'price_subtotal': other.product_uom_qty * other.price_unit
+                        })
+                    else:
+                        invoice_line_or = InvoiceLine.create({
+                            'invoice_id': invoice_or.id,
+                            'name': name,
+                            'origin': other.name,
+                            'account_id': account_id,
+                            'quantity': other.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+                            'uom_id': other.product_uom.id,
+                            'product_id': other.product_id and other.product_id.id or False,
+                            'product_category': other.product_id.categ_id.name,
+                            'price_unit': other.price_unit,
+                            'price_subtotal': other.product_uom_qty * other.price_unit
+                        })
+
                 invoice.compute_taxes()
+                # invoice_or.compute_taxes()
+                # invoice.create_wht_tax()
                 res[service.id] = invoice.id
         return res
 
@@ -391,6 +446,38 @@ class ServiceOrder(models.Model):
             'target': 'current',
             'res_id': self.invoice_id.id,
         }
+
+    @api.multi
+    def action_export_xls(self):
+        file_name = 'temp'
+        workbook = xlsxwriter.Workbook(file_name)
+        worksheet = workbook.add_worksheet('SPK')
+        worksheet.write(0, 0, 'ESTIMASI PERBAIKAN KENDARAAN')
+        worksheet.write(1, 0, 'No. Estimasi')
+        worksheet.write(1, 1, self.name)
+        workbook.close()
+        with open(file_name, "rb") as file:
+            file_base64 = base64.b64encode(file.read())
+
+        record_id = self.env['service.order.excel.wizard'].create(
+            {'excel_file': file_base64, 'excel_file_name': 'testing.xls'})
+
+        return {
+            'name': _('Excel file created'),
+            'view_mode': 'form',
+            'res_id': record_id.id,
+            'res_model': 'service.order.excel.wizard',
+            'view_type': 'form',
+            'type': 'ir.actions.act_window',
+            # 'context': context
+            'target': 'new',
+        }
+
+class ServiceOrderExcelWizard(models.TransientModel):
+    _name = 'service.order.excel.wizard'
+
+    excel_file = fields.Binary('Excel File')
+    excel_file_name = fields.Char('Excel File Name')
 
 class ServiceLine(models.Model):
     _name = 'service.line'
