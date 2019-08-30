@@ -10,6 +10,7 @@ class AccountInvoice(models.Model):
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
                  'currency_id', 'company_id', 'date_invoice', 'type')
     def _compute_wht(self):
+        round_curr = self.currency_id.round
         wht_tax = self.partner_id.wht_tax
         wht_proportion = self.partner_id.wht_proportion
         wht_base = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda l: l.product_category == 'Service Fee'))
@@ -18,23 +19,49 @@ class AccountInvoice(models.Model):
         self.wht_tax = wht_tax
         self.wht_proportion = wht_proportion
         self.wht_base = wht_base_rev
+        self.sub_material = wht_base - wht_base_rev
+        self.sub_spareparts = sum(sp.price_subtotal for sp in self.invoice_line_ids.filtered(lambda s: s.product_category == 'Spareparts'))
+        self.sub_others = sum(oth.price_subtotal for oth in self.invoice_line_ids.filtered(lambda o: o.product_category == 'Service Other'))
+        self.amount_wht = sum(round_curr(wh.amount_total) for wh in self.tax_line_ids.filtered(lambda w: w.tax_id == self.wht_tax))
+
+    def prepare_wht_tax(self):
+        # ctx = dict(self._context)
+        # round_curr = self.currency_id.round
+        # account_invoice_tax = self.env['account.invoice.tax']
+        res = {}
+        wht_line = self.invoice_line_ids.search([('product_category', '=', 'Service Fee')], limit=1)
+        if wht_line:
+            wht_tax = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)['taxes']
+            wht_val = self._prepare_tax_line_vals(wht_line, wht_tax[0])
+            # val['manual'] = True # set to manual, so it would not be overwrited by onchange line ids
+            wht_key = self.env['account.tax'].browse(wht_tax[0]['id']).get_grouping_key(wht_val)
+            # account_invoice_tax.create(wht_val)
+            res = {'key': wht_key, 'val': wht_val}
+        return res
+        # dummy write on self to trigger recomputations
+        # return self.with_context(ctx).write({'invoice_line_ids': []})
 
     def create_wht_tax(self):
-        ctx = dict(self._context)
-        account_invoice_tax = self.env['account.invoice.tax']
-        tax = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)['taxes']
-        line = self.invoice_line_ids.search([('product_category', '=', 'Service Fee')], limit=1)
-        val = self._prepare_tax_line_vals(line, tax[0])
-        # val['manual'] = True # set to manual, so it would not be overwrited by onchange line ids
-        account_invoice_tax.create(val)
+        wht = self.prepare_wht_tax()
+        self.env['account.invoice.tax'].create(wht['val'])
 
-        # dummy write on self to trigger recomputations
-        return self.with_context(ctx).write({'invoice_line_ids': []})
+    # @api.onchange('invoice_line_ids')
+    # def _onchange_invoice_line_ids(self):
+    #     taxes_grouped = self.get_taxes_values()
+    #     # wht = self.prepare_wht_tax()
+    #     # taxes_grouped[wht['key']] = wht['val']
+    #     tax_lines = self.tax_line_ids.filtered('manual')
+    #     for tax in taxes_grouped.values():
+    #         tax_lines += tax_lines.new(tax)
+    #     self.tax_line_ids = tax_lines
+    #     return
 
     @api.multi
     def get_taxes_values(self):
         tax_grouped = {}
         round_curr = self.currency_id.round
+        account_tax = self.env['account.tax']
+        wht_line = False
         for line in self.invoice_line_ids:
             if not line.account_id:
                 continue
@@ -44,19 +71,20 @@ class AccountInvoice(models.Model):
             taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
             for tax in taxes:
                 val = self._prepare_tax_line_vals(line, tax)
-                key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
-
+                # key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
+                key = account_tax.browse(tax['id']).get_grouping_key(val)
                 if key not in tax_grouped:
                     tax_grouped[key] = val
                     tax_grouped[key]['base'] = round_curr(val['base'])
                 else:
                     tax_grouped[key]['amount'] += val['amount']
                     tax_grouped[key]['base'] += round_curr(val['base'])
-        wht_tax = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)['taxes']
-        wht_val = self._prepare_tax_line_vals(wht_line, wht_tax[0])
-        wht_key = self.env['account.tax'].browse(wht_tax[0]['id']).get_grouping_key(wht_val)
-        tax_grouped[wht_key] = wht_val
-        tax_grouped[wht_key]['base'] = round_curr(wht_val['base'])
+        if wht_line:
+            wht_tax = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)['taxes']
+            wht_val = self._prepare_tax_line_vals(wht_line, wht_tax[0])
+            wht_key = account_tax.browse(wht_tax[0]['id']).get_grouping_key(wht_val)
+            tax_grouped[wht_key] = wht_val
+            tax_grouped[wht_key]['base'] = round_curr(wht_val['base'])
         return tax_grouped
 
     @api.one
@@ -82,13 +110,17 @@ class AccountInvoice(models.Model):
     #     res = super(AccountInvoice, self)._onchange_partner_id()
     #     return res
 
+    sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
+    sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
+    sub_others = fields.Monetary('Others', compute='_compute_wht', store=True, readonly=True)
     wht_tax = fields.Many2one('account.tax', string="Withholding Tax", compute='_compute_wht',
         store=True, readonly=True)
     wht_proportion = fields.Float('WHT proportion', compute='_compute_wht', store=True,
         readonly=True)
     wht_base = fields.Monetary('Base Amount WHT', compute='_compute_wht', store=True,
         readonly=True, track_visibility='always')
-    own_risk = fields.Float('Own Risk', digits=0)
+    amount_wht = fields.Monetary('Amount WHT', compute='_compute_wht', store=True, readonly=True)
+    own_risk = fields.Monetary('Own Risk', digits=0)
 
 
 class AccountInvoiceLine(models.Model):

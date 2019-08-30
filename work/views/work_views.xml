@@ -236,6 +236,14 @@
       <field name="act_window_id" ref="action_work_order_list"/>
     </record>
 
+    <record id="action_work_purchase_order_list" model="ir.actions.act_window">
+      <field name="name">PO from Work</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">purchase.order</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
     <menuitem id="menu_work_order"
       name="Production" groups="work.group_work_user"/>
 
@@ -243,6 +251,11 @@
       parent="menu_work_order"
       action="action_work_order_list"
       name="Work Order"/>
+
+    <menuitem id="menu_work_purchase_order_list"
+      parent="menu_work_order"
+      action="action_work_purchase_order_list"
+      name="PO from Work Order"/>
 
   </data>
 </odoo>

@@ -118,7 +118,7 @@ class ServiceOrder(models.Model):
         # readonly=True, states={'draft': [('readonly', False)], 'confirmed': [('readonly', False)]})
     quotation_notes = fields.Text('Quotation Notes')
     company_id = fields.Many2one(
-        'res.company', 'Company',
+        'res.company', 'Company', readonly=True, states={'draft': [('readonly', False)]},
         default=lambda self: self.env['res.company']._company_default_get('service.order'))
     partner_invoice_id = fields.Many2one('res.partner', 'Invoicing Address', readonly=True, states={'draft': [('readonly', False)]})
     invoice_method = fields.Selection([
@@ -236,6 +236,9 @@ class ServiceOrder(models.Model):
     def action_service_confirm(self):
         if self.filtered(lambda service: service.state != 'draft'):
             raise UserError(_("Only draft repair can be confirmed."))
+        if self.bill_type == 'claim':
+            if not self.insurance_id:
+                raise UserError(_("For Claim, Insurance must be filled"))
         before_repair = self.filtered(lambda service: service.invoice_method == 'b4repair')
         before_repair.write({'state': '2binvoiced'})
         to_confirm = self - before_repair
@@ -307,10 +310,10 @@ class ServiceOrder(models.Model):
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                     })
 
-                    if own_risk:
+                    if own_risk and self.bill_type == 'claim':
                         invoice_or = Invoice.create({
                             'name': service.name,
-                            'origin': service.name,
+                            'origin': '%s-%s' % ('OR', service.name),
                             'type': 'out_invoice',
                             'account_id': service.partner_id.property_account_receivable_id.id,
                             # 'account_id': service.partner_invoice_id.property_account_receivable_id.id,
@@ -361,7 +364,6 @@ class ServiceOrder(models.Model):
                         name = fee.name
                     if not fee.product_id:
                         raise UserError(_('No product defined on fees.'))
-
                     if fee.product_id.property_account_income_id:
                         account_id = fee.property_account_income_id.id
                     elif fee.product_id.categ_id.property_account_income_categ_id:
@@ -399,9 +401,9 @@ class ServiceOrder(models.Model):
                     else:
                         raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
 
-                    if other.name != 'Own Risk':
-                        invoice_line = InvoiceLine.create({
-                            'invoice_id': invoice.id,
+                    if invoice_or and other.name == 'Own Risk':
+                        invoice_line_or = InvoiceLine.create({
+                            'invoice_id': invoice_or.id,
                             'name': name,
                             'origin': other.name,
                             'account_id': account_id,
@@ -414,8 +416,8 @@ class ServiceOrder(models.Model):
                             'price_subtotal': other.product_uom_qty * other.price_unit
                         })
                     else:
-                        invoice_line_or = InvoiceLine.create({
-                            'invoice_id': invoice_or.id,
+                        invoice_line = InvoiceLine.create({
+                            'invoice_id': invoice.id,
                             'name': name,
                             'origin': other.name,
                             'account_id': account_id,
@@ -452,10 +454,58 @@ class ServiceOrder(models.Model):
         file_name = 'temp'
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet('SPK')
-        worksheet.write(0, 0, 'ESTIMASI PERBAIKAN KENDARAAN')
+        worksheet.merge_range('A1:E1', 'ESTIMASI PERBAIKAN KENDARAAN')
         worksheet.write(1, 0, 'No. Estimasi')
         worksheet.write(1, 1, self.name)
+        worksheet.write(2, 0, 'Asuransi')
+        worksheet.write(2, 1, self.insurance_id.name)
+        worksheet.write(3, 0, 'Customer')
+        worksheet.write(3, 1, self.partner_id.name)
+        worksheet.write(4, 0, 'Tipe Kendaraan')
+        worksheet.write(4, 1, self.model)
+        worksheet.write(1, 3, 'Warna')
+        worksheet.write(1, 4, self.base_colour)
+        worksheet.write(2, 3, 'Dempul / Cat')
+        # worksheet.write(2, 4, '')
+        worksheet.write(3, 3, 'Las / Ketok')
+        # worksheet.write(3, 4, '')
+        worksheet.write(4, 3, 'Estimasi Selesai')
+        worksheet.write(4, 4, self.planned_date)
+
+        # details
+        worksheet.write(6, 0, 'No.')
+        worksheet.write(6, 1, 'Description')
+        worksheet.write(6, 2, 'Quantity')
+        worksheet.write(6, 3, 'Unit Price')
+        worksheet.write(6, 4, 'Price')
+        worksheet.merge_range(7, 0, 7, 4, 'Spareparts')
+        row = 8
+        idx = 1
+        for o in self.operations:
+            worksheet.write(row, 0, idx)
+            worksheet.write(row, 1, o.name)
+            worksheet.write(row, 2, o.product_uom_qty)
+            worksheet.write(row, 3, o.price_unit)
+            worksheet.write(row, 4, o.price_subtotal)
+            row += 1
+            idx += 1
+        worksheet.merge_range(row, 0, row, 4, 'Repairs')
+        row += 1
+        idx = 1
+        for r in self.fees_lines:
+            worksheet.write(row, 0, idx)
+            worksheet.write(row, 1, r.name)
+            worksheet.write(row, 2, r.product_uom_qty)
+            worksheet.write(row, 3, r.price_unit)
+            worksheet.write(row, 4, r.price_subtotal)
+            row += 1
+            idx += 1
+        row += 1
+        worksheet.write(row, 3, 'Total')
+        worksheet.write(row, 4, self.amount_untaxed)
+        # Save workbook
         workbook.close()
+        # read and save as binary
         with open(file_name, "rb") as file:
             file_base64 = base64.b64encode(file.read())
 
