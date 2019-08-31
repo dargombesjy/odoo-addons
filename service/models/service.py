@@ -452,7 +452,7 @@ class ServiceOrder(models.Model):
     @api.multi
     def action_export_xls(self):
         file_name = 'temp'
-        workbook = xlsxwriter.Workbook(file_name)
+        workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
         worksheet = workbook.add_worksheet('SPK')
         worksheet.merge_range('A1:E1', 'ESTIMASI PERBAIKAN KENDARAAN')
         worksheet.write(1, 0, 'No. Estimasi')
@@ -704,7 +704,7 @@ class ServiceOther(models.Model):
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True)
     cost_tax_id = fields.Many2many(
-        'account.tax', 'service_others_cost_tax', 'service_others_line_id', 'tax_id', 'Taxes')
+        'account.tax', 'service_others_cost_tax', 'service_others_line_id', 'cost_tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
@@ -754,8 +754,13 @@ class ServiceConsumable(models.Model):
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
     cost_tax_id = fields.Many2many(
-        'account.tax', 'service_consumable_line_tax', 'service_consumable_line_id', 'tax_id', 'Taxes')
+        'account.tax', 'service_consumable_line_tax', 'service_consumable_line_id', 'cost_tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+
+    @api.one
+    @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
+    def _compute_cost_subtotal(self):
+        self.cost_subtotal = self.product_uom_qty * self.cost_unit
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
     def onchange_product_id(self):

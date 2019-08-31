@@ -69,9 +69,10 @@
                   <td></td>
                 </tr>
                 <tr>
-                  <td style="width:30%">Estimasi Selesai</td>
-                  <td>:</td>
-                  <td><span t-field="o.planned_date"/></td>
+                  <td></td>
+                  <!-- <td style="width:30%">Estimasi Selesai</td> -->
+                  <td></td>
+                  <td><!--span t-field="o.planned_date"/--></td>
                 </tr>
               </table>
             </div>
@@ -83,7 +84,7 @@
                 <th>No.</th>
                 <th>Description</th>
                 <th class="text-right">Quantity</th>
-                <t t-if="o.invoice_method != 'none'">
+                <t t-if="o.state == 'draft'">
                   <th class="text-right">Unit Price</th>
                   <!-- <th class="text-center">Tax</th> -->
                   <th class="text-right">Price</th>
@@ -101,7 +102,7 @@
                     <span t-field="line.product_uom_qty"/>
                     <span t-field="line.product_uom.name" groups="uom.group_uom"/>
                   </td>
-                  <t t-if="(line.service_id.invoice_method != 'none')">
+                  <t t-if="(o.state == 'draft')">
                     <td class="text-right"><span t-field="line.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
@@ -121,7 +122,7 @@
                     <span t-field="fees.product_uom_qty"/>
                     <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
                   </td>
-                  <t t-if="(fees.service_id.invoice_method != 'none')">
+                  <t t-if="(o.state == 'draft')">
                     <td class="text-right"><span t-field="fees.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
@@ -134,20 +135,22 @@
             </tbody>
           </table>
 
-          <div id="total" class="row justify-content-end mb32">
-            <div class="col-4">
-              <table class="table table-sm">
-                <t t-if="o.invoice_method != 'none'">
-                  <tr class="border-black o_subtotal">
-                    <td><strong>Total W/o Taxes</strong></td>
-                    <td class="text-right">
-                      <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                    </td>
-                  </tr>
-                </t>
-              </table>
+          <t t-if="o.state == 'draft'">
+            <div id="total" class="row justify-content-end mb32">
+              <div class="col-4">
+                <table class="table table-sm">
+                  <t t-if="o.invoice_method != 'none'">
+                    <tr class="border-black o_subtotal">
+                      <td><strong>Total W/o Taxes</strong></td>
+                      <td class="text-right">
+                        <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                      </td>
+                    </tr>
+                  </t>
+                </table>
+              </div>
             </div>
-          </div>
+          </t>
           <div class="oe_structure"/>
           <t t-if="o.state != 'draft'">
             <div id="spk-footer" class="row mb32">

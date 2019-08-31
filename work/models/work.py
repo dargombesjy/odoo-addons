@@ -10,7 +10,8 @@ class ServiceOrder(models.Model):
     # received_date = fields.Datetime('Doc. Receive Date')
     sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart transfer ID', copy=False, index=True)
     consumable_picking_id = fields.Many2one('stock.picking', 'Consumable transfer ID', copy=False, index=True)
-    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
+    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
+    vendor_id = fields.Many2many('res.partner', 'service_order_vendor', 'service_order_id', 'vendor_id', 'Vendors')
     consumable_lines = fields.One2many(
         'service.consumable', 'service_id', copy=True)
     # readonly=True states={'draft': [('readonly', False)]})
@@ -38,7 +39,7 @@ class ServiceOrder(models.Model):
                     'product_qty': fee.product_uom_qty,
                     'product_uom': fee.product_uom.id,
                     'price_unit': fee.cost_unit,
-                    'taxes_id': fee.cost_tax_id,
+                    # 'taxes_id': fee.cost_tax_id,
                 })
                 fee.write({'purchased': True, 'purchase_line_id': purchase_line.id})
             purchase.button_confirm()
@@ -104,16 +105,16 @@ class ServiceOrder(models.Model):
                     'state': 'draft',
                 })
 
-                for other in service.others_lines:
+                for bahan in service.consumable_lines:
                     Move_Line.create({
                         'name': service.name,
                         'picking_id': picking.id,
-                        'product_id': other.product_id.id,
-                        'product_uom_qty': other.product_uom_qty,
-                        'product_uom': other.product_uom.id,
+                        'product_id': bahan.product_id.id,
+                        'product_uom_qty': bahan.product_uom_qty,
+                        'product_uom': bahan.product_uom.id,
                         'package_id': False,
                         'package_level_id': False,
-                        'location_id': other.service_id.location_id.id, # 12,  # other.location_id.id,
+                        'location_id': bahan.service_id.location_id.id, # 12,  # other.location_id.id,
                         'location_dest_id': 9,  # other.location_dest_id.id
                     })
 
@@ -140,8 +141,8 @@ class ServiceOrder(models.Model):
     def action_service_end(self):
         if self.filtered(lambda service: service.state != 'under_repair'):
             raise UserError(_("Service must be under repair in order to end."))
-        if self.filtered(lambda service: service.work_stage != 'done'):
-            raise UserError(_('Stage must "Selesai" to end Service.'))
+        if self.filtered(lambda service: service.work_stage != 'delivered'):
+            raise UserError(_('Stage must "Delivered" to end Service.'))
         for service in self:
             service.write({'repaired': True})
             vals = {'state': 'done'}
