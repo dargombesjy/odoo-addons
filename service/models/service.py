@@ -9,11 +9,46 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     service_id = fields.Many2one('service.order')
+    eq_name = fields.Char('License Plate')
+    eq_model = fields.Char('Model')
+    receiver = fields.Char('Receiver')
+    received_date = fields.Date('Received Date')
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
     service_id = fields.Many2one('service.order')
+    service_line_id = fields.Many2one('service.line')
+    product_id = fields.Many2one(
+        'product.product', 'Product',
+        domain=[('type', 'in', ['product', 'consu'])], index=True, required=False,
+        states={'done': [('readonly', True)]})
+    product_category = fields.Char('Product Category')
+
+    @api.constrains('product_uom')
+    def _check_uom(self):
+        moves_error = self.filtered(lambda move: move.product_id.uom_id.category_id != move.product_uom.category_id)
+        if self.product_category == 'Sparepart' and self.state == 'draft':
+            moves_error = False
+        if moves_error:
+            user_warning = _('You cannot perform the move because the unit of measure has a different category as the product unit of measure.')
+            for move in moves_error:
+                user_warning += _('\n\n%s --> Product UoM is %s (%s) - Move UoM is %s (%s)') % (move.product_id.display_name, move.product_id.uom_id.name, move.product_id.uom_id.category_id.name, move.product_uom.name, move.product_uom.category_id.name)
+            user_warning += _('\n\nBlocking: %s') % ' ,'.join(moves_error.mapped('name'))
+            raise UserError(user_warning)
+
+    @api.one
+    @api.depends('product_id', 'product_uom', 'product_uom_qty')
+    def _compute_product_qty(self):
+        if not self.product_category == 'Sparepart' and not self.state == 'draft':
+            rounding_method = self._context.get('rounding_method', 'UP')
+            self.product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id, rounding_method=rounding_method)
+
+class StockMoveLine(models.Model):
+    _inherit = 'stock.move.line'
+
+    service_line_id = fields.Many2one('service.line')
+    product_alias = fields.Char('Product Alias')
 
 class ServiceOrder(models.Model):
     _name = 'service.order'
@@ -95,10 +130,10 @@ class ServiceOrder(models.Model):
         ('cancel', 'Cancelled'),
         ('confirmed', 'Confirmed'),
         ('under_repair', 'Under Repair'),
-        ('ready', 'Ready to Repair'),
+        ('ready', 'Repair Done'),
         ('2binvoiced', 'To be Invoiced'),
         ('invoice_except', 'Invoice Exception'),
-        ('done', 'Repaired')],
+        ('done', 'Closed')],
         string='Status', copy=False, default='draft', readonly=True,
         track_visibility='onchange',
         help="* The \'Draft\' status is used when a user is encoding a new and unconfirmed repair order.\n"
@@ -152,13 +187,12 @@ class ServiceOrder(models.Model):
         ('finishing', 'Finishing'),
         ('done', 'Selesai'),
         ('delivered', 'Delivered')], string='Stage', default="bongkar")
-    # cost_untaxed = fields.Float('Untaxed cost', compute='_cost_untaxed', store=True)
-    # cost_tax = fields.Float('Taxes', compute='_cost_tax', store=True)
-    # cost_total = fields.Float('Total cost', compute='_cost_total', store=True)
     purchased = fields.Boolean('PO Created', copy=False, readonly=True)
-    purchase_id = fields.Many2one(
-        'purchase.order', 'Purchase Order',
-        copy=False, readonly=True, track_visibility="onchange")
+    # purchase_id = fields.Many2one(
+    #     'purchase.order', 'Purchase Order',
+    #     copy=False, readonly=True, track_visibility="onchange")
+    purchase_ids = fields.Many2many('purchase.order', 'service_order_po', 'service_order_id', 'purchase_order_id', 'Purchase Orders')
+    vendor_ids = fields.Many2many('res.partner', 'service_order_vendor', 'service_order_id', 'vendor_id', 'Vendors')
 
     @api.onchange('equipment_id')
     def onchange_equipment_id(self):
@@ -534,7 +568,7 @@ class ServiceLine(models.Model):
     _description = 'Service Line (Part)'
 
     name = fields.Text('Description')
-    part_number = fields.Char('Part Number')
+    # part_number = fields.Char('Part Number')
     service_id = fields.Many2one(
         'service.order', 'Service Order reference',
         index=True, ondelete='cascade')
@@ -543,7 +577,7 @@ class ServiceLine(models.Model):
         ('customer', 'Customer Supply'),
         ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True,
         default='vendor')
-    product_id = fields.Many2one('product.product', 'Sparepart', required=True)
+    product_id = fields.Many2one('product.product', 'Part Number') # , required=True)
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
@@ -557,11 +591,11 @@ class ServiceLine(models.Model):
         'account.invoice.line', 'Invoice Line', copy=False)
 
     # Production line ---- #
-    received = fields.Boolean('Received', copy=False)
     location_id = fields.Many2one(
         'stock.location', 'Source Location', index=True)
     location_dest_id = fields.Many2one(
         'stock.location', 'Dest. Location', index=True)
+    received = fields.Boolean('Received', copy=False)
     move_id = fields.Many2one(
         'stock.move', 'Inventory Move', copy=False, readonly=True)
     lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial')
@@ -572,14 +606,10 @@ class ServiceLine(models.Model):
         ('cancel', 'Cancelled')], 'Status', default='draft',
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
-    # cost_unit = fields.Float('Unit Cost', required=True, default=0.0)
-    # cost_tax_id = fields.Many2many(
-    #     'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
-    # cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
-    purchased = fields.Boolean('Purchased', copy=False, required=True)
-    purchase_line_id = fields.Many2one(
-        'purchase.order.line', 'Purchase Line', copy=False)
-    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    # purchased = fields.Boolean('Purchased', copy=False, required=True)
+    # purchase_line_id = fields.Many2one(
+    #     'purchase.order.line', 'Purchase Line', copy=False)
+    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id', 'tax_id') #, 'service_id.invoice_method')
@@ -587,7 +617,7 @@ class ServiceLine(models.Model):
         taxes = self.tax_id.compute_all(self.price_unit, self.service_id.currency_id, self.product_uom_qty, self.product_id, self.service_id.partner_id)
         self.price_subtotal = taxes['total_excluded']
 
-    @api.onchange('suppy_type', 'service_id')
+    @api.onchange('supply_type', 'service_id')
     def onchange_operation_type(self):
         """ On change of operation type it sets source location, destination location
         and to invoice field.
@@ -616,8 +646,8 @@ class ServiceLine(models.Model):
         # if not self.product_id or not self.product_uom_qty:
         # return
         if self.product_id:
-            self.name = self.product_id.name
-            self.part_number = self.product_id.default_code
+            # self.name = self.product_id.name
+            # self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
@@ -628,7 +658,7 @@ class ServiceFee(models.Model):
     # _inherits = {'work.fee': 'workfee_id'}
 
     name = fields.Text('Description', index=True)
-    fee_code = fields.Char('Service Code')
+    # fee_code = fields.Char('Service Code')
     service_id = fields.Many2one(
         'service.order', 'Service Order Reference',
         index=True, ondelete='cascade', required=True)
@@ -640,7 +670,6 @@ class ServiceFee(models.Model):
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
-    rejected = fields.Boolean('Repaired', copy=False, readonly=True)
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True)
@@ -650,7 +679,8 @@ class ServiceFee(models.Model):
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
-    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    vendor_ids = fields.Many2many('res.partner', 'service_fee_vendor', 'service_fee_id', 'vendor_id', 'Vendors')
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -676,7 +706,7 @@ class ServiceFee(models.Model):
         partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
-            self.fee_code = self.product_id.default_code
+            # self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
         if partner and self.product_id:
@@ -687,7 +717,7 @@ class ServiceOther(models.Model):
     _description = 'Service Others'
 
     name = fields.Text('Description')
-    other_code = fields.Char('Item Code')
+    # other_code = fields.Char('Item Code')
     service_id = fields.Many2one(
         'service.order', 'Service Order Reference',
         index=True, ondelete='cascade', required=True)
@@ -699,7 +729,6 @@ class ServiceOther(models.Model):
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
-    rejected = fields.Boolean('Repaired', copy=False, readonly=True)
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True)
@@ -709,7 +738,8 @@ class ServiceOther(models.Model):
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
-    vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    vendor_ids = fields.Many2many('res.partner', 'service_other_vendor', 'service_other_id', 'vendor_id', 'Vendors')
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -735,7 +765,7 @@ class ServiceOther(models.Model):
         partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
-            self.other_code = self.product_id.default_code
+            # self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
         if partner and self.product_id:
@@ -756,6 +786,16 @@ class ServiceConsumable(models.Model):
     cost_tax_id = fields.Many2many(
         'account.tax', 'service_consumable_line_tax', 'service_consumable_line_id', 'cost_tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+
+    # Production line ---- #
+    location_id = fields.Many2one(
+        'stock.location', 'Source Location', index=True)
+    location_dest_id = fields.Many2one(
+        'stock.location', 'Dest. Location', index=True)
+    received = fields.Boolean('Received', copy=False)
+    move_id = fields.Many2one(
+        'stock.move', 'Inventory Move', copy=False, readonly=True)
+    lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial')
 
     @api.one
     @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -779,3 +819,22 @@ class ServiceConsumable(models.Model):
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
         self.cost_unit = self.product_id.standard_price
+
+    @api.onchange('service_id')
+    def onchange_service_id(self):
+        """ On change of operation type it sets source location, destination location
+        and to invoice field.
+        @param product: Changed operation type.
+        @param guarantee_limit: Guarantee limit of current record.
+        @return: Dictionary of values.
+        """
+        self.onchange_product_id()
+        args = self.service_id.company_id and [('company_id', '=', self.service_id.company_id.id)] or []
+        warehouse = self.env['stock.warehouse'].search(args, limit=1)
+        self.location_id = warehouse.lot_stock_id
+        self.location_dest_id = self.env['stock.location'].search([('usage', '=', 'customer')], limit=1).id
+        # else:
+        #     self.price_unit = 0.0
+        #     self.tax_id = False
+        #     self.location_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
+        #     self.location_dest_id = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id

@@ -80,9 +80,9 @@
                       <page string="Sparepart Line">
                         <group>
                           <group>
-                            <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
-                            <field name="name" invisible="1"/>
-                            <field name="part_number"/>
+                            <field name="product_id" string="Part Number" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
+                            <field name="name" invisible="0"/>
+                            <!-- <field name="part_number"/> -->
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
@@ -106,9 +106,9 @@
                   </form>
                   <tree string="Spareparts" editable="bottom" accesskey="s">
                     <field name="supply_type" accesskey="q"/>
-                    <field name="product_id" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
-                    <field name="name" invisible="1"/>
-                    <field name="part_number"/>
+                    <field name="product_id" string="Part Number" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
+                    <field name="name" invisible="0"/>
+                    <!-- <field name="part_number"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
@@ -134,8 +134,8 @@
                   <form string="Fees">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]"/>
-                      <field name="fee_code"/>
-                      <field name="name" invisible="1"/>
+                      <!-- <field name="fee_code"/> -->
+                      <field name="name" invisible="0"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -148,8 +148,8 @@
                   </form>
                   <tree string="Fees" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]" required="True"/>
-                    <field name="name" invisible="1"/>
-                    <field name="fee_code"/>
+                    <field name="name" invisible="0"/>
+                    <!-- <field name="fee_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
@@ -165,8 +165,8 @@
                   <form string="Others">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]"/>
-                      <field name="name" invisible="1"/>
-                      <field name="other_code"/>
+                      <field name="name" invisible="0"/>
+                      <!-- <field name="other_code"/> -->
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -179,8 +179,8 @@
                   </form>
                   <tree string="Others" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" required="True"/>
-                    <field name="name" invisible="1"/>
-                    <field name="other_code"/>
+                    <field name="name" invisible="0"/>
+                    <!-- <field name="other_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>

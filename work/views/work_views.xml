@@ -23,7 +23,7 @@
     </record>
 
     <record id="view_work_order_form" model="ir.ui.view">
-      <field name="name">service.form</field>
+      <field name="name">work.form</field>
       <field name="model">service.order</field>
       <field name="priority" eval="1"/>
       <field name="arch" type="xml">
@@ -33,12 +33,13 @@
             <!-- <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/> -->
             <button name="action_service_cancel_draft" states="under_repair" string="Set to Draft" type="object"/>
             <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
-            <button name="action_print_sparepart_request" states="under_repair" string="Req. Sparepart" type="object"/>
-            <button name="action_print_consumable_request" states="under_repair" string="Req. Consumables" type="object"/>
-            <button name="action_service_end" states="under_repair" string="End Repair" type="object" class="oe_highlight"/>
-            <button name="action_create_sparepart_transfer" states="2binvoiced" string="Receive Sparepart" type="object"/>
-            <button name="action_create_consumable_transfer" states="2binvoiced" string="Receive Consumables" type="object"/>
-            <button name="action_create_purchase_fee" states="2binvoiced" string="Create PO" type="object"/>
+            <!-- <button name="action_print_sparepart_request" states="under_repair" string="Req. Sparepart" type="object"/> -->
+            <!-- <button name="action_print_consumable_request" states="under_repair" string="Req. Consumables" type="object"/> -->
+            <button name="action_create_sparepart_transfer" states="under_repair" string="Receive Sparepart" type="object"/>
+            <button name="action_create_consumable_transfer" states="under_repair" string="Receive Consumables" type="object"/>
+            <button name="action_service_ready" states="under_repair" string="Repair Done" type="object" class="oe_highlight"/>
+            <button name="action_create_purchase_fee" states="ready" string="Create PO" type="object"/>
+            <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,repaired,done"/>
           </header>
           <sheet>
@@ -64,8 +65,8 @@
                 <field name="received_date" required="True"/>
                 <field name="work_stage"/>
                 <field name="finish_date"/>
-                <field name="vendor_id" string="Repair Vendor" domain="[('supplier', '=', True)]" widget="many2many_tags"/>
-                <field name="purchase_id"/>
+                <field name="vendor_ids" string="Repair Vendor" domain="[('supplier', '=', True)]" widget="many2many_tags"/>
+                <field name="purchase_ids" widget="many2many_tags"/>
                 <field name="sparepart_picking_id"/>
                 <field name="consumable_picking_id"/>
                 <field name="invoice_method" invisible="1"/>
@@ -82,7 +83,7 @@
                             <field name="supply_type"/>
                             <field name="product_id"/>
                             <field name="name"/>
-                            <field name="part_number"/>
+                            <!-- <field name="part_number"/> -->
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
@@ -104,11 +105,11 @@
                   <tree string="Spareparts" editable="bottom">
                     <field name="supply_type"/>
                     <field name="product_id"/>
-                    <field name="part_number"/>
+                    <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <!-- <field name="location_id"/> -->
-                    <field name="received" invisible="1"/>
+                    <field name="received" invisible="0"/>
                   </tree>
                 </field>
                 <div class="oe_clear"/>
@@ -119,7 +120,7 @@
                     <group>
                       <field name="product_id"/>
                       <field name="name"/>
-                      <field name="fee_code"/>
+                      <!-- <field name="fee_code"/> -->
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -127,15 +128,17 @@
                       </div>
                       <field name="cost_unit"/>
                       <field name="cost_subtotal" widget="monetary"/>
+                      <field name="vendor_ids" domain="[('supplier', '=', True)]"/>
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
                     <field name="product_id" domain="[('type','=','service')]" required="True"/>
-                    <field name="fee_code"/>
+                    <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
+                    <field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]"/>
                   </tree>
                 </field>
               </page>
@@ -145,7 +148,6 @@
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]"/>
                       <field name="name"/>
-                      <field name="other_code"/>
                       <field name="name"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -154,17 +156,17 @@
                       </div>
                       <field name="cost_unit"/>
                       <field name="cost_subtotal" widget="monetary"/>
-                      <field name="vendor_id" domain="[('supplier', '=', True)]"/>
+                      <field name="vendor_ids" domain="[('supplier', '=', True)]"/>
                     </group>
                   </form>
                   <tree string="Others" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]"/>
-                    <field name="other_code"/>
+                    <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
-                    <field name="vendor_id"/>
+                    <field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]"/>
                   </tree>
                 </field>
               </page>
@@ -181,6 +183,7 @@
                       </div>
                       <field name="cost_unit"/>
                       <field name="cost_subtotal" widget="monetary"/>
+                      <field name="received" invisible="0"/>
                     </group>
                   </form>
                   <tree string="Consumables" editable="bottom">
@@ -190,6 +193,7 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
+                    <field name="received" invisible="0"/>
                   </tree>
                 </field>
               </page>

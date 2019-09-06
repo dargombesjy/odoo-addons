@@ -8,42 +8,90 @@ class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
     # received_date = fields.Datetime('Doc. Receive Date')
-    sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart transfer ID', copy=False, index=True)
-    consumable_picking_id = fields.Many2one('stock.picking', 'Consumable transfer ID', copy=False, index=True)
-    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False, index=True)
-    vendor_id = fields.Many2many('res.partner', 'service_order_vendor', 'service_order_id', 'vendor_id', 'Vendors')
+    sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart Pick ID', copy=False, index=True)
+    consumable_picking_id = fields.Many2one('stock.picking', 'Consumable Pick ID', copy=False, index=True)
     consumable_lines = fields.One2many(
         'service.consumable', 'service_id', copy=True)
     # readonly=True states={'draft': [('readonly', False)]})
+    items_ok = fields.Boolean('Materials received',  compute="_compute_received_flag", store=True)
+
+    @api.one
+    @api.depends('operations', 'fees_lines', 'consumable_lines')
+    # @api.depends('operations', 'fees_lines', 'others_lines', 'consumable_lines')
+    def _compute_received_flag(self):
+        ops_ok = self.operations.filtered(lambda ops: ops.received)
+        fees_ok = self.fees_lines.filtered(lambda fees: fees.purchased)
+        # others_ok = self.others_lines.filtered(lambda others: others.purchased)
+        consumables_ok = self.consumable_lines.filtered(lambda consum: consum.received)
+        if ops_ok and fees_ok and consumables_ok:
+            self.items_ok = True
+
+    def create_po_dict(self):
+        po_vendor = {}
+        po_items = []
+        for fee in self.fees_lines:
+            for vendor in fee.vendor_ids:
+                if vendor not in po_vendor:
+                    po_vendor[vendor] = po_items.append(fee)
+        return po_vendor
 
     @api.multi
     def action_create_purchase_fee(self):
         Purchase = self.env['purchase.order']
         Purchase_Line = self.env['purchase.order.line']
-        for service in self:
-            purchase = Purchase.create({
-                'name': service.name,
-                'origin': service.name,
-                'partner_id': service.vendor_id.id,
-                'state': 'draft',
-            })
+        po_dict = self.create_po_dict()
+        items = list(po_dict.items())
 
-            for fee in service.fees_lines:
-                if fee.cost_unit == 0:
-                    raise UserError(_('Cost not updated'))
-                purchase_line = Purchase_Line.create({
-                    'order_id': purchase.id,
-                    'name': fee.product_id.name,
-                    'date_planned': datetime.today(),
-                    'product_id': fee.product_id.id,
-                    'product_qty': fee.product_uom_qty,
-                    'product_uom': fee.product_uom.id,
-                    'price_unit': fee.cost_unit,
-                    # 'taxes_id': fee.cost_tax_id,
+        for service in self:
+            # for fee in service.fees_lines:
+            for item in items:
+                purchase = Purchase.create({
+                    'name': 'PO Service-"%s"' % service.name,
+                    'origin': service.name,
+                    'partner_id': item[0].id,
+                    'state': 'draft',
                 })
-                fee.write({'purchased': True, 'purchase_line_id': purchase_line.id})
-            purchase.button_confirm()
-            service.write({'purchased': True, 'purchase_id': purchase.id})
+                for v in item[1]:
+                    purchase_line = Purchase_Line.create({
+                        'order_id': purchase.id,
+                        'name': v.product_id.name,
+                        'date_planned': datetime.today(),
+                        'product_id': v.product_id.id,
+                        'product_qty': v.product_uom_qty,
+                        'product_uom': v.product_uom.id,
+                        'price_unit': v.cost_unit,
+                    })
+            # fee.write({'purchased': True, 'purchase_line_id': purchase_line.id})
+        service.write({'purchased': True})
+
+    # @api.multi
+    # def action_create_purchase_fee(self):
+    #     Purchase = self.env['purchase.order']
+    #     Purchase_Line = self.env['purchase.order.line']
+    #     for service in self:
+    #         purchase = Purchase.create({
+    #             'name': service.name,
+    #             'origin': service.name,
+    #             'partner_id': service.vendor_id.id,
+    #             'state': 'draft',
+    #         })
+    #
+    #         for fee in service.fees_lines:
+    #             # if fee.cost_unit == 0:
+    #             #     raise UserError(_('Cost not updated'))
+    #             purchase_line = Purchase_Line.create({
+    #                 'order_id': purchase.id,
+    #                 'name': fee.product_id.name,
+    #                 'date_planned': datetime.today(),
+    #                 'product_id': fee.product_id.id,
+    #                 'product_qty': fee.product_uom_qty,
+    #                 'product_uom': fee.product_uom.id,
+    #                 'price_unit': fee.cost_unit,
+    #                 # 'taxes_id': fee.cost_tax_id,
+    #             })
+    #             fee.write({'purchased': True, 'purchase_line_id': purchase_line.id})
+    #         # purchase.button_confirm()
+    #         service.write({'purchased': True, 'purchase_id': purchase.id})
 
     @api.multi
     def action_create_sparepart_transfer(self):
@@ -57,7 +105,9 @@ class ServiceOrder(models.Model):
                 picking = Picking.create({
                     # 'name': '',
                     'service_id': service.id,
-                    'origin': service.name,
+                    # 'origin': service.name,
+                    'eq_name': service.equipment_id.name,
+                    'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,
                     'picking_type_id': 2,
@@ -67,17 +117,38 @@ class ServiceOrder(models.Model):
                 })
 
                 for operation in service.operations:
-                    Move_Line.create({
-                        'name': service.name,
+                    if operation.product_id:
+                        uom_id = operation.product_uom.id
+                    else:
+                        uom_id = 1
+                    moving = Move_Line.create({
+                        'service_id': service.id,
+                        'service_line_id': operation.id,
+                        'name': operation.name,
+                        'product_category': 'Sparepart',
                         'picking_id': picking.id,
                         'product_id': operation.product_id.id,
                         'product_uom_qty': operation.product_uom_qty,
-                        'product_uom': operation.product_uom.id,
+                        'product_uom': uom_id, # operation.product_uom.id,
                         'package_id': False,
                         'package_level_id': False,
                         'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
                         'location_dest_id': 9,  # operation.location_dest_id.id
+                        # 'move_line_ids': [(0, 0, {'product_id': operation.product_id.id,
+                        #                        'picking_id': picking.id,
+                        #                        # 'lot_id': operation.lot_id.id,
+                        #                        'product_uom_qty': 0,  # bypass reservation here
+                        #                        'product_uom_id': operation.product_uom.id,
+                        #                        # 'qty_done': operation.product_uom_qty,
+                        #                        'package_id': False,
+                        #                        'result_package_id': False,
+                        #                        # 'owner_id': owner_id,
+                        #                        'location_id': operation.service_id.location_id.id, #TODO: owner stuff
+                        #                        'location_dest_id': 9, # operation.location_dest_id.id,
+                        #                        'service_line_id': operation.id,
+                        #                        'product_alias': operation.name,})],
                     })
+                    operation.write({'move_id': moving.id, 'received': True})
                 service.write({'sparepart_picking_id': picking.id})
 
     @api.multi
@@ -96,7 +167,9 @@ class ServiceOrder(models.Model):
                 picking = Picking.create({
                     # 'name': '',
                     'service_id': service.id,
-                    'origin': service.name,
+                    # 'origin': service.name,
+                    'eq_name': service.equipment_id.name,
+                    'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,
                     'picking_type_id': 2,
@@ -106,8 +179,11 @@ class ServiceOrder(models.Model):
                 })
 
                 for bahan in service.consumable_lines:
-                    Move_Line.create({
-                        'name': service.name,
+                    moving = Move_Line.create({
+                        'service_id': service.id,
+                        'service_line_id': bahan.id,
+                        'name': bahan.name,
+                        'product_category': 'Consumable',
                         'picking_id': picking.id,
                         'product_id': bahan.product_id.id,
                         'product_uom_qty': bahan.product_uom_qty,
@@ -116,9 +192,23 @@ class ServiceOrder(models.Model):
                         'package_level_id': False,
                         'location_id': bahan.service_id.location_id.id, # 12,  # other.location_id.id,
                         'location_dest_id': 9,  # other.location_dest_id.id
+                        # 'move_line_ids': [(0, 0, {'product_id': bahan.product_id.id,
+                        #                        'picking_id': picking.id,
+                        #                        # 'lot_id': bahan.lot_id.id,
+                        #                        'product_uom_qty': 0,  # bypass reservation here
+                        #                        'product_uom_id': bahan.product_uom.id,
+                        #                        # 'qty_done': bahan.product_uom_qty,
+                        #                        'package_id': False,
+                        #                        'result_package_id': False,
+                        #                        # 'owner_id': owner_id,
+                        #                        'location_id': bahan.service_id.location_id.id, #TODO: owner stuff
+                        #                        'location_dest_id': 9, # bahan.location_dest_id.id,
+                        #                        'service_line_id': bahan.id,
+                        #                        'product_alias': bahan.name,})],
                     })
-
+                    bahan.write({'move_id': moving.id, 'received': True})
                 service.write({'consumable_picking_id': picking.id})
+
     @api.multi
     def action_print_consumable_request(self):
         return self.env.ref('work.action_work_consumable_request').report_action(self)
@@ -143,6 +233,8 @@ class ServiceOrder(models.Model):
             raise UserError(_("Service must be under repair in order to end."))
         if self.filtered(lambda service: service.work_stage != 'delivered'):
             raise UserError(_('Stage must "Delivered" to end Service.'))
+        if self.filtered(lambda service: service.items_ok == False):
+            raise UserError(_('All items must received or purchased'))
         for service in self:
             service.write({'repaired': True})
             vals = {'state': 'done'}
