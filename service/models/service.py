@@ -32,7 +32,7 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     service_id = fields.Many2one('service.order')
-    service_line_id = fields.Many2one('service.line')
+    service_line_id = fields.Integer('Line Id')
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], index=True, required=False,
@@ -76,7 +76,10 @@ class StockMove(models.Model):
         to_assign = {}
         for move in self:
             if move.service_id:
-                service_line = move.env['service.line'].search([('id', '=', move.service_line_id.id)], limit=1)
+                if move.product_category == 'Sparepart':
+                    service_line = move.env['service.line'].search([('id', '=', move.service_line_id)], limit=1)
+                else:
+                    service_line = move.env['service.consumable'].search([('id', '=', move.service_line_id)], limit=1)
                 service_line.write({'received': True})
             # if the move is preceeded, then it's waiting (if preceeding move is done, then action_assign has been called already and its state is already available)
             if move.move_orig_ids:
@@ -113,7 +116,7 @@ class StockMove(models.Model):
     @api.onchange('product_id')
     def onchange_product_id(self):
         if self.product_category == 'Sparepart':
-            service_line = self.env['service.line'].search([('id', '=', self.service_line_id.id)], limit=1)
+            service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
             service_line.write({'product_id': self.product_id.id})
         product = self.product_id.with_context(lang=self.partner_id.lang or self.env.user.lang)
         self.name = product.partner_ref
@@ -123,7 +126,7 @@ class StockMove(models.Model):
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
-    service_line_id = fields.Many2one('service.line')
+    # service_line_id = fields.Many2one('service.line')
     product_alias = fields.Char('Product Alias')
 
 class ServiceOrder(models.Model):
@@ -189,6 +192,7 @@ class ServiceOrder(models.Model):
     partner_id = fields.Many2one(
         'res.partner', 'Customer', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
+    service_advisor = fields.Char('Service Advisor')
     address_id = fields.Many2one(
         'res.partner', 'Delivery Address', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
@@ -659,7 +663,7 @@ class ServiceLine(models.Model):
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
-    price_unit = fields.Float('Unit Price', required=True)
+    price_unit = fields.Float('Unit Price')
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal", store=True, digits=0)

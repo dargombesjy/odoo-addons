@@ -7,7 +7,7 @@ access_work_consumable_user,work.consumable user,model_service_consumable,group_
 access_work_equip_user,work_equip user,service.model_service_equipment,group_work_user,1,1,0,0
 access_work_equip_make_user,work_equip.make user,service.model_service_equipment_make,group_work_user,1,1,0,0
 access_work_equip_variant_user,work.equip.variant user,service.model_service_equipment_variant,group_work_user,1,1,0,0
-access_work_purchase_order,work.purchase user,purchase.model_purchase_order,group_work_user,1,0,0,0
-access_work_purchase_order_line,work.purchase.line user,purchase.model_purchase_order_line,group_work_user,1,0,0,0
-access_work_stock_picking,work.stock_picking user,stock.model_stock_picking,group_work_user,1,0,0,0
-access_work_stock_move,work.stock_move user,stock.model_stock_move,group_work_user,1,0,0,0
+access_work_purchase_order,work.purchase user,purchase.model_purchase_order,group_work_user,1,1,1,0
+access_work_purchase_order_line,work.purchase.line user,purchase.model_purchase_order_line,group_work_user,1,1,1,0
+access_work_stock_picking,work.stock_picking user,stock.model_stock_picking,group_work_user,1,1,1,0
+access_work_stock_move,work.stock_move user,stock.model_stock_move,group_work_user,1,1,1,0

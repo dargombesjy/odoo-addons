@@ -77,13 +77,13 @@ class ServiceOrder(models.Model):
         partner = self.partner_id
         for service in self:
             if not service.operations:
-                raise UserWarning(_('No Sparepart items to transfer'))
+                raise UserError(_('No Sparepart items to transfer'))
             if not service.sparepart_picking_id:
                 # raise UserError('Sparepart request already created')
                 picking = Picking.create({
                     # 'name': '',
                     'service_id': service.id,
-                    'origin': "Part-%s"  % service.name,
+                    'origin': "Part-%s" % service.name,
                     'eq_name': service.equipment_id.name,
                     'eq_model': service.model,
                     'move_type': 'one',
@@ -97,26 +97,28 @@ class ServiceOrder(models.Model):
             else:
                 picking = service.sparepart_picking_id
 
-            for operation in service.operations:
-                if operation.product_id:
-                    uom_id = operation.product_uom.id
-                else:
-                    uom_id = 1
-                moving = Move_Line.create({
-                    'service_id': service.id,
-                    'service_line_id': operation.id,
-                    'name': operation.name,
-                    'product_category': 'Sparepart',
-                    'picking_id': picking.id,
-                    'product_id': operation.product_id.id,
-                    'product_uom_qty': operation.product_uom_qty,
-                    'product_uom': uom_id, # operation.product_uom.id,
-                    'package_id': False,
-                    'package_level_id': False,
-                    'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
-                    'location_dest_id': 9,
-                })
-                operation.write({'move_id': moving.id, 'requested': True})
+            outs = service.operations.filtered(lambda line: line.requested == False)
+            if outs:
+                for operation in outs:
+                    if operation.product_id:
+                        uom_id = operation.product_uom.id
+                    else:
+                        uom_id = 1
+                    moving = Move_Line.create({
+                        'service_id': service.id,
+                        'service_line_id': operation.id,
+                        'name': operation.name,
+                        'product_category': 'Sparepart',
+                        'picking_id': picking.id,
+                        'product_id': operation.product_id.id,
+                        'product_uom_qty': operation.product_uom_qty,
+                        'product_uom': uom_id, # operation.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
+                        'location_dest_id': 9,
+                    })
+                    operation.write({'move_id': moving.id, 'requested': True})
 
     @api.multi
     def action_print_sparepart_request(self):
@@ -130,7 +132,7 @@ class ServiceOrder(models.Model):
         partner = self.partner_id
         for service in self:
             if not service.consumable_lines:
-                raise UserWarning(_('No Consumable items to transfer'))
+                raise UserError(_('No Consumable items to transfer'))
             if not service.consumable_picking_id:
                 # raise UserError('Consumable request already created')
                 picking = Picking.create({
@@ -150,22 +152,24 @@ class ServiceOrder(models.Model):
             else:
                 picking = service.consumable_picking_id
 
-            for bahan in service.consumable_lines:
-                moving = Move_Line.create({
-                    'service_id': service.id,
-                    'service_line_id': bahan.id,
-                    'name': bahan.name,
-                    'product_category': 'Consumable',
-                    'picking_id': picking.id,
-                    'product_id': bahan.product_id.id,
-                    'product_uom_qty': bahan.product_uom_qty,
-                    'product_uom': bahan.product_uom.id,
-                    'package_id': False,
-                    'package_level_id': False,
-                    'location_id': bahan.service_id.location_id.id, # 12,  # other.location_id.id,
-                    'location_dest_id': 9,
-                })
-                bahan.write({'move_id': moving.id, 'requested': True})
+            outs = service.consumable_lines.filtered(lambda line: line.requested == False)
+            if outs:
+                for bahan in outs:
+                    moving = Move_Line.create({
+                        'service_id': service.id,
+                        'service_line_id': bahan.id,
+                        'name': bahan.name,
+                        'product_category': 'Consumable',
+                        'picking_id': picking.id,
+                        'product_id': bahan.product_id.id,
+                        'product_uom_qty': bahan.product_uom_qty,
+                        'product_uom': bahan.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': bahan.service_id.location_id.id, # 12,  # other.location_id.id,
+                        'location_dest_id': 9,
+                    })
+                    bahan.write({'move_id': moving.id, 'requested': True})
 
     @api.multi
     def action_print_consumable_request(self):

@@ -55,6 +55,7 @@
                 <field name="policy_no"/>
                 <field name="insurance_id" domain="[('is_insurance', '=', True)]"/>
                 <field name="partner_id" domain="[('customer', '=', True)]" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                <field name="service_advisor"/>
                 <field name="address_id" invisible="1"/>
                 <field name="partner_invoice_id" invisible="1"/>
               </group>
