@@ -35,8 +35,8 @@
             <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
             <!-- <button name="action_print_sparepart_request" states="under_repair" string="Req. Sparepart" type="object"/> -->
             <!-- <button name="action_print_consumable_request" states="under_repair" string="Req. Consumables" type="object"/> -->
-            <button name="action_create_sparepart_transfer" states="under_repair" string="Receive Sparepart" type="object"/>
-            <button name="action_create_consumable_transfer" states="under_repair" string="Receive Consumables" type="object"/>
+            <button name="action_create_sparepart_transfer" states="under_repair" string="Request Sparepart" type="object"/>
+            <button name="action_create_consumable_transfer" states="under_repair" string="Request Consumables" type="object"/>
             <button name="action_service_ready" states="under_repair" string="Repair Done" type="object" class="oe_highlight"/>
             <button name="action_create_purchase_fee" states="ready" string="Create PO" type="object"/>
             <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
@@ -66,10 +66,11 @@
                 <field name="work_stage"/>
                 <field name="finish_date"/>
                 <field name="vendor_ids" string="Repair Vendor" domain="[('supplier', '=', True)]" widget="many2many_tags"/>
-                <field name="purchase_ids" widget="many2many_tags"/>
+                <field name="purchase_ids" widget="many2many_tags" attrs="{'readonly': 1}"/>
                 <field name="sparepart_picking_id"/>
                 <field name="consumable_picking_id"/>
                 <field name="invoice_method" invisible="1"/>
+                <field name="items_ok" invisible="0"/>
               </group>
             </group>
             <notebook>
@@ -108,8 +109,8 @@
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
-                    <!-- <field name="location_id"/> -->
-                    <field name="received" invisible="0"/>
+                    <field name="requested" string="Req"/>
+                    <field name="received" invisible="0" string="Rcv"/>
                   </tree>
                 </field>
                 <div class="oe_clear"/>
@@ -193,7 +194,8 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
-                    <field name="received" invisible="0"/>
+                    <field name="requested" string="Req"/>
+                    <field name="received" invisible="0" string="Rcv"/>
                   </tree>
                 </field>
               </page>

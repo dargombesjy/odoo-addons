@@ -14,6 +14,20 @@ class StockPicking(models.Model):
     receiver = fields.Char('Receiver')
     received_date = fields.Date('Received Date')
 
+    @api.multi
+    def action_confirm(self):
+        if self.mapped('move_lines').filtered(lambda move: not move.product_id):
+            raise UserError(_('All items must have Product ID'))
+        self.mapped('package_level_ids').filtered(lambda pl: pl.state == 'draft' and not pl.move_ids)._generate_moves()
+        # call `_action_confirm` on every draft move
+        self.mapped('move_lines')\
+            .filtered(lambda move: move.state == 'draft')\
+            ._action_confirm()
+        # call `_action_assign` on every confirmed move which location_id bypasses the reservation
+        self.filtered(lambda picking: picking.location_id.usage in ('supplier', 'inventory', 'production') and picking.state == 'confirmed')\
+            .mapped('move_lines')._action_assign()
+        return True
+
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
@@ -28,8 +42,11 @@ class StockMove(models.Model):
     @api.constrains('product_uom')
     def _check_uom(self):
         moves_error = self.filtered(lambda move: move.product_id.uom_id.category_id != move.product_uom.category_id)
-        if self.product_category == 'Sparepart' and self.state == 'draft':
+        sparepart = self.filtered(lambda move: move.product_category == 'Sparepart')
+        if sparepart:
             moves_error = False
+        # if self.product_category == 'Sparepart' and self.state == 'draft':
+        #     moves_error = False
         if moves_error:
             user_warning = _('You cannot perform the move because the unit of measure has a different category as the product unit of measure.')
             for move in moves_error:
@@ -40,9 +57,68 @@ class StockMove(models.Model):
     @api.one
     @api.depends('product_id', 'product_uom', 'product_uom_qty')
     def _compute_product_qty(self):
-        if not self.product_category == 'Sparepart' and not self.state == 'draft':
-            rounding_method = self._context.get('rounding_method', 'UP')
+        rounding_method = self._context.get('rounding_method', 'UP')
+        if not self.product_category == 'Sparepart':
             self.product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id, rounding_method=rounding_method)
+        else:
+            if self.state == 'draft':
+                self.product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_uom, rounding_method=rounding_method)
+
+    def _action_confirm(self, merge=True, merge_into=False):
+        """ Confirms stock move or put it in waiting if it's linked to another move.
+        :param: merge: According to this boolean, a newly confirmed move will be merged
+        in another move of the same picking sharing its characteristics.
+        """
+        move_create_proc = self.env['stock.move']
+        move_to_confirm = self.env['stock.move']
+        move_waiting = self.env['stock.move']
+
+        to_assign = {}
+        for move in self:
+            if move.service_id:
+                service_line = move.env['service.line'].search([('id', '=', move.service_line_id.id)], limit=1)
+                service_line.write({'received': True})
+            # if the move is preceeded, then it's waiting (if preceeding move is done, then action_assign has been called already and its state is already available)
+            if move.move_orig_ids:
+                move_waiting |= move
+            else:
+                if move.procure_method == 'make_to_order':
+                    move_create_proc |= move
+                else:
+                    move_to_confirm |= move
+            if move._should_be_assigned():
+                key = (move.group_id.id, move.location_id.id, move.location_dest_id.id)
+                if key not in to_assign:
+                    to_assign[key] = self.env['stock.move']
+                to_assign[key] |= move
+
+        # create procurements for make to order moves
+        for move in move_create_proc:
+            values = move._prepare_procurement_values()
+            origin = (move.group_id and move.group_id.name or (move.origin or move.picking_id.name or "/"))
+            self.env['procurement.group'].run(move.product_id, move.product_uom_qty, move.product_uom, move.location_id, move.rule_id and move.rule_id.name or "/", origin,
+                                              values)
+
+        move_to_confirm.write({'state': 'confirmed'})
+        (move_waiting | move_create_proc).write({'state': 'waiting'})
+
+        # assign picking in batch for all confirmed move that share the same details
+        for moves in to_assign.values():
+            moves._assign_picking()
+        self._push_apply()
+        if merge:
+            return self._merge_moves(merge_into=merge_into)
+        return self
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_category == 'Sparepart':
+            service_line = self.env['service.line'].search([('id', '=', self.service_line_id.id)], limit=1)
+            service_line.write({'product_id': self.product_id.id})
+        product = self.product_id.with_context(lang=self.partner_id.lang or self.env.user.lang)
+        self.name = product.partner_ref
+        self.product_uom = product.uom_id.id
+        return {'domain': {'product_uom': [('category_id', '=', product.uom_id.category_id.id)]}}
 
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
@@ -191,8 +267,10 @@ class ServiceOrder(models.Model):
     # purchase_id = fields.Many2one(
     #     'purchase.order', 'Purchase Order',
     #     copy=False, readonly=True, track_visibility="onchange")
-    purchase_ids = fields.Many2many('purchase.order', 'service_order_po', 'service_order_id', 'purchase_order_id', 'Purchase Orders')
-    vendor_ids = fields.Many2many('res.partner', 'service_order_vendor', 'service_order_id', 'vendor_id', 'Vendors')
+    purchase_ids = fields.Many2many('purchase.order', 'service_order_po',
+        'service_order_id', 'purchase_order_id', 'Purchase Orders')
+    vendor_ids = fields.Many2many('res.partner', 'service_order_vendor',
+        'service_order_id', 'vendor_id', 'Vendors')
 
     @api.onchange('equipment_id')
     def onchange_equipment_id(self):
@@ -595,6 +673,7 @@ class ServiceLine(models.Model):
         'stock.location', 'Source Location', index=True)
     location_dest_id = fields.Many2one(
         'stock.location', 'Dest. Location', index=True)
+    requested = fields.Boolean('Requested', copy=False)
     received = fields.Boolean('Received', copy=False)
     move_id = fields.Many2one(
         'stock.move', 'Inventory Move', copy=False, readonly=True)
@@ -646,7 +725,7 @@ class ServiceLine(models.Model):
         # if not self.product_id or not self.product_uom_qty:
         # return
         if self.product_id:
-            # self.name = self.product_id.name
+            self.name = self.product_id.name
             # self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
@@ -792,6 +871,7 @@ class ServiceConsumable(models.Model):
         'stock.location', 'Source Location', index=True)
     location_dest_id = fields.Many2one(
         'stock.location', 'Dest. Location', index=True)
+    requested = fields.Boolean('Requested', copy=False)
     received = fields.Boolean('Received', copy=False)
     move_id = fields.Many2one(
         'stock.move', 'Inventory Move', copy=False, readonly=True)
