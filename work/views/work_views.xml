@@ -40,7 +40,7 @@
             <button name="action_service_ready" states="under_repair" string="Repair Done" type="object" class="oe_highlight"/>
             <button name="action_create_purchase_fee" states="ready" string="Create PO" type="object"/>
             <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
-            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,repaired,done"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,ready,done"/>
           </header>
           <sheet>
             <div class="oe_button_box" name="button_box">
