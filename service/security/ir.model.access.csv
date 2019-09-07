@@ -1,8 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_service_user,service user,model_service_order,group_service_user,1,1,1,0
-access_service_line_user,service.line user,model_service_line,group_service_user,1,1,1,0
-access_service_fee_user,service.fee user,model_service_fee,group_service_user,1,1,1,0
-access_service_other_user,service.other user,model_service_other,group_service_user,1,1,1,0
+access_service_line_user,service.line user,model_service_line,group_service_user,1,1,1,1
+access_service_fee_user,service.fee user,model_service_fee,group_service_user,1,1,1,1
+access_service_other_user,service.other user,model_service_other,group_service_user,1,1,1,1
+access_service_consum_user,service.consum user,model_service_consumable,group_service_user,1,0,0,0
 access_equipment_user,equipment user,model_service_equipment,group_service_user,1,1,1,0
 access_equipment_make_user,equipment.make user,model_service_equipment_make,group_service_user,1,1,1,0
 access_equipment_variant_user,equipment.variant user,model_service_equipment_variant,group_service_user,1,1,1,0

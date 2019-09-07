@@ -50,7 +50,7 @@ class ServiceOrder(models.Model):
         for service in self:
             for item in items:
                 purchase = Purchase.create({
-                    'name': 'PO Service-%s' % service.name,
+                    'name': 'Service-%s' % service.name,
                     'origin': service.name,
                     'partner_id': item[0].id,
                     'state': 'draft',
@@ -83,7 +83,7 @@ class ServiceOrder(models.Model):
                 picking = Picking.create({
                     # 'name': '',
                     'service_id': service.id,
-                    # 'origin': service.name,
+                    'origin': "Part-%s"  % service.name,
                     'eq_name': service.equipment_id.name,
                     'eq_model': service.model,
                     'move_type': 'one',
@@ -136,7 +136,7 @@ class ServiceOrder(models.Model):
                 picking = Picking.create({
                     # 'name': '',
                     'service_id': service.id,
-                    # 'origin': service.name,
+                    'origin': "Bahan-%s" % service.name,
                     'eq_name': service.equipment_id.name,
                     'eq_model': service.model,
                     'move_type': 'one',

@@ -563,7 +563,7 @@ class ServiceOrder(models.Model):
 
     @api.multi
     def action_export_xls(self):
-        file_name = 'temp'
+        file_name = '/home/kmsadmin/temp/service_order.xlsx'
         workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
         worksheet = workbook.add_worksheet('SPK')
         worksheet.merge_range('A1:E1', 'ESTIMASI PERBAIKAN KENDARAAN')
