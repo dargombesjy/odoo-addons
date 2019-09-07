@@ -37,7 +37,7 @@
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/> -->
-            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,repaired,done"/>
           </header>
           <sheet>
             <div class="oe_button_box" name="button_box">
