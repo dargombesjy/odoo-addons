@@ -45,6 +45,11 @@
                   <td>:</td>
                   <td><span t-field="o.model"/></td>
                 </tr>
+                <tr>
+                  <td style="width:30%">No. Polisi</td>
+                  <td>:</td>
+                  <td><span t-field="o.equipment_id.name"/></td>
+                </tr>
               </table>
             </div>
             <!-- <div class="col-2 bm-2">
@@ -69,10 +74,16 @@
                   <td></td>
                 </tr>
                 <tr>
+                  <t t-if="o.state != 'draft'">
+                    <td style="width:30%">Estimasi Selesai</td>
+                    <td>:</td>
+                    <td><span t-field="o.planned_date"/></td>
+                  </t>
+                </tr>
+                <tr>
                   <td></td>
-                  <!-- <td style="width:30%">Estimasi Selesai</td> -->
                   <td></td>
-                  <td><!--span t-field="o.planned_date"/--></td>
+                  <td></td>
                 </tr>
               </table>
             </div>
@@ -255,7 +266,7 @@
               <div class="col-3 text-center">
                 <span>Diterima Oleh</span>
                 <div style="height:100px"/>
-                <span>( Service Advisor )</span>
+                <span t-field="o.service_advisor"/>
               </div>
             </div>
           </t>
