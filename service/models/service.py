@@ -175,7 +175,8 @@ class ServiceOrder(models.Model):
         ('estimasi', 'Jasa Estimasi'),
         ('batal_klaim', 'Batal Klaim'),
         ('new', 'Unit In'),
-        ('order_part', 'Order Part')], index=True, readonly=True,
+        ('order_part', 'Order Part'),
+        ('derek', 'Derek')], index=True, readonly=True,
         states={'draft': [('readonly', False)]})
 
     @api.one
@@ -231,6 +232,8 @@ class ServiceOrder(models.Model):
     others_lines = fields.One2many(
         'service.other', 'service_id', copy=True)
         # readonly=True, states={'draft': [('readonly', False)], 'confirmed': [('readonly', False)]})
+    consumable_lines = fields.One2many(
+        'service.consumable', 'service_id', copy=True)    
     quotation_notes = fields.Text('Quotation Notes')
     company_id = fields.Many2one(
         'res.company', 'Company', readonly=True, states={'draft': [('readonly', False)]},
@@ -253,6 +256,7 @@ class ServiceOrder(models.Model):
     amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True)
     amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True)
     amount_total = fields.Float('Total', compute='_amount_total', store=True)
+    cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True)
 
     # ------ Operation --------- #
     work_stage = fields.Selection([
@@ -322,6 +326,17 @@ class ServiceOrder(models.Model):
     def _amount_total(self):
         self.amount_total = self.currency_id.round(self.amount_untaxed + self.amount_tax)
 
+    @api.one
+    @api.depends('operations.cost_subtotal', 'invoice_method', 'fees_lines.cost_subtotal',
+                 'others_lines.cost_subtotal', 'consumable_lines.cost_subtotal')
+    def _cost_untaxed(self):
+        total = sum(operation.cost_subtotal for operation in self.operations)
+        total += sum(fee.cost_subtotal for fee in self.fees_lines)
+        for other in self.others_lines:
+            if other.product_id.name != 'Own Risk':
+                total += other.cost_subtotal
+        total += sum(consumable.cost_subtotal for consumable in self.consumable_lines)
+        self.cost_total = total
 
     _sql_constraints = [
         ('name', 'unique (name)', 'The name of the Service Order must be unique!')
@@ -689,6 +704,11 @@ class ServiceLine(models.Model):
         ('cancel', 'Cancelled')], 'Status', default='draft',
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
+    approved = fields.Boolean('Approved')
+    cost_unit = fields.Float('Unit Cost', required=True)
+    # cost_tax_id = fields.Many2many(
+    #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
     # purchased = fields.Boolean('Purchased', copy=False, required=True)
     # purchase_line_id = fields.Many2one(
     #     'purchase.order.line', 'Purchase Line', copy=False)
@@ -718,6 +738,16 @@ class ServiceLine(models.Model):
         #     self.tax_id = False
         #     self.location_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
         #     self.location_dest_id = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
+
+    @api.one
+    @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
+    def _compute_cost_subtotal(self):
+        self.cost_subtotal = self.product_uom_qty * self.cost_unit
+
+    @api.onchange('product_uom')
+    def _onchange_product_uom(self):
+        self.price_unit = self.product_id.list_price
+        self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
     def onchange_product_id(self):
@@ -752,6 +782,7 @@ class ServiceFee(models.Model):
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
+    approved = fields.Boolean('Approved')
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 
     # ------ Production ------ #

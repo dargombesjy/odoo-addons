@@ -84,12 +84,12 @@
                             <field name="supply_type"/>
                             <field name="product_id"/>
                             <field name="name"/>
-                            <!-- <field name="part_number"/> -->
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
                               <field name="product_uom" groups="uom.group_uom"/>
                             </div>
+                            <field name="approved" string="Acc?"/>
                             <field name="received"/>
                           </group>
                           <group>
@@ -109,6 +109,7 @@
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
+                    <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                     <field name="requested" string="Req"/>
                     <field name="received" invisible="0" string="Rcv"/>
                   </tree>
@@ -121,7 +122,6 @@
                     <group>
                       <field name="product_id"/>
                       <field name="name"/>
-                      <!-- <field name="fee_code"/> -->
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -130,6 +130,7 @@
                       <field name="cost_unit"/>
                       <field name="cost_subtotal" widget="monetary"/>
                       <field name="vendor_ids" domain="[('supplier', '=', True)]"/>
+                      <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
@@ -140,6 +141,7 @@
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
                     <field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]"/>
+                    <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                   </tree>
                 </field>
               </page>
@@ -214,14 +216,24 @@
         </form>
       </field>
     </record>
-
+    
+    <record id="view_work_order_pivot" model="ir.ui.view">
+      <field name="name">work.pivot</field>
+      <field name="model">service.order</field>
+      <field name="arch" type="xml">
+        <pivot string="Service Order" display_quantity="True">
+          <field name="company_id" type="row"/>
+          <field name="amount_total" type="measure"/>
+        </pivot>
+      </field>
+    </record>
 
     <record id="action_work_order_list" model="ir.actions.act_window">
       <field name="name">Work Order</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">service.order</field>
       <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">tree,form,pivot</field>
       <!-- <field name="view_id" ref="view_work_order_tree"/> -->
       <!-- <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">Create Work Order</p>
@@ -241,13 +253,20 @@
       <field name="view_id" ref="view_work_order_form"/>
       <field name="act_window_id" ref="action_work_order_list"/>
     </record>
+    
+    <record id="action_work_order_pivot" model="ir.actions.act_window.view">
+      <field name="sequence" eval="3"/>
+      <field name="view_mode">pivot</field>
+      <field name="view_id" ref="view_work_order_pivot"/>
+    </record>
 
     <record id="action_work_purchase_order_list" model="ir.actions.act_window">
       <field name="name">PO from Work</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">purchase.order</field>
       <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">tree,form,pivot</field>
+      <field name="domain">[('po_type','=','service')]</field>
     </record>
 
     <menuitem id="menu_work_order"

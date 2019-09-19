@@ -16,6 +16,15 @@
       <t t-call="web.external_layout">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
         <div class="page" style="font-size:0.9rem">
+          <style type="text/css">
+            .table-sm td {
+              padding-top: 0.1rem;
+              padding-bottom: 0.1rem;
+            }
+            .signature-block {
+              page-break-inside: avoid;
+            }
+          </style>
           <div class="oe_structure" style="height:50px"/>
           <h4 class="text-center">
             <span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
@@ -92,7 +101,8 @@
           <table class="table table-sm o_main_table border-all">
             <thead>
               <tr>
-                <th>No.</th>
+                <th style="width:5%;">No.</th>
+                <th style="width:20%;">Supply Type</th>
                 <th>Description</th>
                 <th class="text-right">Quantity</th>
                 <t t-if="o.state == 'draft'">
@@ -105,19 +115,29 @@
             <tbody>
               <t t-if="o.operations">
                 <t t-set="i" t-value="1"/>
-                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Spareparts</strong></td></tr>
+                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Spareparts</strong></td></tr>
                 <tr t-foreach="o.operations" t-as="line">
-                  <td><span t-esc="i"/></td>
-                  <td><p><span t-field="line.name"/></p></td>
-                  <td class="text-right">
-                    <span t-field="line.product_uom_qty"/>
-                    <span t-field="line.product_uom.name" groups="uom.group_uom"/>
-                  </td>
-                  <t t-if="(o.state == 'draft')">
+                  <t t-if="o.state == 'draft'">
+                    <td style="width:5%;"><span t-esc="i"/></td>
+                    <td style="width:20%;"><span t-field="line.supply_type"/></td>
+                    <td><span t-field="line.name"/></td>
+                    <td class="text-right">
+                      <span t-field="line.product_uom_qty"/>
+                      <span t-field="line.product_uom.name" groups="uom.group_uom"/>
+                    </td>
                     <td class="text-right"><span t-field="line.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
                       <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                  </t>
+                  <t t-elif="line.approved">
+                    <td style="width:5%;"><span t-esc="i"/></td>
+                    <td style="width:20%;"><span t-field="line.supply_type"/></td>
+                    <td><span t-field="line.name"/></td>
+                    <td class="text-right">
+                      <span t-field="line.product_uom_qty"/>
+                      <span t-field="line.product_uom.name" groups="uom.group_uom"/>
                     </td>
                   </t>
                   <t t-set="i" t-value="i+1"/>
@@ -125,19 +145,27 @@
               </t>
               <t t-if="o.fees_lines">
                 <t t-set="m" t-value="1"/>
-                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Repairs</strong></td></tr>
+                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Repairs</strong></td></tr>
                 <tr t-foreach="o.fees_lines" t-as="fees">
-                  <td><span t-esc="m"/></td>
-                  <td><p><span t-field="fees.name"/></p></td>
-                  <td class="text-right">
-                    <span t-field="fees.product_uom_qty"/>
-                    <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                  </td>
-                  <t t-if="(o.state == 'draft')">
+                  <t t-if="o.state == 'draft'">
+                    <td style="width:5%;"><span t-esc="m"/></td>
+                    <td colspan="2"><span t-field="fees.name"/></td>
+                    <td class="text-right">
+                      <span t-field="fees.product_uom_qty"/>
+                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
+                    </td>
                     <td class="text-right"><span t-field="fees.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
                       <span t-field="fees.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                  </t>
+                  <t t-elif="fees.approved">
+                    <td style="width:5%;"><span t-esc="m"/></td>
+                    <td colspan="2"><span t-field="fees.name"/></td>
+                    <td class="text-right">
+                      <span t-field="fees.product_uom_qty"/>
+                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
                     </td>
                   </t>
                   <t t-set="m" t-value="m+1"/>
@@ -166,7 +194,7 @@
           <t t-if="o.state != 'draft'">
             <div id="spk-footer" class="row mb32">
               <div class="col-12">
-                <table class="table">
+                <table class="table table-sm">
                   <thead>
                     <tr style="vertical-align:middle">
                       <th>Proses</th>
@@ -242,11 +270,11 @@
                 </table>
               </div>
               <div class="col-3">
-                <h4>PART SUPPLY</h4>
-                <p></p>
+<!--                 <h4>PART SUPPLY</h4> -->
+<!--                 <p></p> -->
               </div>
             </div>
-            <div class="row">
+            <div class="row signature-block">
               <div class="col-3 text-center">
                 <!-- <span t-field="o.received_date"/> -->
                 <span>............,......</span>

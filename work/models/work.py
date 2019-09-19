@@ -12,8 +12,6 @@ class ServiceOrder(models.Model):
         readonly=True, copy=False, index=True)
     consumable_picking_id = fields.Many2one('stock.picking', 'Consumable Pick ID',
         readonly=True, copy=False, index=True)
-    consumable_lines = fields.One2many(
-        'service.consumable', 'service_id', copy=True)
     # readonly=True states={'draft': [('readonly', False)]})
     items_ok = fields.Boolean('Materials received',  compute="_compute_received_flag", store=True)
 
@@ -21,10 +19,15 @@ class ServiceOrder(models.Model):
     @api.depends('operations.received', 'fees_lines.purchased', 'consumable_lines.received')
     # @api.depends('operations', 'fees_lines', 'others_lines', 'consumable_lines')
     def _compute_received_flag(self):
-        ops_ng = self.operations.filtered(lambda ops: not ops.received)
-        fees_ng = self.fees_lines.filtered(lambda fees: not fees.purchased)
+        ops_ng = fees_ng = consumables_ng = False
+        if self.operations:
+            ops_ng = self.operations.filtered(lambda ops: not ops.received)
+        if self.fees_lines:
+            fees_ng = self.fees_lines.filtered(lambda fees: not fees.purchased)
         # others_ok = self.others_lines.filtered(lambda others: others.purchased)
-        consumables_ng = self.consumable_lines.filtered(lambda consum: not consum.received)
+        if self.consumable_lines:
+            consumables_ng = self.consumable_lines.filtered(lambda consum: not consum.received)
+
         if not ops_ng and not fees_ng and not consumables_ng:
             self.items_ok = True
 
@@ -50,8 +53,10 @@ class ServiceOrder(models.Model):
         for service in self:
             for item in items:
                 purchase = Purchase.create({
+                    'po_type': 'service',
                     'name': 'Service-%s' % service.name,
-                    'origin': service.name,
+                    # 'origin': service.name,
+                    'service_id': service.id,
                     'partner_id': item[0].id,
                     'state': 'draft',
                 })

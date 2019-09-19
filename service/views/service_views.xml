@@ -32,7 +32,6 @@
             <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
             <button name="action_export_xls" states="draft" string="Export to Excel" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
-            <!-- <button name="action_service_cancel_draft" states="cancel" string="Set to Draft" type="object"/> -->
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
@@ -83,7 +82,6 @@
                           <group>
                             <field name="product_id" string="Part Number" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                             <field name="name" invisible="0"/>
-                            <!-- <field name="part_number"/> -->
                             <label for="product_uom_qty"/>
                             <div class="o_row">
                               <field name="product_uom_qty"/>
@@ -93,6 +91,7 @@
                             <field name="price_unit"/>
                             <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                             <field name="price_subtotal" widget="monetary"/>
+                            <field name="approved" string="Acc?"/>
                           </group>
                           <group>
                             <field name="invoiced"/>
@@ -116,6 +115,7 @@
                     <field name="tax_id" invisible="1"/>
                     <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
+                    <field name="approved" string="Acc?"/>
                   </tree>
                 </field>
                 <group class="oe_subtotal_footer oe_right">
@@ -135,7 +135,6 @@
                   <form string="Fees">
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]"/>
-                      <!-- <field name="fee_code"/> -->
                       <field name="name" invisible="0"/>
                       <label for="product_uom_qty"/>
                       <div class="o_row">
@@ -145,12 +144,12 @@
                       <field name="price_unit"/>
                       <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
                       <field name="price_subtotal" widget="monetary"/>
+                      <field name="approved" string="Acc?"/>
                     </group>
                   </form>
                   <tree string="Fees" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 5)]" required="True"/>
                     <field name="name" invisible="0"/>
-                    <!-- <field name="fee_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
@@ -158,6 +157,7 @@
                     <field name="tax_id" invisible="1"/>
                     <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
+                    <field name="approved" string="Acc?"/>
                   </tree>
                 </field>
               </page>
@@ -167,7 +167,6 @@
                     <group>
                       <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]"/>
                       <field name="name" invisible="0"/>
-                      <!-- <field name="other_code"/> -->
                       <label for="product_uom_qty"/>
                       <div class="o_row">
                         <field name="product_uom_qty" string="Quantity"/>
@@ -181,7 +180,6 @@
                   <tree string="Others" editable="bottom">
                     <field name="product_id" domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" required="True"/>
                     <field name="name" invisible="0"/>
-                    <!-- <field name="other_code"/> -->
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
@@ -215,6 +213,11 @@
         <search string="Search Service Orders">
           <field name="name" string="Service Orders"/>
           <field name="equipment_id"/>
+          <field name="state"/>
+          <filter string="Quotations" name="quotations" domain="[('state','=','draft')]"/>
+          <filter string="Confirmed" domain="[('state','=','confirmed')]" name="current" />
+          <filter string="Under Repair" name="under_repair" domain="[('state','=','under_repair')]"/>
+          <filter string="Repair Done" name="repair_done" domain="[('state','=','ready')]"/>
         </search>
       </field>
     </record>
@@ -231,6 +234,15 @@
       </field>
     </record>
 
+    <record id="action_account_work_order_list" model="ir.actions.act_window">
+      <field name="name">Service To Be Invoiced</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">service.order</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="domain">[('state','=','2binvoiced')]</field>
+    </record>
+
     <menuitem id="menu_service_order"
       name="Service" sequence="36" groups="service.group_service_menu"/>
 
@@ -238,7 +250,13 @@
       parent="menu_service_order"
       action="action_service_order_tree"
       name="Services"/>
-
+      
+    <menuitem id="menu_account_work_order_list"
+      parent="account.menu_finance_receivables"
+      action="action_account_work_order_list"
+      name="Service To Be Invoiced"
+      sequence="1"/>
+      
     <!-- <menuitem id="menu_service_order_report"
       parent="menu_service_order"
       action="action_report_service_order"

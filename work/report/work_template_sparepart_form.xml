@@ -92,7 +92,7 @@
                 <t t-set="i" t-value="0"/>
                 <tr t-foreach="o.operations" t-as="line">
                   <td><span t-esc="i + 1"/></td>
-                  <td><span t-field="line.part_number"/></td>
+                  <td><span t-field="line.product_id.name"/></td>
                   <td><span t-field="line.name"/></td>
                   <td><span t-field="line.product_uom_qty"/></td>
                   <td></td>
