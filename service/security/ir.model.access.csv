@@ -16,3 +16,11 @@ access_equipment_make_fin,equipment.make finance,model_service_equipment_make,gr
 access_equipment_variant_fin,equipment.variant finance,model_service_equipment_variant,group_service_finance,1,0,0,0
 product_service_user,product.service_user,product.model_product_product,group_service_user,1,1,1,0
 product_template_service_user,product.template_service_user,product.model_product_template,group_service_user,1,1,1,0
+access_service_manager,service manager,model_service_order,group_service_manager,1,1,1,1
+access_service_line_manager,service.line manager,model_service_line,group_service_manager,1,1,1,1
+access_service_fee_manager,service.fee manager,model_service_fee,group_service_manager,1,1,1,1
+access_service_other_manager,service.other manager,model_service_other,group_service_manager,1,1,1,1
+access_service_consum_manager,service.consum manager,model_service_consumable,group_service_manager,1,1,1,1
+access_equipment_manager,equipment manager,model_service_equipment,group_service_manager,1,1,1,1
+access_equipment_make_manager,equipment.make manager,model_service_equipment_make,group_service_manager,1,1,1,1
+access_equipment_variant_manager,equipment.variant manager,model_service_equipment_variant,group_service_manager,1,1,1,1

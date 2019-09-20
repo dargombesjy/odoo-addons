@@ -223,6 +223,7 @@ class ServiceOrder(models.Model):
              "* The \'To be Invoiced\' status is used to generate the invoice before or after repairing done.\n"
              "* The \'Done\' status is set when repairing is completed.\n"
              "* The \'Cancelled\' status is used when user cancel repair order.")
+    has_confirmed = fields.Boolean('Has Confirmed')
     operations = fields.One2many(
         'service.line', 'service_id', 'Part', copy=True)
         # readonly=True, states={'draft': [('readonly', False)], 'confirmed': [('readonly', False)]})
@@ -373,9 +374,12 @@ class ServiceOrder(models.Model):
         before_repair = self.filtered(lambda service: service.invoice_method == 'b4repair')
         before_repair.write({'state': '2binvoiced'})
         to_confirm = self - before_repair
-        to_confirm_operations = to_confirm.mapped('operations')
-        to_confirm_operations.write({'state': 'confirmed'})
-        to_confirm.write({'state': 'confirmed'})
+        if self.has_confirmed:
+            to_confirm.write({'state': 'under_repair'})
+        else:
+            to_confirm_operations = to_confirm.mapped('operations')
+            to_confirm_operations.write({'state': 'confirmed'})
+            to_confirm.write({'state': 'confirmed', 'has_confirmed': True})
         return True
 
     @api.multi
@@ -388,16 +392,39 @@ class ServiceOrder(models.Model):
 
     def action_service_invoice_create(self):
         for service in self:
+            if service.work_stage not in ['done', 'delivered']:
+                raise UserError(_('Stage must "Done" at least'))
             service.action_invoice_create()
-            if service.invoice_method == 'b4repair':
-                service.action_service_ready()
-            elif service.invoice_method == 'after_repair':
-                service.write({'state': 'done'})
+            service.write({'state': 'ready'})
+#             if service.invoice_method == 'b4repair':
+#                 service.action_service_ready()
+#             elif service.invoice_method == 'after_repair':
+#                 service.write({'state': 'done'})
         return True
 
     def action_service_ready(self):
+        if self.operations.filtered(lambda op: not op.requested):
+            raise UserError(_('There are items not requested'))
+        if self.consumable_lines.filtered(lambda op: not op.requested):
+            raise UserError(_('There are consumables not requested'))
         self.mapped('operations').write({'state': 'confirmed'})
-        return self.write({'state': 'ready'})
+        return self.write({'state': '2binvoiced', 'work_stage': 'done'})
+
+    @api.multi
+    def action_service_end(self):
+        if self.filtered(lambda service: service.state != 'ready'):
+            raise UserError(_("Service must done in order to close."))
+        if self.filtered(lambda service: not service.items_ok):
+            raise UserError(_('All items must received and purchased'))
+        if self.filtered(lambda service: service.work_stage != 'delivered'):
+            raise UserError(_('Stage must "Delivered" to end Service.'))
+        for service in self:
+            service.write({'repaired': True})
+            vals = {'state': 'done'}
+            if not service.invoiced and service.invoice_method == 'after_repair':
+                vals['state'] = '2binvoiced'
+            service.write(vals)
+        return True
 
     @api.multi
     def action_invoice_create(self, group=False):
@@ -678,6 +705,7 @@ class ServiceLine(models.Model):
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
+    estimate_unit = fields.Float('Estimation')
     price_unit = fields.Float('Unit Price')
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
@@ -744,9 +772,15 @@ class ServiceLine(models.Model):
     def _compute_cost_subtotal(self):
         self.cost_subtotal = self.product_uom_qty * self.cost_unit
 
+    @api.onchange('price_unit')
+    def onchange_price_unit(self):
+        if not self.service_id.has_confirmed:
+            self.estimate_unit = self.price_unit
+
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
         self.price_unit = self.product_id.list_price
+        self.estimate_unit = self.product_id.list_price
         self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
@@ -760,7 +794,6 @@ class ServiceLine(models.Model):
         # return
         if self.product_id:
             self.name = self.product_id.name
-            # self.part_number = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
@@ -771,12 +804,12 @@ class ServiceFee(models.Model):
     # _inherits = {'work.fee': 'workfee_id'}
 
     name = fields.Text('Description', index=True)
-    # fee_code = fields.Char('Service Code')
     service_id = fields.Many2one(
         'service.order', 'Service Order Reference',
         index=True, ondelete='cascade', required=True)
     product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
+    estimate_unit = fields.Float('Estimation')
     price_unit = fields.Float('Unit Price', required=True)
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
@@ -793,7 +826,6 @@ class ServiceFee(models.Model):
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
-    # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
     vendor_ids = fields.Many2many('res.partner', 'service_fee_vendor', 'service_fee_id', 'vendor_id', 'Vendors')
 
     @api.one
@@ -806,10 +838,16 @@ class ServiceFee(models.Model):
     @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
     def _compute_cost_subtotal(self):
         self.cost_subtotal = self.product_uom_qty * self.cost_unit
+        
+    @api.onchange('price_unit')
+    def onchange_price_unit(self):
+        if not self.service_id.has_confirmed:
+            self.estimate_unit = self.price_unit
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
         self.price_unit = self.product_id.list_price
+        self.estimate_unit = self.product_id.list_price
         self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
@@ -820,8 +858,10 @@ class ServiceFee(models.Model):
         partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
-            # self.fee_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
+        
+#         if self.service_id.vendor_ids:
+#             self.vendor_ids = self.service_id.vendor_ids
 
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
@@ -837,6 +877,7 @@ class ServiceOther(models.Model):
         index=True, ondelete='cascade', required=True)
     product_id = fields.Many2one('product.product', 'Service Other', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
+    estimate_unit = fields.Float('Estimation')
     price_unit = fields.Float('Unit Price', required=True)
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
@@ -869,6 +910,7 @@ class ServiceOther(models.Model):
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
         self.price_unit = self.product_id.list_price
+        self.estimate_unit = self.product_id.list_price
         self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
@@ -879,7 +921,6 @@ class ServiceOther(models.Model):
         partner = self.service_id.partner_invoice_id
         if self.product_id:
             self.name = self.product_id.name
-            # self.other_code = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
 
         if partner and self.product_id:

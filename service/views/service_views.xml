@@ -33,10 +33,11 @@
             <button name="action_export_xls" states="draft" string="Export to Excel" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
+            <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
             <!-- <button name="action_service_cancel" states="draft" type="object" string="Cancel Repair"/> -->
-            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,ready,done"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,2binvoiced,ready,done"/>
           </header>
           <sheet>
             <div class="oe_button_box" name="button_box">
@@ -63,6 +64,7 @@
                 <field name="planned_date"/>
                 <field name="equipment_id"/>
                 <field name="status_unit"/>
+                <field name="work_stage" attrs="{'invisible':[('state', 'in', ('draft', 'confirmed', 'under_repair'))]}"/>
                 <field name="make"/>
                 <field name="model"/>
                 <field name="manuf_year"/>

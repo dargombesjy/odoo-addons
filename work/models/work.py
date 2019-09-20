@@ -17,7 +17,6 @@ class ServiceOrder(models.Model):
 
     @api.one
     @api.depends('operations.received', 'fees_lines.purchased', 'consumable_lines.received')
-    # @api.depends('operations', 'fees_lines', 'others_lines', 'consumable_lines')
     def _compute_received_flag(self):
         ops_ng = fees_ng = consumables_ng = False
         if self.operations:
@@ -31,9 +30,13 @@ class ServiceOrder(models.Model):
         if not ops_ng and not fees_ng and not consumables_ng:
             self.items_ok = True
 
+    @api.onchange('vendor_ids')
+    def onchange_vendor_ids(self):
+        for fee in self.fees_lines:
+            fee.vendor_ids = self.vendor_ids
+
     def create_po_dict(self):
         po_vendor = {}
-        po_items = []
         for fee in self.fees_lines:
             for vendor in fee.vendor_ids:
                 if vendor not in po_vendor:
@@ -51,6 +54,8 @@ class ServiceOrder(models.Model):
         po_ids = []
 
         for service in self:
+            if self.filtered(lambda service: service.work_stage in ('bongkar', 'ketok')):
+                raise UserError(_('At least stage must "Dempul" to create PO.'))
             for item in items:
                 purchase = Purchase.create({
                     'po_type': 'service',
@@ -180,14 +185,6 @@ class ServiceOrder(models.Model):
     def action_print_consumable_request(self):
         return self.env.ref('work.action_work_consumable_request').report_action(self)
 
-    def action_service_ready(self):
-        if self.operations.filtered(lambda op: not op.requested):
-            raise UserError(_('There are items not requested'))
-        if self.consumable_lines.filtered(lambda op: not op.requested):
-            raise UserError(_('There are consumables not requested'))
-        self.mapped('operations').write({'state': 'confirmed'})
-        return self.write({'state': 'ready'})
-
     @api.multi
     def action_service_start(self):
         """ Writes service order state to 'Under Repair'
@@ -199,27 +196,11 @@ class ServiceOrder(models.Model):
         return self.write({'state': 'under_repair'})
 
     @api.multi
-    def action_service_end(self):
-        if self.filtered(lambda service: service.state != 'ready'):
-            raise UserError(_("Service must done in order to close."))
-        if self.filtered(lambda service: not service.items_ok):
-            raise UserError(_('All items must received and purchased'))
-        if self.filtered(lambda service: service.work_stage != 'delivered'):
-            raise UserError(_('Stage must "Delivered" to end Service.'))
-        for service in self:
-            service.write({'repaired': True})
-            vals = {'state': 'done'}
-            if not service.invoiced and service.invoice_method == 'after_repair':
-                vals['state'] = '2binvoiced'
-            service.write(vals)
-        return True
-
-    @api.multi
     def action_service_cancel_draft(self):
         return self.write({'state': 'draft'})
 
-class ServiceLine(models.Model):
-    _inherit = 'service.line'
+# class ServiceLine(models.Model):
+#     _inherit = 'service.line'
 
     # @api.one
     # def _compute_cost_subtotal(self):
@@ -249,23 +230,3 @@ class ServiceLine(models.Model):
     #                 'target': 'new'
     #             }
 
-class ServiceFee(models.Model):
-    _inherit = 'service.fee'
-
-#     @api.one
-#     def _compute_cost_subtotal(self):
-#         pass
-#
-class ServiceOther(models.Model):
-    _inherit = 'service.other'
-
-#     @api.one
-#     def _compute_cost_subtotal(self):
-#         pass
-#
-class ServiceConsumable(models.Model):
-    _inherit = 'service.consumable'
-
-#     @api.one
-#     def _compute_cost_subtotal(self):
-#         pass

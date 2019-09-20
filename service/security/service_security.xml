@@ -12,6 +12,10 @@
     <record id="group_service_menu" model="res.groups">
       <field name="name">Service / Menu</field>
     </record>
+    
+    <record id="group_service_manager" model="res.groups">
+      <field name="name">Service / Manager</field>
+    </record>
 
     <!-- <record model="ir.rule" id="service_rule">
       <field name="name">service multi-company</field>
