@@ -11,3 +11,4 @@ access_work_purchase_order,work.purchase user,purchase.model_purchase_order,grou
 access_work_purchase_order_line,work.purchase.line user,purchase.model_purchase_order_line,group_work_user,1,1,1,0
 access_work_stock_picking,work.stock_picking user,stock.model_stock_picking,group_work_user,1,1,1,0
 access_work_stock_move,work.stock_move user,stock.model_stock_move,group_work_user,1,1,1,0
+access_work_invoice_line,work.invoice_line user,account.model_account_invoice_line,group_work_user,1,1,1,0

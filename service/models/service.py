@@ -159,7 +159,7 @@ class ServiceOrder(models.Model):
     policy_no = fields.Char('Policy No.')
     register_date = fields.Date('Register Date', required=True, default=fields.Date.today)
     received_date = fields.Date('Doc. Receive Date', default=fields.Date.today)
-    planned_date = fields.Date('Planned Finish Date', required=True)
+    planned_date = fields.Date('Planned Finish Date') # , required=True)
     finish_date = fields.Date('Actual Finish Date')
     equipment_id = fields.Many2one(
         'service.equipment', 'Equipment', copy=False, required=True,
@@ -176,7 +176,8 @@ class ServiceOrder(models.Model):
         ('batal_klaim', 'Batal Klaim'),
         ('new', 'Unit In'),
         ('order_part', 'Order Part'),
-        ('derek', 'Derek')], index=True, readonly=True,
+        ('derek', 'Derek'),
+        ('pick_up', 'Pick Up')], index=True, readonly=True,
         states={'draft': [('readonly', False)]})
 
     @api.one
@@ -234,7 +235,7 @@ class ServiceOrder(models.Model):
         'service.other', 'service_id', copy=True)
         # readonly=True, states={'draft': [('readonly', False)], 'confirmed': [('readonly', False)]})
     consumable_lines = fields.One2many(
-        'service.consumable', 'service_id', copy=True)    
+        'service.consumable', 'service_id', copy=True)
     quotation_notes = fields.Text('Quotation Notes')
     company_id = fields.Many2one(
         'res.company', 'Company', readonly=True, states={'draft': [('readonly', False)]},
@@ -403,10 +404,10 @@ class ServiceOrder(models.Model):
         return True
 
     def action_service_ready(self):
-        if self.operations.filtered(lambda op: not op.requested):
-            raise UserError(_('There are items not requested'))
-        if self.consumable_lines.filtered(lambda op: not op.requested):
-            raise UserError(_('There are consumables not requested'))
+        if self.operations.filtered(lambda op: not op.received):
+            raise UserError(_('There are items not yet received'))
+        if self.consumable_lines.filtered(lambda op: not op.received):
+            raise UserError(_('There are consumables not yet received'))
         self.mapped('operations').write({'state': 'confirmed'})
         return self.write({'state': '2binvoiced', 'work_stage': 'done'})
 
@@ -732,7 +733,7 @@ class ServiceLine(models.Model):
         ('cancel', 'Cancelled')], 'Status', default='draft',
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
-    approved = fields.Boolean('Approved')
+    approved = fields.Boolean('Approved', default=True)
     cost_unit = fields.Float('Unit Cost', required=True)
     # cost_tax_id = fields.Many2many(
     #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
@@ -779,9 +780,10 @@ class ServiceLine(models.Model):
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
-        self.price_unit = self.product_id.list_price
-        self.estimate_unit = self.product_id.list_price
-        self.cost_unit = self.product_id.standard_price
+        if self.supply_type == 'self':
+            self.price_unit = self.product_id.list_price
+            self.estimate_unit = self.product_id.list_price
+            self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
     def onchange_product_id(self):
@@ -815,7 +817,7 @@ class ServiceFee(models.Model):
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
-    approved = fields.Boolean('Approved')
+    approved = fields.Boolean('Approved', default=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 
     # ------ Production ------ #
@@ -838,7 +840,7 @@ class ServiceFee(models.Model):
     @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
     def _compute_cost_subtotal(self):
         self.cost_subtotal = self.product_uom_qty * self.cost_unit
-        
+
     @api.onchange('price_unit')
     def onchange_price_unit(self):
         if not self.service_id.has_confirmed:
@@ -859,7 +861,7 @@ class ServiceFee(models.Model):
         if self.product_id:
             self.name = self.product_id.name
             self.product_uom = self.product_id.uom_id.id
-        
+
 #         if self.service_id.vendor_ids:
 #             self.vendor_ids = self.service_id.vendor_ids
 

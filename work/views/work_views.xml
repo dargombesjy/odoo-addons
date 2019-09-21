@@ -35,8 +35,8 @@
             <!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" string="Start Repair" class="oe_highlight"/> -->
             <!-- <button name="action_print_sparepart_request" states="under_repair" string="Req. Sparepart" type="object"/> -->
             <!-- <button name="action_print_consumable_request" states="under_repair" string="Req. Consumables" type="object"/> -->
-            <button name="action_create_sparepart_transfer" states="under_repair" string="Request Sparepart" type="object"/>
-            <button name="action_create_consumable_transfer" states="under_repair" string="Request Consumables" type="object"/>
+            <button name="action_create_sparepart_transfer" states="under_repair" string="Req. Sparepart" type="object"/>
+            <button name="action_create_consumable_transfer" states="under_repair" string="Req. Bahan" type="object"/>
             <button name="action_create_purchase_fee" states="under_repair" string="Create PO" type="object"/>
             <button name="action_service_ready" states="under_repair" string="Repair Done" type="object" class="oe_highlight"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,under_repair,ready,done"/>
@@ -88,7 +88,7 @@
                               <field name="product_uom_qty"/>
                               <field name="product_uom" groups="uom.group_uom"/>
                             </div>
-                            <field name="approved" string="Acc?"/>
+                            <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                             <field name="received"/>
                           </group>
                           <group>
@@ -108,7 +108,7 @@
                     <field name="name"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
-                    <field name="approved" string="Acc?"/> <!--attrs="{'readonly': 1}"/-->
+                    <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                     <field name="requested" string="Req"/>
                     <field name="received" invisible="0" string="Rcv"/>
                   </tree>
@@ -140,7 +140,7 @@
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
                     <field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]"/>
-                    <field name="approved" string="Acc?"/> <!-- attrs="{'readonly': 1}"/-->
+                    <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                   </tree>
                 </field>
               </page>
@@ -215,7 +215,7 @@
         </form>
       </field>
     </record>
-    
+
     <record id="view_work_order_pivot" model="ir.ui.view">
       <field name="name">work.pivot</field>
       <field name="model">service.order</field>
@@ -252,7 +252,7 @@
       <field name="view_id" ref="view_work_order_form"/>
       <field name="act_window_id" ref="action_work_order_list"/>
     </record>
-    
+
     <record id="action_work_order_pivot" model="ir.actions.act_window.view">
       <field name="sequence" eval="3"/>
       <field name="view_mode">pivot</field>

@@ -16,6 +16,7 @@
             <field name="wht_base" string="Jasa"/>
             <field name="amount_untaxed" string="Subtotal"/>
             <field name="amount_tax"/>
+            <field name="amount_wht" string="WHT"/>
             <field name="own_risk"/>
             <field name="amount_total" class="oe_subtotal_footer_separator"/>
             <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>

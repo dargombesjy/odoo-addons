@@ -252,13 +252,13 @@
       parent="menu_service_order"
       action="action_service_order_tree"
       name="Services"/>
-      
+
     <menuitem id="menu_account_work_order_list"
       parent="account.menu_finance_receivables"
       action="action_account_work_order_list"
       name="Service To Be Invoiced"
       sequence="1"/>
-      
+
     <!-- <menuitem id="menu_service_order_report"
       parent="menu_service_order"
       action="action_report_service_order"

@@ -14,7 +14,16 @@
     <template id="consumable_request_document">
       <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
       <t t-call="web.external_layout">
-        <div class="page">
+        <div class="page" style="font-size:0.9rem">
+          <style type="text/css">
+            .table td {
+              padding-top: 0.1rem;
+              padding-bottom: 0.1rem;
+            }
+            .signature-block {
+              page-break-inside: avoid;
+            }
+          </style>
           <div class="oe_structure"/>
           <h3 class="text-center">
             <span>PERMINTAAN BAHAN BAKU</span>
@@ -128,24 +137,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td>
-              </tr>
+              <t t-if="o.consumable_lines">
+                <t t-set="i" t-value="i"/>
+                <tr t-foreach="o.consumable_lines" t-as="line">
+                  <td></td>
+                  <td><span t-field="line.name"/></td>
+                  <td><span t-field="line.product_uom_qty"/></td>
+                  <td></td>
+                  <td></td>
+                  <t t-set="i" value="i+1"/>
+                </tr>
+              </t>
             </tbody>
           </table>
           <div class="oe_structure"/>
