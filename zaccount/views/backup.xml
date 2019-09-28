@@ -1,0 +1,12 @@
+
+    <!-- <xpath expr="//tree/field[@name='sequence']" position="after">
+      <field name="product_category"/>
+    </xpath>
+    <xpath expr="//field[@name='amount_untaxed']" position="before">
+      <field name="sub_spareparts"/>
+      <field name="sub_material"/>
+      <field name="wht_base" string="Jasa"/>
+    </xpath>
+    <xpath expr="//field[@name='amount_total']" position="before">
+      <field name="own_risk"/>
+    </xpath> -->

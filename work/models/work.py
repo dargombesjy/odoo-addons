@@ -59,8 +59,8 @@ class ServiceOrder(models.Model):
             for item in items:
                 purchase = Purchase.create({
                     'po_type': 'service',
-                    'name': 'Service-%s' % service.name,
-                    # 'origin': service.name,
+                    # 'name': 'Service-%s' % service.name,
+                    'origin': service.name,
                     'service_id': service.id,
                     'partner_id': item[0].id,
                     'state': 'draft',

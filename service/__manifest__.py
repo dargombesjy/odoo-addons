@@ -13,6 +13,7 @@
         'views/equipment_views.xml',
         # 'views/partner_views.xml',
         # 'data/ir_sequence_data.xml',
+#         'data/product_category.xml',
         'report/service_reports.xml',
         'report/service_layout.xml',
         'report/service_template_service_order.xml',

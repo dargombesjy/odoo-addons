@@ -113,6 +113,10 @@ class AccountInvoice(models.Model):
     #     res = super(AccountInvoice, self)._onchange_partner_id()
     #     return res
 
+    origin_type = fields.Selection([
+        ('general', 'General'),
+        ('service', 'Service'),
+        ('own_risk', 'Own Risk')], 'Origin Type', required=True, default='general')
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
     sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
     sub_others = fields.Monetary('Others', compute='_compute_wht', store=True, readonly=True)

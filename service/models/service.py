@@ -3,6 +3,7 @@ import xlsxwriter
 import base64
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
+from num2words import num2words
 
 
 class StockPicking(models.Model):
@@ -451,37 +452,33 @@ class ServiceOrder(models.Model):
                         'comment': (comment and (invoice.comment and invoice.comment + "\n" + comment or comment)) or (invoice.comment and invoice.comment or ''),
                     })
                 else:
-                    # if not service.partner_id.property_account_receivable_id:
                     if not service.partner_invoice_id.property_account_receivable_id:
                         raise UserError(_('No account defined for partner "%s"' % service.partner_invoice_id.name))
-                        # raise UserError(_('No account defined for parner "%s%"') % service.partner_id.name)
                     invoice = Invoice.create({
-                        'name': service.name,
+                        # 'name': service.name,
                         'origin': service.name,
+                        'origin_type': 'service',
                         'type': 'out_invoice',
-                        # 'account_id': service.partner_id.property_account_receivable_id.id,
                         'account_id': service.partner_invoice_id.property_account_receivable_id.id,
                         # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
                         'partner_id': service.partner_invoice_id.id,
                         'currency_id': service.currency_id.id,
                         # 'comment': service.quotation_notes,
-                        # 'fiscal_position_id': service.partner_id.property_account_position_id
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                     })
 
                     if own_risk and self.bill_type == 'claim':
                         invoice_or = Invoice.create({
-                            'name': service.name,
+                            # 'name': service.name,
                             'origin': '%s-%s' % ('OR', service.name),
+                            'origin_type': 'own_risk',
                             'type': 'out_invoice',
                             'account_id': service.partner_id.property_account_receivable_id.id,
-                            # 'account_id': service.partner_invoice_id.property_account_receivable_id.id,
                             # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
                             'partner_id': service.partner_id.id,
                             'currency_id': service.currency_id.id,
                             # 'comment': service.quotation_notes,
                             'fiscal_position_id': service.partner_id.property_account_position_id
-                            # 'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                         })
                         invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
@@ -618,19 +615,23 @@ class ServiceOrder(models.Model):
         worksheet.write(1, 1, self.name)
         worksheet.write(2, 0, 'Asuransi')
         worksheet.write(2, 1, self.insurance_id.name)
-        worksheet.write(3, 0, 'Customer')
-        worksheet.write(3, 1, self.partner_id.name)
-        worksheet.write(4, 0, 'Tipe Kendaraan')
-        worksheet.write(4, 1, self.model)
-        worksheet.write(1, 3, 'Warna')
-        worksheet.write(1, 4, self.base_colour)
-        worksheet.write(2, 3, 'Dempul / Cat')
-        # worksheet.write(2, 4, '')
-        worksheet.write(3, 3, 'Las / Ketok')
-        # worksheet.write(3, 4, '')
-        worksheet.write(4, 3, 'Estimasi Selesai')
-        worksheet.write(4, 4, self.planned_date)
+        worksheet.write(3, 0, 'Merek Mobil')
+        worksheet.write(3, 1, '%s %s' % (self.make, self.model))
+        worksheet.write(4, 0, 'No. Polisi / Chassis')
+        worksheet.write(4, 1, '%s / %s' % (self.equipment_id.name, self.chassis_no))
+        worksheet.write(5, 0, 'Warna')
+        worksheet.write(5, 1, self.base_colour)
 
+        worksheet.write(1, 3, 'Nama Pelanggan')
+        worksheet.write(1, 4, self.partner_id.name)
+        worksheet.write(2, 3, 'Alamat')
+        worksheet.write(2, 4, self.partner_id)
+        worksheet.write(3, 3, 'Telepon')
+        worksheet.write(3, 4, self.partner_id)
+        worksheet.write(4, 3, 'No. Polis Asuransi')
+        worksheet.write(4, 4, self.policy_no)
+        worksheet.write(5, 3, 'No. Berkas')
+        worksheet.write(5, 4, self.claim_id)
         # details
         worksheet.write(6, 0, 'No.')
         worksheet.write(6, 1, 'Description')
@@ -640,28 +641,50 @@ class ServiceOrder(models.Model):
         worksheet.merge_range(7, 0, 7, 4, 'Spareparts')
         row = 8
         idx = 1
+        total_spareparts = 0
         for o in self.operations:
             worksheet.write(row, 0, idx)
             worksheet.write(row, 1, o.name)
             worksheet.write(row, 2, o.product_uom_qty)
             worksheet.write(row, 3, o.price_unit)
             worksheet.write(row, 4, o.price_subtotal)
+            total_spareparts += o.price_subtotal
             row += 1
             idx += 1
+        worksheet.merge_range(row, 0, row, 3, 'Total Spareparts')
+        worksheet.write(row, 4, total_spareparts)
+        row += 1
+
         worksheet.merge_range(row, 0, row, 4, 'Repairs')
         row += 1
         idx = 1
+        total_jasa = 0
         for r in self.fees_lines:
             worksheet.write(row, 0, idx)
             worksheet.write(row, 1, r.name)
             worksheet.write(row, 2, r.product_uom_qty)
             worksheet.write(row, 3, r.price_unit)
             worksheet.write(row, 4, r.price_subtotal)
+            total_jasa += r.price_subtotal
             row += 1
             idx += 1
+        worksheet.merge_range(row, 0, row, 3, 'Total Jasa')
+        worksheet.write(row, 4, total_jasa)
+
         row += 1
+#         worksheet.merge_range(row, 0, row, 3, 'Total')
         worksheet.write(row, 3, 'Total')
         worksheet.write(row, 4, self.amount_untaxed)
+
+        row += 1
+        worksheet.write(row, 0, 'Terbilang:')
+        worksheet.merge_range(row, 1, row, 2, num2words(self.amount_untaxed, lang='id'))
+        worksheet.merge_range(row, 3, row, 4, '%s' % ('Bekasi', fields.Date.today()))
+
+        row += 1
+        worksheet.merge_range(row, 0, row + 2, 0, 'Catatan')
+        worksheet.merge_range(row, 1, row + 2, 2)
+        worksheet.merge_range(row, 3, row + 2, 4, 'Refdison')
         # Save workbook
         workbook.close()
         # read and save as binary

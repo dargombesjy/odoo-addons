@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="cat_sparepart" model="product.category">
+      <field name="name">Sparepart</field>
+      <field name="parent_id">1</field>
+      <field name="property_cost_method">fifo</field>
+    </record>
+
+    <record id="cat_fee" model="product.category">
+      <field name="name">Service Fee</field>
+      <field name="parent_id">1</field>
+      <field name="property_cost_method">standard</field>
+    </record>
+
+    <record id="cat_other" model="product.category">
+      <field name="name">Service Other</field>
+      <field name="parent_id">1</field>
+      <field name="property_cost_method">standard</field>
+    </record>
+
+    <record id="cat_consumable" model="product.category">
+      <field name="name">Consumable</field>
+      <field name="parent_id">1</field>
+      <field name="property_cost_method">fifo</field>
+    </record>
+
+  </data>
+</odoo>
