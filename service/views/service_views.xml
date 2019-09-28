@@ -110,7 +110,7 @@
                     <field name="supply_type" accesskey="q"/>
                     <field name="product_id" string="Part Number" domain="[('type', '=', 'product'), ('categ_id', '=', 4)]"/>
                     <field name="name" invisible="0"/>
-                    <!-- <field name="part_number"/> -->
+                    <field name="part_number"/>
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>

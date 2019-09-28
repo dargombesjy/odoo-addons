@@ -102,7 +102,12 @@
             <thead>
               <tr>
                 <th style="width:5%;">No.</th>
-                <th style="width:20%;">Supply Type</th>
+                <t t-if="o.state == 'draft'">
+                  <th>Part Number</th>
+                </t>
+                <t t-else="">
+                  <th style="width:20%;">Supply Type</th>
+                </t>
                 <th>Description</th>
                 <th class="text-right">Quantity</th>
                 <t t-if="o.state == 'draft'">
@@ -119,7 +124,8 @@
                 <tr t-foreach="o.operations" t-as="line">
                   <t t-if="o.state == 'draft'">
                     <td style="width:5%;"><span t-esc="i"/></td>
-                    <td style="width:20%;"><span t-field="line.supply_type"/></td>
+                    <!-- <td style="width:20%;"><span t-field="line.supply_type"/></td> -->
+                    <td><span t-field="line.part_number"/></td>
                     <td><span t-field="line.name"/></td>
                     <td class="text-right">
                       <span t-field="line.product_uom_qty"/>
@@ -128,7 +134,7 @@
                     <td class="text-right"><span t-field="line.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
-                      <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                      <span t-field="line.price_subtotal"/><!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
                     </td>
                   </t>
                   <t t-elif="line.approved">
@@ -157,7 +163,7 @@
                     <td class="text-right"><span t-field="fees.price_unit"/></td>
                     <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
                     <td class="text-right o_price_total">
-                      <span t-field="fees.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                      <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
                     </td>
                   </t>
                   <t t-elif="fees.approved">
@@ -182,7 +188,7 @@
                     <tr class="border-black o_subtotal">
                       <td><strong>Total W/o Taxes</strong></td>
                       <td class="text-right">
-                        <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        <span t-field="o.amount_untaxed"/> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
                       </td>
                     </tr>
                   </t>
@@ -274,30 +280,46 @@
 <!--                 <p></p> -->
               </div>
             </div>
-            <div class="row signature-block">
-              <div class="col-3 text-center">
-                <!-- <span t-field="o.received_date"/> -->
-                <span>............,......</span>
-                <div style="height:100px"/>
-                <span>( ........ )</span>
-              </div>
-              <div class="col-3 text-center">
-                <span>Disiapkan Oleh</span>
-                <div style="height:100px"/>
-                <span>( Foreman )</span>
-              </div>
-              <div class="col-3 text-center">
-                <span>Pengecekan</span>
-                <div style="height:100px"/>
-                <span>( QC )</span>
-              </div>
-              <div class="col-3 text-center">
-                <span>Diterima Oleh</span>
-                <div style="height:100px"/>
-                <span t-field="o.service_advisor"/>
-              </div>
-            </div>
           </t>
+          <div class="row signature-block">
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <span>............,......</span>
+                  <div style="height:100px"/>
+                  <span>( ........ )</span>
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <span>Disiapkan Oleh</span>
+                  <div style="height:100px"/>
+                  <span>( Foreman )</span>\
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <span>Pengecekan</span>
+                  <div style="height:100px"/>
+                  <span>( QC )</span>
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <span>Diterima Oleh</span>
+                </t>
+                <t t-else="">
+                  <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                </t>
+                <div style="height:100px"/>
+                <t t-if="o.state == 'draft'">
+                  <span>REFDISON</span>
+                </t>
+                <t t-else="">
+                  <span t-field="o.service_advisor"/>
+                </t>
+              </div>
+          </div>
+          <!-- </t> -->
 
           <p t-field="o.quotation_notes"/>
           <div class="oe_structure"/>

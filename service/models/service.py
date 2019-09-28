@@ -255,11 +255,11 @@ class ServiceOrder(models.Model):
         copy=False, readonly=True, track_visibility="onchange")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
     repaired = fields.Boolean('Repaired', copy=False, readonly=True)
-    amount_untaxed = fields.Float('Untaxed Amount', compute='_amount_untaxed', store=True)
-    amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True)
-    amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True)
-    amount_total = fields.Float('Total', compute='_amount_total', store=True)
-    cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True)
+    amount_untaxed = fields.Float('Untaxed Amount', compute='_amount_untaxed', store=True, digits=(12,0))
+    amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True, digits=(12,0))
+    amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True, digits=(12,0))
+    amount_total = fields.Float('Total', compute='_amount_total', store=True, digits=(12,0))
+    cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True, digits=(12,0))
 
     # ------ Operation --------- #
     work_stage = fields.Selection([
@@ -610,81 +610,116 @@ class ServiceOrder(models.Model):
         file_name = '/home/kmsadmin/temp/service_order.xlsx'
         workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
         worksheet = workbook.add_worksheet('SPK')
-        worksheet.merge_range('A1:E1', 'ESTIMASI PERBAIKAN KENDARAAN')
-        worksheet.write(1, 0, 'No. Estimasi')
-        worksheet.write(1, 1, self.name)
-        worksheet.write(2, 0, 'Asuransi')
-        worksheet.write(2, 1, self.insurance_id.name)
-        worksheet.write(3, 0, 'Merek Mobil')
-        worksheet.write(3, 1, '%s %s' % (self.make, self.model))
-        worksheet.write(4, 0, 'No. Polisi / Chassis')
-        worksheet.write(4, 1, '%s / %s' % (self.equipment_id.name, self.chassis_no))
-        worksheet.write(5, 0, 'Warna')
-        worksheet.write(5, 1, self.base_colour)
 
-        worksheet.write(1, 3, 'Nama Pelanggan')
-        worksheet.write(1, 4, self.partner_id.name)
-        worksheet.write(2, 3, 'Alamat')
-        worksheet.write(2, 4, self.partner_id)
-        worksheet.write(3, 3, 'Telepon')
-        worksheet.write(3, 4, self.partner_id)
-        worksheet.write(4, 3, 'No. Polis Asuransi')
-        worksheet.write(4, 4, self.policy_no)
-        worksheet.write(5, 3, 'No. Berkas')
-        worksheet.write(5, 4, self.claim_id)
+        number_format = workbook.add_format({
+            'num_format': '#,##0',
+            'border': 1
+        })
+        border_format = workbook.add_format({
+            'border': 1
+        })
+        header_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'border': 1
+        })
+        section_format = workbook.add_format({
+            'border': 1,
+            'bold': True
+        })
+        center_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'center',
+            'border': 1
+        })
+        merged_format_top = workbook.add_format({
+            'align': 'left',
+            'valign': 'top',
+            'border': 1
+        })
+        merged_format_bottom = workbook.add_format({
+            'align': 'center',
+            'valign': 'bottom',
+            'border': 1
+        })
+        wrap_format = workbook.add_format()
+        wrap_format.set_text_wrap()
+
+        worksheet.merge_range('A1:F1', 'ESTIMASI PERBAIKAN KENDARAAN', header_format)
+        worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
+        worksheet.write(1, 2, self.name, border_format)
+        worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)
+        worksheet.write(2, 2, self.insurance_id.name or '', border_format)
+        worksheet.merge_range(3, 0, 3, 1, 'Merek Mobil', border_format)
+        worksheet.write(3, 2, '%s %s' % (self.make, self.model), border_format)
+        worksheet.merge_range(4, 0, 4, 1, 'No. Polisi / Chassis', border_format)
+        worksheet.write(4, 2, '%s / %s' % (self.equipment_id.name, self.chassis_no), border_format)
+        worksheet.merge_range(5, 0, 5, 1, 'Warna', border_format)
+        worksheet.write(5, 2, self.base_colour or '', border_format)
+
+        worksheet.write(1, 4, 'Nama Pelanggan', border_format)
+        worksheet.write(1, 5, self.partner_id.name, border_format)
+        worksheet.write(2, 4, 'Alamat', border_format)
+        worksheet.write(2, 5, self.partner_id.street or '', border_format)
+        worksheet.write(3, 4, 'Telepon', border_format)
+        worksheet.write(3, 5, self.partner_id.phone or '', border_format)
+        worksheet.write(4, 4, 'No. Polis Asuransi', border_format)
+        worksheet.write(4, 5, self.policy_no or '', border_format)
+        worksheet.write(5, 4, 'No. Berkas', border_format)
+        worksheet.write(5, 5, self.claim_id or '', border_format)
         # details
-        worksheet.write(6, 0, 'No.')
-        worksheet.write(6, 1, 'Description')
-        worksheet.write(6, 2, 'Quantity')
-        worksheet.write(6, 3, 'Unit Price')
-        worksheet.write(6, 4, 'Price')
-        worksheet.merge_range(7, 0, 7, 4, 'Spareparts')
-        row = 8
+        worksheet.write(7, 0, 'No.', header_format)
+        worksheet.merge_range(7, 1, 7, 2, 'Description', header_format)
+        worksheet.write(7, 3, 'Quantity', header_format)
+        worksheet.write(7, 4, 'Unit Price', header_format)
+        worksheet.write(7, 5, 'Price', header_format)
+        worksheet.merge_range(8, 0, 8, 5, 'Spareparts', section_format)
+        row = 9
         idx = 1
         total_spareparts = 0
         for o in self.operations:
             worksheet.write(row, 0, idx)
-            worksheet.write(row, 1, o.name)
-            worksheet.write(row, 2, o.product_uom_qty)
-            worksheet.write(row, 3, o.price_unit)
-            worksheet.write(row, 4, o.price_subtotal)
+            worksheet.merge_range(row, 1, row, 2, o.name)
+            worksheet.write(row, 3, o.product_uom_qty)
+            worksheet.write(row, 4, o.price_unit, number_format)
+            worksheet.write(row, 5, o.price_subtotal, number_format)
             total_spareparts += o.price_subtotal
             row += 1
             idx += 1
-        worksheet.merge_range(row, 0, row, 3, 'Total Spareparts')
-        worksheet.write(row, 4, total_spareparts)
+        worksheet.merge_range(row, 0, row, 4, 'Total Spareparts', section_format)
+        worksheet.write(row, 5, total_spareparts, number_format)
         row += 1
 
-        worksheet.merge_range(row, 0, row, 4, 'Repairs')
+        worksheet.merge_range(row, 0, row, 5, 'Repairs', section_format)
         row += 1
         idx = 1
         total_jasa = 0
         for r in self.fees_lines:
             worksheet.write(row, 0, idx)
-            worksheet.write(row, 1, r.name)
-            worksheet.write(row, 2, r.product_uom_qty)
-            worksheet.write(row, 3, r.price_unit)
-            worksheet.write(row, 4, r.price_subtotal)
+            worksheet.merge_range(row, 1, row, 2, r.name)
+            worksheet.write(row, 3, r.product_uom_qty)
+            worksheet.write(row, 4, r.price_unit, number_format)
+            worksheet.write(row, 5, r.price_subtotal, number_format)
             total_jasa += r.price_subtotal
             row += 1
             idx += 1
-        worksheet.merge_range(row, 0, row, 3, 'Total Jasa')
-        worksheet.write(row, 4, total_jasa)
+        worksheet.merge_range(row, 0, row, 4, 'Total Jasa', section_format)
+        worksheet.write(row, 5, total_jasa, number_format)
 
         row += 1
-#         worksheet.merge_range(row, 0, row, 3, 'Total')
-        worksheet.write(row, 3, 'Total')
-        worksheet.write(row, 4, self.amount_untaxed)
+        worksheet.merge_range(row, 0, row, 4, 'Total', section_format)
+        worksheet.write(row, 5, self.amount_untaxed, number_format)
 
         row += 1
-        worksheet.write(row, 0, 'Terbilang:')
-        worksheet.merge_range(row, 1, row, 2, num2words(self.amount_untaxed, lang='id'))
-        worksheet.merge_range(row, 3, row, 4, '%s' % ('Bekasi', fields.Date.today()))
+        total = total_spareparts + total_jasa
+        worksheet.write(row, 0, 'Terbilang:', border_format)
+        worksheet.merge_range(row, 1, row, 3, num2words(total, lang='id'), wrap_format)
+        worksheet.merge_range(row, 4, row, 5, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
 
         row += 1
-        worksheet.merge_range(row, 0, row + 2, 0, 'Catatan')
-        worksheet.merge_range(row, 1, row + 2, 2)
-        worksheet.merge_range(row, 3, row + 2, 4, 'Refdison')
+        worksheet.merge_range(row, 0, row + 2, 0, 'Catatan', merged_format_top)
+        worksheet.merge_range(row, 1, row + 2, 3, '', merged_format_top)
+        worksheet.merge_range(row, 4, row + 2, 5, self.service_advisor, merged_format_bottom)
         # Save workbook
         workbook.close()
         # read and save as binary
@@ -726,14 +761,15 @@ class ServiceLine(models.Model):
         ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True,
         default='vendor')
     product_id = fields.Many2one('product.product', 'Part Number') # , required=True)
+    part_number = fields.Char('Kode Part Admin')
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
     estimate_unit = fields.Float('Estimation')
-    price_unit = fields.Float('Unit Price')
+    price_unit = fields.Float('Unit Price', digits=(12,0))
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
-    price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal", store=True, digits=0)
+    price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal", store=True, digits=(12,0))
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
     rejected = fields.Boolean('Repaired', copy=False, readonly=True)
     invoice_line_id = fields.Many2one(
@@ -835,9 +871,9 @@ class ServiceFee(models.Model):
     product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
     estimate_unit = fields.Float('Estimation')
-    price_unit = fields.Float('Unit Price', required=True)
+    price_unit = fields.Float('Unit Price', required=True, digits=(12,0))
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
-    price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
+    price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=(12,0))
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     approved = fields.Boolean('Approved', default=True)
