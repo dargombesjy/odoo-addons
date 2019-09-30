@@ -645,7 +645,7 @@ class ServiceOrder(models.Model):
         wrap_format = workbook.add_format()
         wrap_format.set_text_wrap()
 
-        worksheet.merge_range('A1:F1', 'ESTIMASI PERBAIKAN KENDARAAN', header_format)
+        worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format)
         worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
         worksheet.write(1, 2, self.name, border_format)
         worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)
@@ -657,69 +657,71 @@ class ServiceOrder(models.Model):
         worksheet.merge_range(5, 0, 5, 1, 'Warna', border_format)
         worksheet.write(5, 2, self.base_colour or '', border_format)
 
-        worksheet.write(1, 4, 'Nama Pelanggan', border_format)
-        worksheet.write(1, 5, self.partner_id.name, border_format)
-        worksheet.write(2, 4, 'Alamat', border_format)
-        worksheet.write(2, 5, self.partner_id.street or '', border_format)
-        worksheet.write(3, 4, 'Telepon', border_format)
-        worksheet.write(3, 5, self.partner_id.phone or '', border_format)
-        worksheet.write(4, 4, 'No. Polis Asuransi', border_format)
-        worksheet.write(4, 5, self.policy_no or '', border_format)
-        worksheet.write(5, 4, 'No. Berkas', border_format)
-        worksheet.write(5, 5, self.claim_id or '', border_format)
+        worksheet.merge_range(1, 3, 1, 4, 'Nama Pelanggan', border_format)
+        worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, border_format)
+        worksheet.merge_range(2, 3, 2, 4, 'Alamat', border_format)
+        worksheet.merge_range(2, 5, 2, 6, self.partner_id.street or '', border_format)
+        worksheet.merge_range(3, 3, 3, 4, 'Telepon', border_format)
+        worksheet.merge_range(3, 5, 3, 6, self.partner_id.phone or '', border_format)
+        worksheet.merge_range(4, 3, 4, 4, 'No. Polis Asuransi', border_format)
+        worksheet.merge_range(4, 5, 4, 6, self.policy_no or '', border_format)
+        worksheet.merge_range(5, 3, 5, 4, 'No. Berkas', border_format)
+        worksheet.merge_range(5, 5, 5, 6, self.claim_id or '', border_format)
         # details
         worksheet.write(7, 0, 'No.', header_format)
-        worksheet.merge_range(7, 1, 7, 2, 'Description', header_format)
-        worksheet.write(7, 3, 'Quantity', header_format)
-        worksheet.write(7, 4, 'Unit Price', header_format)
-        worksheet.write(7, 5, 'Price', header_format)
-        worksheet.merge_range(8, 0, 8, 5, 'Spareparts', section_format)
+        worksheet.merge_range(7, 1, 7, 3, 'KETERANGAN', header_format)
+        worksheet.write(7, 4, 'QUANTITY', header_format)
+        worksheet.write(7, 5, 'HARGA SATUAN (Rp.)', header_format)
+        worksheet.write(7, 6, 'TOTAL HARGA (Rp.)', header_format)
+        worksheet.merge_range(8, 0, 8, 6, 'PENGGANTIAN SPAREPARTS', section_format)
         row = 9
         idx = 1
         total_spareparts = 0
         for o in self.operations:
-            worksheet.write(row, 0, idx)
-            worksheet.merge_range(row, 1, row, 2, o.name)
-            worksheet.write(row, 3, o.product_uom_qty)
-            worksheet.write(row, 4, o.price_unit, number_format)
-            worksheet.write(row, 5, o.price_subtotal, number_format)
+            worksheet.write(row, 0, idx, border_format)
+            worksheet.write(row, 1, o.part_number, border_format)
+            worksheet.merge_range(row, 2, row, 3, o.description, border_format)
+            worksheet.write(row, 4, o.product_uom_qty, border_format)
+            worksheet.write(row, 5, o.price_unit, number_format)
+            worksheet.write(row, 6, o.price_subtotal, number_format)
             total_spareparts += o.price_subtotal
             row += 1
             idx += 1
-        worksheet.merge_range(row, 0, row, 4, 'Total Spareparts', section_format)
-        worksheet.write(row, 5, total_spareparts, number_format)
+        worksheet.merge_range(row, 0, row, 5, 'Total Spareparts', section_format)
+        worksheet.write(row, 6, total_spareparts, number_format)
         row += 1
 
-        worksheet.merge_range(row, 0, row, 5, 'Repairs', section_format)
+        worksheet.merge_range(row, 0, row, 6, 'PERBAIKAN DAN PENGECATAN', section_format)
         row += 1
         idx = 1
         total_jasa = 0
         for r in self.fees_lines:
-            worksheet.write(row, 0, idx)
-            worksheet.merge_range(row, 1, row, 2, r.name)
-            worksheet.write(row, 3, r.product_uom_qty)
-            worksheet.write(row, 4, r.price_unit, number_format)
-            worksheet.write(row, 5, r.price_subtotal, number_format)
+            worksheet.write(row, 0, idx, border_format)
+            worksheet.write(row, 1, '', border_format)
+            worksheet.merge_range(row, 2, row, 3, r.description, border_format)
+            worksheet.write(row, 4, r.product_uom_qty, border_format)
+            worksheet.write(row, 5, r.price_unit, number_format)
+            worksheet.write(row, 6, r.price_subtotal, number_format)
             total_jasa += r.price_subtotal
             row += 1
             idx += 1
-        worksheet.merge_range(row, 0, row, 4, 'Total Jasa', section_format)
-        worksheet.write(row, 5, total_jasa, number_format)
+        worksheet.merge_range(row, 0, row, 5, 'Total Jasa', section_format)
+        worksheet.write(row, 6, total_jasa, number_format)
 
         row += 1
-        worksheet.merge_range(row, 0, row, 4, 'Total', section_format)
-        worksheet.write(row, 5, self.amount_untaxed, number_format)
+        worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
+        worksheet.write(row, 6, self.amount_untaxed, number_format)
 
         row += 1
         total = total_spareparts + total_jasa
-        worksheet.write(row, 0, 'Terbilang:', border_format)
-        worksheet.merge_range(row, 1, row, 3, num2words(total, lang='id'), wrap_format)
-        worksheet.merge_range(row, 4, row, 5, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
+        worksheet.merge_range(row, 0, row, 1, 'Terbilang:', border_format)
+        worksheet.merge_range(row, 2, row, 4, num2words(total, lang='id'), wrap_format)
+        worksheet.merge_range(row, 5, row, 6, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
 
         row += 1
-        worksheet.merge_range(row, 0, row + 2, 0, 'Catatan', merged_format_top)
-        worksheet.merge_range(row, 1, row + 2, 3, '', merged_format_top)
-        worksheet.merge_range(row, 4, row + 2, 5, self.service_advisor, merged_format_bottom)
+        worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
+        worksheet.merge_range(row, 2, row + 2, 4, '', wrap_format)
+        worksheet.merge_range(row, 5, row + 2, 6, self.service_advisor, merged_format_bottom)
         # Save workbook
         workbook.close()
         # read and save as binary
