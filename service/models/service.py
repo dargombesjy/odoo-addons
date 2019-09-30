@@ -681,7 +681,7 @@ class ServiceOrder(models.Model):
         for o in self.operations:
             worksheet.write(row, 0, idx, border_format)
             worksheet.write(row, 1, o.part_number, border_format)
-            worksheet.merge_range(row, 2, row, 3, o.description, border_format)
+            worksheet.merge_range(row, 2, row, 3, o.name, border_format)
             worksheet.write(row, 4, o.product_uom_qty, border_format)
             worksheet.write(row, 5, o.price_unit, number_format)
             worksheet.write(row, 6, o.price_subtotal, number_format)
@@ -699,7 +699,7 @@ class ServiceOrder(models.Model):
         for r in self.fees_lines:
             worksheet.write(row, 0, idx, border_format)
             worksheet.write(row, 1, '', border_format)
-            worksheet.merge_range(row, 2, row, 3, r.description, border_format)
+            worksheet.merge_range(row, 2, row, 3, r.name, border_format)
             worksheet.write(row, 4, r.product_uom_qty, border_format)
             worksheet.write(row, 5, r.price_unit, number_format)
             worksheet.write(row, 6, r.price_subtotal, number_format)
