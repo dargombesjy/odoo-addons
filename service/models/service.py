@@ -644,6 +644,7 @@ class ServiceOrder(models.Model):
         })
         wrap_format = workbook.add_format()
         wrap_format.set_text_wrap()
+        wrap_format.set_border()
 
         worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format)
         worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
@@ -658,7 +659,7 @@ class ServiceOrder(models.Model):
         worksheet.write(5, 2, self.base_colour or '', border_format)
 
         worksheet.merge_range(1, 3, 1, 4, 'Nama Pelanggan', border_format)
-        worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, border_format)
+        worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, wrap_format)
         worksheet.merge_range(2, 3, 2, 4, 'Alamat', border_format)
         worksheet.merge_range(2, 5, 2, 6, self.partner_id.street or '', border_format)
         worksheet.merge_range(3, 3, 3, 4, 'Telepon', border_format)
