@@ -25,7 +25,7 @@
               page-break-inside: avoid;
             }
           </style>
-          <div class="oe_structure" style="height:50px"/>
+          <div class="oe_structure" style="height:45px"/>
           <h4 class="text-center">
             <span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
             <span t-if="o.state != 'draft'">SURAT PERINTAH KERJA BENGKEL</span>
@@ -118,6 +118,34 @@
               </tr>
             </thead>
             <tbody>
+              <t t-if="o.fees_lines">
+                <t t-set="m" t-value="1"/>
+                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Repairs</strong></td></tr>
+                <tr t-foreach="o.fees_lines" t-as="fees">
+                  <t t-if="o.state == 'draft'">
+                    <td style="width:5%;"><span t-esc="m"/></td>
+                    <td colspan="2"><span t-field="fees.name"/></td>
+                    <td class="text-right">
+                      <span t-field="fees.product_uom_qty"/>
+                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
+                    </td>
+                    <td class="text-right"><span t-field="fees.price_unit"/></td>
+                    <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
+                    <td class="text-right o_price_total">
+                      <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                    </td>
+                  </t>
+                  <t t-elif="fees.approved">
+                    <td style="width:5%;"><span t-esc="m"/></td>
+                    <td colspan="2"><span t-field="fees.name"/></td>
+                    <td class="text-right">
+                      <span t-field="fees.product_uom_qty"/>
+                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
+                    </td>
+                  </t>
+                  <t t-set="m" t-value="m+1"/>
+                </tr>
+              </t>
               <t t-if="o.operations">
                 <t t-set="i" t-value="1"/>
                 <tr class="bg-200 o_line_section"><td colspan="6"><strong>Spareparts</strong></td></tr>
@@ -149,34 +177,6 @@
                   <t t-set="i" t-value="i+1"/>
                 </tr>
               </t>
-              <t t-if="o.fees_lines">
-                <t t-set="m" t-value="1"/>
-                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Repairs</strong></td></tr>
-                <tr t-foreach="o.fees_lines" t-as="fees">
-                  <t t-if="o.state == 'draft'">
-                    <td style="width:5%;"><span t-esc="m"/></td>
-                    <td colspan="2"><span t-field="fees.name"/></td>
-                    <td class="text-right">
-                      <span t-field="fees.product_uom_qty"/>
-                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                    <td class="text-right"><span t-field="fees.price_unit"/></td>
-                    <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
-                    <td class="text-right o_price_total">
-                      <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                    </td>
-                  </t>
-                  <t t-elif="fees.approved">
-                    <td style="width:5%;"><span t-esc="m"/></td>
-                    <td colspan="2"><span t-field="fees.name"/></td>
-                    <td class="text-right">
-                      <span t-field="fees.product_uom_qty"/>
-                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                  </t>
-                  <t t-set="m" t-value="m+1"/>
-                </tr>
-              </t>
             </tbody>
           </table>
 
@@ -186,9 +186,21 @@
                 <table class="table table-sm">
                   <t t-if="o.invoice_method != 'none'">
                     <tr class="border-black o_subtotal">
-                      <td><strong>Total W/o Taxes</strong></td>
+                      <td><strong>Subtotal</strong></td>
                       <td class="text-right">
                         <span t-field="o.amount_untaxed"/> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Pajak</td>
+                      <td class="text-right">
+                        <span t-field="o.amount_tax"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                      </td>
+                    </tr>
+                    <tr class="border-black 0_total">
+                      <td>Total</td>
+                      <td class="text-right o_price_total">
+                        <span t-field="o.amount_total"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
                       </td>
                     </tr>
                   </t>

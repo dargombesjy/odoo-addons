@@ -458,6 +458,7 @@ class ServiceOrder(models.Model):
                         # 'name': service.name,
                         'origin': service.name,
                         'origin_type': 'service',
+                        'service_id': service.id,
                         'type': 'out_invoice',
                         'account_id': service.partner_invoice_id.property_account_receivable_id.id,
                         # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
@@ -472,6 +473,7 @@ class ServiceOrder(models.Model):
                             # 'name': service.name,
                             'origin': '%s-%s' % ('OR', service.name),
                             'origin_type': 'own_risk',
+                            'service_id': service.id,
                             'type': 'out_invoice',
                             'account_id': service.partner_id.property_account_receivable_id.id,
                             # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
@@ -887,7 +889,6 @@ class ServiceLine(models.Model):
 class ServiceFee(models.Model):
     _name = 'service.fee'
     _description = 'Service Fees'
-    # _inherits = {'work.fee': 'workfee_id'}
 
     name = fields.Text('Description', index=True)
     service_id = fields.Many2one(

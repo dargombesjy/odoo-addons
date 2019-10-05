@@ -117,6 +117,7 @@ class AccountInvoice(models.Model):
         ('general', 'General'),
         ('service', 'Service'),
         ('own_risk', 'Own Risk')], 'Origin Type', required=True, default='general')
+    service_id = fields.Many2one('service.order', string='Service', copy='False')
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
     sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
     sub_others = fields.Monetary('Others', compute='_compute_wht', store=True, readonly=True)

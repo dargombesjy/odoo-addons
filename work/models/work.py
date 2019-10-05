@@ -38,11 +38,15 @@ class ServiceOrder(models.Model):
     def create_po_dict(self):
         po_vendor = {}
         for fee in self.fees_lines:
-            for vendor in fee.vendor_ids:
-                if vendor not in po_vendor:
-                    po_vendor[vendor] = [fee,]
-                else:
-                    po_vendor[vendor].append(fee)
+            if not fee.purchased:
+                for vendor in fee.vendor_ids:
+                    if vendor not in po_vendor:
+                        po_vendor[vendor] = [fee,]
+                    else:
+                        po_vendor[vendor].append(fee)
+
+        if not po_vendor:
+            raise UserError(_('All items have been purchased'))
         return po_vendor
 
     @api.multi

@@ -10,7 +10,18 @@
             <div t-if="o.partner_id.vat" class="mt16"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="o.partner_id.vat"/></div>
           </t> -->
           <div class="page">
-            <h2>
+            <style type="text/css">
+              .signature-block {
+                page-break-inside: avoid;
+              }
+            </style>
+            <h4 class="text-center">
+              <span>PT.KARYA MURNI SENTOSA</span>
+            </h4>
+            <div>
+              <span>Jl. Siliwangi Km. 7 No. 50</span>
+            </div>
+            <h4>
               <span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
               <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
               <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
@@ -18,7 +29,7 @@
               <span t-if="o.type == 'in_refund'">Vendor Credit Note</span>
               <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
               <span t-field="o.number"/>
-            </h2>
+            </h4>
 
             <!-- div id="informations" class="row mt32 mb32">
               <div class="col-auto mw-100 mb-2" t-if="o.name" name="description">
@@ -48,20 +59,71 @@
             </div -->
             
             <div id="informations" class="row mt32 mb32">
-              <div class="col-2 bm-2">
-                <table class="table table-sm">
-                  <tr>
-                    <td style="width:30%">No. Estimasi</td>
-                    <td>:</td>
-                    <td><span t-field="o.name"/></td>
-                  </tr>
-                </table>
-              </div>
-              <div class="col-2 bm-2">
-                <table class="table table-sm">
-                  <tr></tr>
-                </table>
-              </div>
+              <t t-if="o.origin_type in ('service', 'own_risk')">
+                <div class="col-6 bm-2">
+                  <table class="table table-sm">
+                    <tr>
+                      <td style="width:30%">Nama Asuransi</td>
+                      <td>:</td>
+                      <td><span t-field="o.partner_id.name"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Nama Pelapor</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.partner_id.name"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Merk Kendaraan</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.make"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">No. Polisi</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.equipment_id.name"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Tipe Kendaraan</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.model"/></td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-6 bm-2">
+                  <table class="table table-sm">
+                    <tr>
+                      <td style="width:30%">Claim Ref.No</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.claim_reference"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Claim No</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.claim_id"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">No. Polis</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.policy_no"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Delivery Date</td>
+                      <td>:</td>
+                      <td><span t-field="o.service_id.finish_date"/></td>
+                    </tr>
+                    <tr>
+                      <td style="width:30%">Invoice Date</td>
+                      <td>:</td>
+                      <td><span t-field="o.date_invoice"/></td>
+                    </tr>
+                  </table>
+                </div>
+              </t>
+              <t t-else="">
+                <t t-set="address">
+                  <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name], "no_marker": True}'/>
+                </t>
+              </t>
             </div>
 
             <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
@@ -175,6 +237,14 @@
                         </t>
                       </tr>
                     </t>
+                    <t t-if="o.origin_type == 'service'">
+                      <tr style="">
+                        <td><span>Own Risk</span></td>
+                        <td class="text-right o_price_total">
+                          <span t-field="own_risk"/>
+                        </td>
+                      </tr>
+                    </t>
                     <tr class="border-black o_total">
                       <td><strong>Total</strong></td>
                       <td class="text-right">
@@ -185,6 +255,38 @@
                 </div>
               </div>
             </div>
+            <div class="row signature-block">
+              <div class="col-8">
+                <table class="table table-sm">
+                  <tr>
+                    <td style="width:30%">Account No.</td>
+                    <td>:</td>
+                    <td><span>1560000331167</span></td>
+                  </tr>
+                  <tr>
+                    <td style="width:30%">Account Name</td>
+                    <td>:</td>
+                    <td><span>Karya Murni Sentosa</span></td>
+                  </tr>
+                  <tr>
+                    <td style="width:30%">Bank Name</td>
+                    <td>:</td>
+                    <td><span>Mandiri</span></td>
+                  </tr>
+                  <tr>
+                    <td style="width:30%">Email Notification</td>
+                    <td>:</td>
+                    <td><span>finance.karyamurni@gmail.com</span></td>
+                  </tr>                  
+                </table>
+              </div>
+              <div class="col-4 text-center">
+                <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                <div style="height:100px"/>
+                  <span>REFDISON</span>
+              </div>
+            </div>
+            
             <p t-if="o.reference">
               Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
             </p>
