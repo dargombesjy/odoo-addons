@@ -534,107 +534,110 @@ class ServiceOrder(models.Model):
 
                 service.write({'invoiced': True, 'invoice_id': invoice.id})
 
-                for operation in service.operations:
-                    if group:
-                        name = service.name + '-' + operation.name
-                    else:
-                        name = operation.name
+                if service.operations:
+                    for operation in service.operations:
+                        if group:
+                            name = service.name + '-' + operation.name
+                        else:
+                            name = operation.name
 
-                    if operation.product_id.property_account_income_id:
-                        account_id = operation.property_account_income_id.id
-                    elif operation.product_id.categ_id.property_account_income_categ_id:
-                        account_id = operation.product_id.categ_id.property_account_income_categ_id.id
-                    else:
-                        raise UserError(_('No account defined for product "%s%".') % operation.product_id.name)
+                        if operation.product_id.property_account_income_id:
+                            account_id = operation.property_account_income_id.id
+                        elif operation.product_id.categ_id.property_account_income_categ_id:
+                            account_id = operation.product_id.categ_id.property_account_income_categ_id.id
+                        else:
+                            raise UserError(_('No account defined for product "%s%".') % operation.product_id.name)
 
-                    invoice_line = InvoiceLine.create({
-                        'invoice_id': invoice.id,
-                        'name': name,
-                        'origin': service.name,
-                        'account_id': account_id,
-                        'quantity': operation.product_uom_qty,
-                        'invoice_line_tax_ids': [(6, 0, [x.id for x in operation.tax_id])],
-                        'uom_id': operation.product_uom.id,
-                        'product_id': operation.product_id and operation.product_id.id or False,
-                        'product_category': operation.product_id.categ_id.name,
-                        'price_unit': operation.price_unit,
-                        'price_subtotal': operation.product_uom_qty * operation.price_unit
-                    })
-                    operation.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
-
-                for fee in service.fees_lines:
-                    if group:
-                        name = service.name + '-' + fee.name
-                    else:
-                        name = fee.name
-                    if not fee.product_id:
-                        raise UserError(_('No product defined on fees.'))
-                    if fee.product_id.property_account_income_id:
-                        account_id = fee.property_account_income_id.id
-                    elif fee.product_id.categ_id.property_account_income_categ_id:
-                        account_id = fee.product_id.categ_id.property_account_income_categ_id.id
-                    else:
-                        raise UserError(_('No account defined for product "%s%".') % fee.product_id.name)
-
-                    invoice_line = InvoiceLine.create({
-                        'invoice_id': invoice.id,
-                        'name': name,
-                        'origin': service.name,
-                        'account_id': account_id,
-                        'quantity': fee.product_uom_qty,
-                        'invoice_line_tax_ids': [(6, 0, [x.id for x in fee.tax_id])],
-                        'uom_id': fee.product_uom.id,
-                        'product_id': fee.product_id and fee.product_id.id or False,
-                        'product_category': fee.product_id.categ_id.name,
-                        'price_unit': fee.price_unit,
-                        'price_subtotal': fee.product_uom_qty * fee.price_unit
-                    })
-                    fee.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
-
-                for other in service.others_lines:
-                    if group:
-                        name = service.name + '-' + other.name
-                    else:
-                        name = other.name
-                    if not other.product_id:
-                        raise UserError(_('No product defined on fees.'))
-
-                    if other.product_id.property_account_income_id:
-                        account_id = other.property_account_income_id.id
-                    elif other.product_id.categ_id.property_account_income_categ_id:
-                        account_id = other.product_id.categ_id.property_account_income_categ_id.id
-                    else:
-                        raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
-
-#                     if invoice_or and other.name == 'Own Risk':
-#                         invoice_line_or = InvoiceLine.create({
-#                             'invoice_id': invoice_or.id,
-#                             'name': name,
-#                             'origin': other.name,
-#                             'account_id': account_id,
-#                             'quantity': other.product_uom_qty,
-#                             'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
-#                             'uom_id': other.product_uom.id,
-#                             'product_id': other.product_id and other.product_id.id or False,
-#                             'product_category': other.product_id.categ_id.name,
-#                             'price_unit': other.price_unit,
-#                             'price_subtotal': other.product_uom_qty * other.price_unit
-#                         })
-#                     else:
-                    if other.name != 'Own Risk':
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
                             'name': name,
-                            'origin': other.name,
+                            'origin': service.name,
                             'account_id': account_id,
-                            'quantity': other.product_uom_qty,
-                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
-                            'uom_id': other.product_uom.id,
-                            'product_id': other.product_id and other.product_id.id or False,
-                            'product_category': other.product_id.categ_id.name,
-                            'price_unit': other.price_unit,
-                            'price_subtotal': other.product_uom_qty * other.price_unit
+                            'quantity': operation.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in operation.tax_id])],
+                            'uom_id': operation.product_uom.id,
+                            'product_id': operation.product_id and operation.product_id.id or False,
+                            'product_category': operation.product_id.categ_id.name,
+                            'price_unit': operation.price_unit,
+                            'price_subtotal': operation.product_uom_qty * operation.price_unit
                         })
+                        operation.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
+
+                if service.fees:
+                    for fee in service.fees_lines:
+                        if group:
+                            name = service.name + '-' + fee.name
+                        else:
+                            name = fee.name
+                        if not fee.product_id:
+                            raise UserError(_('No product defined on fees.'))
+                        if fee.product_id.property_account_income_id:
+                            account_id = fee.property_account_income_id.id
+                        elif fee.product_id.categ_id.property_account_income_categ_id:
+                            account_id = fee.product_id.categ_id.property_account_income_categ_id.id
+                        else:
+                            raise UserError(_('No account defined for product "%s%".') % fee.product_id.name)
+    
+                        invoice_line = InvoiceLine.create({
+                            'invoice_id': invoice.id,
+                            'name': name,
+                            'origin': service.name,
+                            'account_id': account_id,
+                            'quantity': fee.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in fee.tax_id])],
+                            'uom_id': fee.product_uom.id,
+                            'product_id': fee.product_id and fee.product_id.id or False,
+                            'product_category': fee.product_id.categ_id.name,
+                            'price_unit': fee.price_unit,
+                            'price_subtotal': fee.product_uom_qty * fee.price_unit
+                        })
+                        fee.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
+
+                if service.others_lines:
+                    for other in service.others_lines:
+                        if group:
+                            name = service.name + '-' + other.name
+                        else:
+                            name = other.name
+                        if not other.product_id:
+                            raise UserError(_('No product defined on fees.'))
+
+                        if other.product_id.property_account_income_id:
+                            account_id = other.property_account_income_id.id
+                        elif other.product_id.categ_id.property_account_income_categ_id:
+                            account_id = other.product_id.categ_id.property_account_income_categ_id.id
+                        else:
+                            raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
+
+    #                     if invoice_or and other.name == 'Own Risk':
+    #                         invoice_line_or = InvoiceLine.create({
+    #                             'invoice_id': invoice_or.id,
+    #                             'name': name,
+    #                             'origin': other.name,
+    #                             'account_id': account_id,
+    #                             'quantity': other.product_uom_qty,
+    #                             'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+    #                             'uom_id': other.product_uom.id,
+    #                             'product_id': other.product_id and other.product_id.id or False,
+    #                             'product_category': other.product_id.categ_id.name,
+    #                             'price_unit': other.price_unit,
+    #                             'price_subtotal': other.product_uom_qty * other.price_unit
+    #                         })
+    #                     else:
+                        if other.name != 'Own Risk':
+                            invoice_line = InvoiceLine.create({
+                                'invoice_id': invoice.id,
+                                'name': name,
+                                'origin': other.name,
+                                'account_id': account_id,
+                                'quantity': other.product_uom_qty,
+                                'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+                                'uom_id': other.product_uom.id,
+                                'product_id': other.product_id and other.product_id.id or False,
+                                'product_category': other.product_id.categ_id.name,
+                                'price_unit': other.price_unit,
+                                'price_subtotal': other.product_uom_qty * other.price_unit
+                            })
 
                 invoice.compute_taxes()
                 # invoice_or.compute_taxes()

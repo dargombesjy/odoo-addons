@@ -338,8 +338,6 @@
                 </t>
               </div>
               
-              <div class="oe_structure"/>
-              
               <div class="col-3 text-center">
                 <t t-if="o.state != 'draft'">
                   <span></span>
