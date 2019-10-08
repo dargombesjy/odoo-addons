@@ -121,7 +121,7 @@
               </t>
               <t t-else="">
                 <t t-set="address">
-                  <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name], "no_marker": True}'/>
+                  <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
                 </t>
               </t>
             </div>
