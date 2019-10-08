@@ -85,7 +85,7 @@
           </div>
 
           <!-- Looping item content -->
-          <table class="table o_main_table text-center" style="vertical-align:middle">
+          <!-- table class="table o_main_table text-center" style="vertical-align:middle">
             <thead>
               <tr>
                 <th rowspan="2" style="vertical-align:middle">Tanggal</th>
@@ -121,7 +121,7 @@
                 <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
               </tr>
             </tbody>
-          </table>
+          </table -->
 
           <table class="table text-center" style="vertical-align:middle">
             <thead>
@@ -132,8 +132,10 @@
                 <th colspan="2">PARAF / NAMA</th>
               </tr>
               <tr>
-                <th>ADM</th>
-                <th>PENERIMA</th>
+                <th>Ka.Prod</th>
+                <th>Foreman</th>
+                <th>WH Admin</th>
+                <th>Penerima</th>
               </tr>
             </thead>
             <tbody>
@@ -143,6 +145,8 @@
                   <td></td>
                   <td><span t-field="line.name"/></td>
                   <td><span t-field="line.product_uom_qty"/></td>
+                  <td></td>
+                  <td></td>
                   <td></td>
                   <td></td>
                   <t t-set="i" value="i+1"/>

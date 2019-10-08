@@ -301,67 +301,67 @@
             </div>
           </t>
           <div class="row signature-block">
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <span></span>
-                  <div style="height:100px"/>
-                  <span>( Service Advisor )</span>
-                </t>
-              </div>
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <span>Disiapkan Oleh</span>
-                  <div style="height:100px"/>
-                  <span>( Ka. Prod )</span>\
-                </t>
-              </div>
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <span>Pengecekan</span>
-                  <div style="height:100px"/>
-                  <span>( Foreman )</span>
-                </t>
-              </div>
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <span>Diterima Oleh</span>
-                </t>
-                <t t-else="">
-                  <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
-                </t>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <span></span>
                 <div style="height:100px"/>
-                <t t-if="o.state == 'draft'">
-                  <span>REFDISON</span>
-                </t>
-                <t t-else="">
-                  <span>( Pelaksana )</span>
-                </t>
-              </div>
-              
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <span></span>
-                  <div style="height:100px"/>
-                  <span>( Foreman )</span>
-                </t>
-              </div>
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <div style="height:100px"/>
-                  <span>( Ka. Prod )</span>\
-                </t>
-              </div>
-              <div class="col-3 text-center">
-                <t t-if="o.state != 'draft'">
-                  <div style="height:100px"/>
-                  <span>( Service advisor )</span>
-                </t>
-              </div>
-              <div class="col-3 text-center">
+                <span>( Service Advisor )</span>
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <span>Disiapkan Oleh</span>
                 <div style="height:100px"/>
-                <span>( CS )</span>
-              </div>
-
+                <span>( Ka. Prod )</span>\
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <span>Pengecekan</span>
+                <div style="height:100px"/>
+                <span>( Foreman )</span>
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <span>Diterima Oleh</span>
+              </t>
+              <t t-else="">
+                <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+              </t>
+              <div style="height:100px"/>
+              <t t-if="o.state == 'draft'">
+                <span>REFDISON</span>
+              </t>
+              <t t-else="">
+                <span>( Pelaksana )</span>
+              </t>
+            </div>
+          </div>
+          <div class="row signature-block">
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <span></span>
+                <div style="height:100px"/>
+                <span>( Foreman )</span>
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <div style="height:100px"/>
+                <span>( Ka. Prod )</span>\
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <t t-if="o.state != 'draft'">
+                <div style="height:100px"/>
+                <span>( Service advisor )</span>
+              </t>
+            </div>
+            <div class="col-3 text-center">
+              <div style="height:100px"/>
+              <span>( CS )</span>
+            </div>
           </div>
           <!-- </t> -->
 

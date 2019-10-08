@@ -436,14 +436,22 @@ class ServiceOrder(models.Model):
     def action_invoice_or_create(self):
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
-        own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
         for service in self.filtered(lambda x: not x.own_risk_invoiced):
+            own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.bill_type != 'claim':
                 raise UserError(_('Only Insurance Claim needs Own Risk billing'))
             if service.own_risk_invoiced:
                 raise UserError(_('Own Risk had invoiced'))
             if not own_risk:
                 raise UserError(_('No Own Risk line item found in "Others" section'))
+
+            if own_risk.product_id.property_account_income_id:
+                account_id = own_risk.product_id.property_account_income_id.id
+            elif own_risk.product_id.categ_id.property_account_income_categ_id:
+                account_id = own_risk.product_id.categ_id.property_account_income_categ_id.id
+            else:
+                raise UserError(_('No account defined for product "%s%".') % own_risk.product_id.name)
+
             invoice_or = Invoice.create({
                 # 'name': service.name,
                 'origin': '%s-%s' % ('OR', service.name),
@@ -463,7 +471,7 @@ class ServiceOrder(models.Model):
                     'invoice_id': invoice_or.id,
                     'name': own_risk.name,
                     'origin': own_risk.name,
-                    'account_id': own_risk.account_id,
+                    'account_id': account_id,
                     'quantity': own_risk.product_uom_qty,
                     'invoice_line_tax_ids': [(6, 0, [x.id for x in own_risk.tax_id])],
                     'uom_id': own_risk.product_uom.id,
@@ -542,7 +550,7 @@ class ServiceOrder(models.Model):
                             name = operation.name
 
                         if operation.product_id.property_account_income_id:
-                            account_id = operation.property_account_income_id.id
+                            account_id = operation.product_id.property_account_income_id.id
                         elif operation.product_id.categ_id.property_account_income_categ_id:
                             account_id = operation.product_id.categ_id.property_account_income_categ_id.id
                         else:
@@ -563,7 +571,7 @@ class ServiceOrder(models.Model):
                         })
                         operation.write({'invoiced': True, 'invoice_line_id': invoice_line.id})
 
-                if service.fees:
+                if service.fees_lines:
                     for fee in service.fees_lines:
                         if group:
                             name = service.name + '-' + fee.name
@@ -572,7 +580,7 @@ class ServiceOrder(models.Model):
                         if not fee.product_id:
                             raise UserError(_('No product defined on fees.'))
                         if fee.product_id.property_account_income_id:
-                            account_id = fee.property_account_income_id.id
+                            account_id = fee.product_id.property_account_income_id.id
                         elif fee.product_id.categ_id.property_account_income_categ_id:
                             account_id = fee.product_id.categ_id.property_account_income_categ_id.id
                         else:
@@ -603,7 +611,7 @@ class ServiceOrder(models.Model):
                             raise UserError(_('No product defined on fees.'))
 
                         if other.product_id.property_account_income_id:
-                            account_id = other.property_account_income_id.id
+                            account_id = other.product_id.property_account_income_id.id
                         elif other.product_id.categ_id.property_account_income_categ_id:
                             account_id = other.product_id.categ_id.property_account_income_categ_id.id
                         else:
