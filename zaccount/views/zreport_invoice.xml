@@ -15,9 +15,9 @@
                 page-break-inside: avoid;
               }
             </style>
-            <h4 class="text-center">
+            <div class="text-center">
               <span>PT.KARYA MURNI SENTOSA</span>
-            </h4>
+            </div>
             <div>
               <span>Jl. Siliwangi Km. 7 No. 50</span>
             </div>
