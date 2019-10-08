@@ -110,7 +110,7 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="approved" string="Acc?" attrs="{'readonly': 1}"/>
                     <field name="requested" string="Req"/>
-                    <field name="received" invisible="0" string="Rcv"/>
+                    <field name="received" string="Rcv" attrs="{'readonly': 1}"/>
                   </tree>
                 </field>
                 <div class="oe_clear"/>
@@ -196,7 +196,7 @@
                     <field name="cost_unit"/>
                     <field name="cost_subtotal" widget="monetary"/>
                     <field name="requested" string="Req"/>
-                    <field name="received" invisible="0" string="Rcv"/>
+                    <field name="received" string="Rcv" attrs="{'readonly': 1}"/>
                   </tree>
                 </field>
               </page>
