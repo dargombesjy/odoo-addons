@@ -32,6 +32,7 @@
             <button name="action_print_service_order" states="draft" string="Print Quotation" type="object"/>
             <button name="action_export_xls" states="draft" string="Export to Excel" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
+            <button name="action_invoice_or_create" type="object" string="Create Own Risk" groups="account.group_account_invoice"/>
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
             <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
@@ -56,6 +57,7 @@
                 <field name="insurance_id" domain="[('is_insurance', '=', True)]"/>
                 <field name="partner_id" domain="[('customer', '=', True)]" attrs="{'invisible': [('state', '=', 'draft')]}"/>
                 <field name="service_advisor"/>
+                <field name="print_tax"/>
                 <field name="address_id" invisible="1"/>
                 <field name="partner_invoice_id" invisible="1"/>
               </group>
@@ -114,7 +116,7 @@
                     <field name="product_uom_qty" string="Quantity"/>
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
-                    <field name="tax_id" invisible="1"/>
+                    <field name="tax_id" invisible="0"/>
                     <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                     <field name="approved" string="Acc?"/>
@@ -156,7 +158,7 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="cost_unit" invisible="1"/>
-                    <field name="tax_id" invisible="1"/>
+                    <field name="tax_id" invisible="0"/>
                     <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                     <field name="approved" string="Acc?"/>
@@ -186,7 +188,7 @@
                     <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                     <field name="price_unit"/>
                     <field name="cost_unit" invisible="1"/>
-                    <field name="tax_id" invisible="1"/>
+                    <field name="tax_id" invisible="0"/>
                     <field name="invoiced" invisible="1"/>
                     <field name="price_subtotal" widget="monetary"/>
                   </tree>

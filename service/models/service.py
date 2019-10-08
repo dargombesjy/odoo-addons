@@ -260,6 +260,8 @@ class ServiceOrder(models.Model):
     amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True, digits=(12,0))
     amount_total = fields.Float('Total', compute='_amount_total', store=True, digits=(12,0))
     cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True, digits=(12,0))
+    own_risk_invoiced = fields.Boolean('Own Risk invoiced')
+    print_tax = fields.Boolean('Print Tax?')
 
     # ------ Operation --------- #
     work_stage = fields.Selection([
@@ -420,6 +422,8 @@ class ServiceOrder(models.Model):
             raise UserError(_('All items must received and purchased'))
         if self.filtered(lambda service: service.work_stage != 'delivered'):
             raise UserError(_('Stage must "Delivered" to end Service.'))
+        if self.filtered(lambda service: service.bill_type == 'claim' and not service.own_risk_invoiced):
+            raise UserError(_('Own Risk not yet billed'))
         for service in self:
             service.write({'repaired': True})
             vals = {'state': 'done'}
@@ -427,6 +431,48 @@ class ServiceOrder(models.Model):
                 vals['state'] = '2binvoiced'
             service.write(vals)
         return True
+
+    @api.multi
+    def action_invoice_or_create(self):
+        InvoiceLine = self.env['account.invoice.line']
+        Invoice = self.env['account.invoice']
+        own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
+        for service in self.filtered(lambda x: not x.own_risk_invoiced):
+            if service.bill_type != 'claim':
+                raise UserError(_('Only Insurance Claim needs Own Risk billing'))
+            if service.own_risk_invoiced:
+                raise UserError(_('Own Risk had invoiced'))
+            if not own_risk:
+                raise UserError(_('No Own Risk line item found in "Others" section'))
+            invoice_or = Invoice.create({
+                # 'name': service.name,
+                'origin': '%s-%s' % ('OR', service.name),
+                'origin_type': 'own_risk',
+                'service_id': service.id,
+                'type': 'out_invoice',
+                'account_id': service.partner_id.property_account_receivable_id.id,
+                # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
+                'partner_id': service.partner_id.id,
+                'currency_id': service.currency_id.id,
+                # 'comment': service.quotation_notes,
+                'fiscal_position_id': service.partner_id.property_account_position_id
+            })
+
+            if invoice_or:
+                InvoiceLine.create({
+                    'invoice_id': invoice_or.id,
+                    'name': own_risk.name,
+                    'origin': own_risk.name,
+                    'account_id': own_risk.account_id,
+                    'quantity': own_risk.product_uom_qty,
+                    'invoice_line_tax_ids': [(6, 0, [x.id for x in own_risk.tax_id])],
+                    'uom_id': own_risk.product_uom.id,
+                    'product_id': own_risk.product_id and own_risk.product_id.id or False,
+                    'product_category': own_risk.product_id.categ_id.name,
+                    'price_unit': own_risk.price_unit,
+                    'price_subtotal': own_risk.product_uom_qty * own_risk.price_unit
+                })
+            service.write({'own_risk_invoiced': True,})
 
     @api.multi
     def action_invoice_create(self, group=False):
@@ -468,20 +514,21 @@ class ServiceOrder(models.Model):
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                     })
 
+#                     if own_risk and self.bill_type == 'claim' and not self.own_risk_invoiced:
+#                         invoice_or = Invoice.create({
+#                             # 'name': service.name,
+#                             'origin': '%s-%s' % ('OR', service.name),
+#                             'origin_type': 'own_risk',
+#                             'service_id': service.id,
+#                             'type': 'out_invoice',
+#                             'account_id': service.partner_id.property_account_receivable_id.id,
+#                             # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
+#                             'partner_id': service.partner_id.id,
+#                             'currency_id': service.currency_id.id,
+#                             # 'comment': service.quotation_notes,
+#                             'fiscal_position_id': service.partner_id.property_account_position_id
+#                         })
                     if own_risk and self.bill_type == 'claim':
-                        invoice_or = Invoice.create({
-                            # 'name': service.name,
-                            'origin': '%s-%s' % ('OR', service.name),
-                            'origin_type': 'own_risk',
-                            'service_id': service.id,
-                            'type': 'out_invoice',
-                            'account_id': service.partner_id.property_account_receivable_id.id,
-                            # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
-                            'partner_id': service.partner_id.id,
-                            'currency_id': service.currency_id.id,
-                            # 'comment': service.quotation_notes,
-                            'fiscal_position_id': service.partner_id.property_account_position_id
-                        })
                         invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
 
@@ -559,21 +606,22 @@ class ServiceOrder(models.Model):
                     else:
                         raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
 
-                    if invoice_or and other.name == 'Own Risk':
-                        invoice_line_or = InvoiceLine.create({
-                            'invoice_id': invoice_or.id,
-                            'name': name,
-                            'origin': other.name,
-                            'account_id': account_id,
-                            'quantity': other.product_uom_qty,
-                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
-                            'uom_id': other.product_uom.id,
-                            'product_id': other.product_id and other.product_id.id or False,
-                            'product_category': other.product_id.categ_id.name,
-                            'price_unit': other.price_unit,
-                            'price_subtotal': other.product_uom_qty * other.price_unit
-                        })
-                    else:
+#                     if invoice_or and other.name == 'Own Risk':
+#                         invoice_line_or = InvoiceLine.create({
+#                             'invoice_id': invoice_or.id,
+#                             'name': name,
+#                             'origin': other.name,
+#                             'account_id': account_id,
+#                             'quantity': other.product_uom_qty,
+#                             'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+#                             'uom_id': other.product_uom.id,
+#                             'product_id': other.product_id and other.product_id.id or False,
+#                             'product_category': other.product_id.categ_id.name,
+#                             'price_unit': other.price_unit,
+#                             'price_subtotal': other.product_uom_qty * other.price_unit
+#                         })
+#                     else:
+                    if other.name != 'Own Risk':
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
                             'name': name,

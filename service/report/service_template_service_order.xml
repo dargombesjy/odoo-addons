@@ -186,23 +186,30 @@
                 <table class="table table-sm">
                   <t t-if="o.invoice_method != 'none'">
                     <tr class="border-black o_subtotal">
-                      <td><strong>Subtotal</strong></td>
+                      <t t-if="o.print_tax">
+                        <td><strong>Subtotal</strong></td>
+                      </t>
+                      <t t-else="">
+                        <td><strong>Total</strong></td>
+                      </t>
                       <td class="text-right">
                         <span t-field="o.amount_untaxed"/> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
                       </td>
                     </tr>
-                    <tr>
-                      <td>Pajak</td>
-                      <td class="text-right">
-                        <span t-field="o.amount_tax"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                      </td>
-                    </tr>
-                    <tr class="border-black 0_total">
-                      <td>Total</td>
-                      <td class="text-right o_price_total">
-                        <span t-field="o.amount_total"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                      </td>
-                    </tr>
+                    <t t-if="o.print_tax">
+                      <tr>
+                        <td>Pajak</td>
+                        <td class="text-right">
+                          <span t-field="o.amount_tax"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                        </td>
+                      </tr>
+                      <tr class="border-black 0_total">
+                        <td>Total</td>
+                        <td class="text-right o_price_total">
+                          <span t-field="o.amount_total"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                        </td>
+                      </tr>
+                    </t>
                   </t>
                 </table>
               </div>
@@ -296,23 +303,23 @@
           <div class="row signature-block">
               <div class="col-3 text-center">
                 <t t-if="o.state != 'draft'">
-                  <span>............,......</span>
+                  <span></span>
                   <div style="height:100px"/>
-                  <span>( ........ )</span>
+                  <span>( Service Advisor )</span>
                 </t>
               </div>
               <div class="col-3 text-center">
                 <t t-if="o.state != 'draft'">
                   <span>Disiapkan Oleh</span>
                   <div style="height:100px"/>
-                  <span>( Foreman )</span>\
+                  <span>( Ka. Prod )</span>\
                 </t>
               </div>
               <div class="col-3 text-center">
                 <t t-if="o.state != 'draft'">
                   <span>Pengecekan</span>
                   <div style="height:100px"/>
-                  <span>( QC )</span>
+                  <span>( Foreman )</span>
                 </t>
               </div>
               <div class="col-3 text-center">
@@ -327,9 +334,36 @@
                   <span>REFDISON</span>
                 </t>
                 <t t-else="">
-                  <span t-field="o.service_advisor"/>
+                  <span>( Pelaksana )</span>
                 </t>
               </div>
+              
+              <div class="oe_structure"/>
+              
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <span></span>
+                  <div style="height:100px"/>
+                  <span>( Foreman )</span>
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <div style="height:100px"/>
+                  <span>( Ka. Prod )</span>\
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <t t-if="o.state != 'draft'">
+                  <div style="height:100px"/>
+                  <span>( Service advisor )</span>
+                </t>
+              </div>
+              <div class="col-3 text-center">
+                <div style="height:100px"/>
+                <span>( CS )</span>
+              </div>
+
           </div>
           <!-- </t> -->
 

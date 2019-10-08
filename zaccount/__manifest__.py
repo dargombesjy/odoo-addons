@@ -11,6 +11,7 @@
     'data': [
         'views/partner_views.xml',
         'views/zaccount_invoice_views.xml',
+        'views/zreport_invoice.xml',
     ],
     'installable': True,
     'auto_install': True,
