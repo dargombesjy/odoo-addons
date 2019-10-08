@@ -241,7 +241,7 @@
                       <tr style="">
                         <td><span>Own Risk</span></td>
                         <td class="text-right o_price_total">
-                          <span t-field="own_risk"/>
+                          <span t-field="o.own_risk"/>
                         </td>
                       </tr>
                     </t>
