@@ -2,24 +2,34 @@
 <odoo>
   <data>
     <template id="zreport_invoice_document" inherit_id="account.report_invoice_document">
-      <xpath expr="//t[@t-call='web.external_layout']">
+      <xpath expr="//t[@t-call='web.external_layout']" position="replace">
         <t t-call="web.external_layout">
           <t t-set="o" t-value="o.with_context(lang=lang)" />
 <!--           <t t-set="address">
             <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
             <div t-if="o.partner_id.vat" class="mt16"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="o.partner_id.vat"/></div>
           </t> -->
-          <div class="page">
+          <div class="page" style="font-size:0.9rem">
             <style type="text/css">
               .signature-block {
                 page-break-inside: avoid;
               }
+              .table-no-border {
+                width: 100%;
+                margin-bottom: 1rem;
+                background-color: transparent;
+              }
+              .table-no-border td {
+                vertical-align: top;
+              }
             </style>
             <div class="text-center">
-              <span>PT.KARYA MURNI SENTOSA</span>
-            </div>
-            <div>
-              <span>Jl. Siliwangi Km. 7 No. 50</span>
+              <h4>
+                <span>PT.KARYA MURNI SENTOSA</span>
+              </h4>
+              <div style="border-bottom: 1px solid;margin-bottom: 16px;">
+                <span>Jl. Siliwangi Km. 7 No. 50</span>
+              </div>
             </div>
             <h4>
               <span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
@@ -58,9 +68,9 @@
               </div>
             </div -->
             
-            <div id="informations" class="row mt32 mb32">
+            <div id="informations" class="row mt16 mb32">
               <t t-if="o.origin_type in ('service', 'own_risk')">
-                <div class="col-6 bm-2">
+                <div class="col-7 bm-2">
                   <table class="table table-sm">
                     <tr>
                       <td style="width:30%">Nama Asuransi</td>
@@ -89,7 +99,7 @@
                     </tr>
                   </table>
                 </div>
-                <div class="col-6 bm-2">
+                <div class="col-5 bm-2">
                   <table class="table table-sm">
                     <tr>
                       <td style="width:30%">Claim Ref.No</td>
@@ -257,7 +267,7 @@
             </div>
             <div class="row signature-block">
               <div class="col-8">
-                <table class="table table-sm">
+                <table class="table-no-border table-sm">
                   <tr>
                     <td style="width:30%">Account No.</td>
                     <td>:</td>

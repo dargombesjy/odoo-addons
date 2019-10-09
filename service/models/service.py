@@ -879,7 +879,7 @@ class ServiceLine(models.Model):
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
     approved = fields.Boolean('Approved', default=True)
-    cost_unit = fields.Float('Unit Cost', required=True)
+    cost_unit = fields.Float('Unit Cost') #, required=True)
     # cost_tax_id = fields.Many2many(
     #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
