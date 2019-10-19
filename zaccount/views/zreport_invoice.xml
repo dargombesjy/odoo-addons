@@ -75,7 +75,7 @@
                     <tr>
                       <td style="width:30%">Nama Asuransi</td>
                       <td>:</td>
-                      <td><span t-field="o.partner_id.name"/></td>
+                      <td><span t-field="o.service_id.insurance_id.name"/></td>
                     </tr>
                     <tr>
                       <td style="width:30%">Nama Pelapor</td>
