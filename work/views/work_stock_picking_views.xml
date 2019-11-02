@@ -94,6 +94,18 @@
         </xpath>
       </field>
     </record>
+    
+    <record id="work_view_picking_tree_search" model="ir.ui.view">
+      <field name="name">work.stock.picking.search</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+      <field name="arch" type="xml">
+      	<xpath expr="//search" position="inside">
+      	  <field name="service_id" string="Service Orders"/>
+      	  <field name="eq_name" string="Equipment"/>
+      	</xpath>
+      </field>
+    </record>
 
     <record id="work_view_picking_tree" model="ir.ui.view">
       <field name="name">work.stock.picking.tree</field>

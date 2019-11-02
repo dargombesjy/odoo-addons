@@ -52,7 +52,7 @@
                 <tr>
                   <td style="width:30%">Tipe Kendaraan</td>
                   <td>:</td>
-                  <td><span t-field="o.model"/></td>
+                  <td><span t-field="o.make"/> <span t-field="o.model"/></td>
                 </tr>
                 <tr>
                   <td style="width:30%">No. Polisi</td>
@@ -123,17 +123,19 @@
                 <tr class="bg-200 o_line_section"><td colspan="6"><strong>Repairs</strong></td></tr>
                 <tr t-foreach="o.fees_lines" t-as="fees">
                   <t t-if="o.state == 'draft'">
-                    <td style="width:5%;"><span t-esc="m"/></td>
-                    <td colspan="2"><span t-field="fees.name"/></td>
-                    <td class="text-right">
-                      <span t-field="fees.product_uom_qty"/>
-                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                    <td class="text-right"><span t-field="fees.price_unit"/></td>
-                    <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
-                    <td class="text-right o_price_total">
-                      <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                    </td>
+                  	<t t-if="fees.approved">
+                   	  <td style="width:5%;"><span t-esc="m"/></td>
+                   	  <td colspan="2"><span t-field="fees.name"/></td>
+                      <td class="text-right">
+                        <span t-field="fees.product_uom_qty"/>
+                        <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
+                      </td>
+                      <td class="text-right"><span t-field="fees.price_unit"/></td>
+                      <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
+                      <td class="text-right o_price_total">
+                        <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                      </td>
+                    </t>
                   </t>
                   <t t-elif="fees.approved">
                     <td style="width:5%;"><span t-esc="m"/></td>
@@ -151,19 +153,21 @@
                 <tr class="bg-200 o_line_section"><td colspan="6"><strong>Spareparts</strong></td></tr>
                 <tr t-foreach="o.operations" t-as="line">
                   <t t-if="o.state == 'draft'">
-                    <td style="width:5%;"><span t-esc="i"/></td>
-                    <!-- <td style="width:20%;"><span t-field="line.supply_type"/></td> -->
-                    <td><span t-field="line.part_number"/></td>
-                    <td><span t-field="line.name"/></td>
-                    <td class="text-right">
-                      <span t-field="line.product_uom_qty"/>
-                      <span t-field="line.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                    <td class="text-right"><span t-field="line.price_unit"/></td>
-                    <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
-                    <td class="text-right o_price_total">
-                      <span t-field="line.price_subtotal"/><!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                    </td>
+                    <t t-if="line.approved">
+                      <td style="width:5%;"><span t-esc="i"/></td>
+                      <!-- <td style="width:20%;"><span t-field="line.supply_type"/></td> -->
+                      <td><span t-field="line.part_number"/></td>
+                      <td><span t-field="line.name"/></td>
+                      <td class="text-right">
+                        <span t-field="line.product_uom_qty"/>
+                        <span t-field="line.product_uom.name" groups="uom.group_uom"/>
+                      </td>
+                      <td class="text-right"><span t-field="line.price_unit"/></td>
+                      <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
+                      <td class="text-right o_price_total">
+                        <span t-field="line.price_subtotal"/><!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
+                      </td>
+                    </t>
                   </t>
                   <t t-elif="line.approved">
                     <td style="width:5%;"><span t-esc="i"/></td>
