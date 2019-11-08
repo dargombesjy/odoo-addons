@@ -77,4 +77,4 @@ class ReportTrialBalance(models.AbstractModel):
             'time': time,
             'Accounts': account_res,
         }
-        return self.env['report'].render('account.report_trialbalance', docargs)
+#         return self.env['report'].render('account.report_trialbalance', docargs)

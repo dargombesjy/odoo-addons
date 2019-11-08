@@ -134,4 +134,4 @@ class ReportGeneralLedger(models.AbstractModel):
             'Accounts': accounts_res,
             'print_journal': codes,
         }
-        return self.env['report'].render('account.report_generalledger', docargs)
+#         return self.env['report'].render('account.report_generalledger', docargs)

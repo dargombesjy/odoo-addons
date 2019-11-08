@@ -145,6 +145,7 @@ class ReportFinancial(models.AbstractModel):
 
     @api.model
     def render_html(self, docids, data=None):
+#     def _get_report_values(self, docids, data=None):
         if not data.get('form') or not self.env.context.get('active_model') or not self.env.context.get('active_id'):
             raise UserError(_("Form content is missing, this report cannot be printed."))
 
@@ -159,4 +160,4 @@ class ReportFinancial(models.AbstractModel):
             'time': time,
             'get_account_lines': report_lines,
         }
-        return self.env['report'].render('account.report_financial', docargs)
+#         return self.env['report'].render('account.report_financial', docargs)

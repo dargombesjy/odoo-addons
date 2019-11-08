@@ -70,6 +70,5 @@
         </record>
 
         <menuitem id="menu_account_financial_reports_tree" name="Account Reports" parent="menu_account_reports" action="action_account_financial_report_tree"/>
-
     </data>
 </odoo>
