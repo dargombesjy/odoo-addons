@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <template id="pass_keluar_doc">
+      <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+          <t t-call="web.external_layout">
+            <div class="page" style="font-size:0.9rem">
+            <style>
+              #pass-main p {
+                margin-bottom: 0.5rem;
+              }
+              #partner span {
+                font-size: 9pt;
+              }
+            </style>
+              <!-- <div class="oe_structure"/> -->
+              <div class="row mb32">
+                <div id="partner" class="col-4">
+                  <h5><strong>PT. Karya Murni Sentosa</strong></h5>
+                  <span>Jl. Siliwangi Km.17 No. 50</span><br></br>
+                  <span>Caringin Rawalumbu - Bekasi</span><br></br>
+                  <span>021-82420757</span>
+                </div>
+                <div class="col-8">
+                  <h2 style="padding-top:25px;padding-left:25px;">
+                    <span>PASS KELUAR</span>
+                  </h2>
+                </div>
+              </div>
+              <p>Mohon diijinkan keluar kendaraan:</p>
+              <div id="pass-main" class="row">
+                <div class="col-3">
+                  <p>No. Polisi</p>
+                  <p>Merk / Type</p>
+                  <p>Warna</p>
+                  <p>Asuransi / Pribadi</p>
+                  <p>Tgl. Keluar</p>
+                  <p>Tujuan</p>
+                  <p>Dibawa oleh</p>
+                  <p>Dibuat oleh</p>
+                </div>
+                <div class="col-9">
+                  <p>: <span t-field="o.equipment_id.name"/></p>
+                  <p>: <span t-field="o.make"/> <span t-field="o.model"/></p>
+                  <p>: <span t-field="o.base_colour"/></p>
+                  <p>: <span t-field="o.insurance_id.name"/></p>
+                  <p>: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/></p>
+                  <p>:</p>
+                  <p>:</p>
+                  <p>:</p>
+                </div>
+              </div>
+
+              <div id="pass-footer" class="row mt32">
+                <div class="col-3" style="font-size:8pt">
+                  <div>
+                    <span>- Putih    : Security</span>
+                  </div>
+                  <div>
+                    <span>- Merah   : Customer / Driver</span>
+                  </div>
+                  <div>
+                    <span>- Kuning : Arsip</span>
+                  </div>
+                </div>
+                <div class="col-5 text-center">
+                  <span>KASIR</span>
+                  <div style="height:80px"/>
+                  <span>(....................)</span>
+                </div>
+                <div class="col-4">
+                  <span>SECURITY</span>
+                  <div style="height:80px"/>
+                  <span>(....................)</span>
+                </div>
+              </div>
+            </div>
+          </t>
+        </t>
+      </t>
+    </template>
+  </data>
+</odoo>

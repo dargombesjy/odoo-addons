@@ -6,6 +6,9 @@
       <field name="model">account.invoice</field>
       <field name="inherit_id" ref="account.invoice_form"/>
       <field name="arch" type="xml">
+        <xpath expr="//header/button[@name='preview_invoice']" position="after">
+          <button name="action_print_invoice_or" string="Print Invoice OR" type="object"/>
+        </xpath>
         <xpath expr="//tree/field[@name='sequence']" position="after">
           <field name="product_category"/>
         </xpath>

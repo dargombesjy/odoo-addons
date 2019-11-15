@@ -33,6 +33,7 @@
             <button name="action_export_xls" states="draft" string="Export to Excel" type="object"/>
             <button name="action_service_confirm" states="draft" string="Confirm Service" type="object" class="oe_highlight"/>
             <button name="action_invoice_or_create" type="object" string="Create Own Risk" groups="account.group_account_invoice"/>
+            <button name="action_print_pass_keluar" type="object" string="Print Pass Keluar" groups="account.group_account_invoice"/>
             <button name="action_service_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
             <button name="action_service_end" states="ready" string="Close Order" type="object" class="oe_highlight"/>
             <!-- <button name="action_service_cancel" string="Cancel Repair" type="object" attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->

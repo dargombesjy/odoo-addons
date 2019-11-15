@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
+
     <report
       string="Quotation / Order"
       id="action_report_service_order"
@@ -9,6 +10,16 @@
       file="service.report_serviceorder"
       report_type="qweb-pdf"
       print_report_name="(object.state == 'draft' and 'Service Quotation - %s' % (object.name) or 'Service Order - %s' % (object.name))"/>
-      <!-- menu="False" -->
+
+    <report
+      string="Gate Pass"
+      id="report_gate_pass"
+      model="service.order"
+      name="service.pass_keluar_doc"
+      file="service.pass_keluar"
+      report_type="qweb-pdf"
+      paperformat="paperformat_pass_keluar"
+      menu="False"/>
+
   </data>
 </odoo>

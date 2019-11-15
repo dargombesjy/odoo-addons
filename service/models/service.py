@@ -394,6 +394,10 @@ class ServiceOrder(models.Model):
     def action_print_service_order(self):
         return self.env.ref('service.action_report_service_order').report_action(self)
 
+    @api.multi
+    def action_print_pass_keluar(self):
+        return self.env.ref('service.report_gate_pass').report_action(self)
+
     def action_service_invoice_create(self):
         for service in self:
             if service.work_stage not in ['done', 'delivered']:
@@ -585,7 +589,7 @@ class ServiceOrder(models.Model):
                             account_id = fee.product_id.categ_id.property_account_income_categ_id.id
                         else:
                             raise UserError(_('No account defined for product "%s%".') % fee.product_id.name)
-    
+
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
                             'name': name,

@@ -5,6 +5,7 @@ encoding//account_standard_report/models/account.py=utf-8
 encoding//account_standard_report/models/account_standard_report_template.py=utf-8
 encoding//account_standard_report/report/report_account_standard_excel.py=utf-8
 encoding//account_standard_report/wizard/account_standard_report.py=utf-8
+encoding//accounting_pdf_reports/reports/report_aged_partner.py=utf-8
 encoding//accounting_pdf_reports/reports/report_financial.py=utf-8
 encoding//accounting_pdf_reports/wizards/account_general_ledger.py=utf-8
 encoding//accounting_pdf_reports/wizards/account_report.py=utf-8
