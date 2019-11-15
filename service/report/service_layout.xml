@@ -17,12 +17,13 @@
           <div class="text-center" style="border-top:1px solid black">
             <div t-if="report_type == 'pdf'" class="text-muted">
               Page: <span class="page"/> / <span class="topage"/>
-              <span id="print-date"></span>
+              Date: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+              <!-- <span id="print-date"></span> -->
             </div>
-            <script>
-              var d = new Date();
-              document.getElementById("print-date").innerHTML = d;
-            </script>
+            <!-- <script> -->
+              <!-- var d = new Date(); -->
+              <!-- document.getElementById("print-date").innerHTML = d; -->
+            <!-- </script> -->
           </div>
         </div>
       </xpath>

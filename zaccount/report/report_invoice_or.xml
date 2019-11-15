@@ -6,10 +6,13 @@
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
             <t t-set="o" t-value="o.with_context(lang=lang)" />
-            <div class="page" style="font-size:0.9rem">
+            <div class="page" style="font-size:0.85rem">
               <style type="text/css">
                 .signature-block {
                   page-break-inside: avoid;
+                }
+                .table-sm td {
+                  padding: 0.1rem;
                 }
                 .table-no-border {
                   width: 100%;
@@ -37,7 +40,7 @@
                 <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
                 <span t-field="o.number"/>
               </h4>
-  
+
               <!-- div id="informations" class="row mt32 mb32">
                 <div class="col-auto mw-100 mb-2" t-if="o.name" name="description">
                   <strong>Description:</strong>
@@ -64,8 +67,8 @@
                   <p class="m-0" t-field="o.reference"/>
                 </div>
               </div -->
-  
-              <div id="informations" class="row mt16 mb32">
+
+              <div id="informations" class="row mt8 mb16">
                 <t t-if="o.origin_type in ('service', 'own_risk')">
                   <div class="col-7 bm-2">
                     <table class="table table-sm">
@@ -82,18 +85,18 @@
                       <tr>
                         <td style="width:30%">Merk Kendaraan</td>
                         <td>:</td>
-                        <td><span t-field="o.service_id.make"/></td>
+                        <td><span t-field="o.service_id.make"/> <span t-field="o.service_id.model"/></td>
                       </tr>
                       <tr>
                         <td style="width:30%">No. Polisi</td>
                         <td>:</td>
                         <td><span t-field="o.service_id.equipment_id.name"/></td>
                       </tr>
-                      <tr>
+                      <!-- <tr>
                         <td style="width:30%">Tipe Kendaraan</td>
                         <td>:</td>
                         <td><span t-field="o.service_id.model"/></td>
-                      </tr>
+                      </tr> -->
                     </table>
                   </div>
                   <div class="col-5 bm-2">
@@ -113,11 +116,11 @@
                         <td>:</td>
                         <td><span t-field="o.service_id.policy_no"/></td>
                       </tr>
-                      <tr>
+                      <!-- <tr>
                         <td style="width:30%">Delivery Date</td>
                         <td>:</td>
                         <td><span t-field="o.service_id.finish_date"/></td>
-                      </tr>
+                      </tr> -->
                       <tr>
                         <td style="width:30%">Invoice Date</td>
                         <td>:</td>
@@ -132,9 +135,9 @@
                   </t>
                 </t>
               </div>
-  
+
               <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
-  
+
               <table class="table table-sm o_main_table" name="invoice_line_table">
                 <thead>
                   <tr>
@@ -161,7 +164,7 @@
                   <t t-foreach="o.invoice_line_ids" t-as="line">
                     <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                     <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
-  
+
                     <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                       <t t-if="not line.display_type" name="account_invoice_line_accountable">
                         <td name="account_invoice_line_name"><span t-field="line.name"/></td>
@@ -197,7 +200,7 @@
                         </td>
                       </t>
                     </tr>
-  
+
                     <t t-if="current_section and (line_last or o.invoice_line_ids[line_index+1].display_type == 'line_section')">
                       <tr class="is-subtotal text-right">
                         <td colspan="99">
@@ -212,7 +215,7 @@
                   </t>
                 </tbody>
               </table>
-  
+
               <div class="clearfix">
                 <div id="total" class="row">
                   <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
@@ -262,7 +265,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row signature-block">
+              <div class="row signature-block mt16">
                 <div class="col-8">
                   <table class="table-no-border table-sm">
                     <tr>
@@ -293,7 +296,7 @@
                     <span>REFDISON</span>
                 </div>
               </div>
-  
+
               <p t-if="o.reference">
                 Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
               </p>
