@@ -5,10 +5,10 @@
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
-            <div class="page" style="font-size:0.9rem">
+            <div class="page" style="font-size:0.85rem">
             <style>
               #pass-main p {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.2rem;
               }
               #partner span {
                 font-size: 9pt;
@@ -17,10 +17,10 @@
               <!-- <div class="oe_structure"/> -->
               <div class="row mb32">
                 <div id="partner" class="col-4">
-                  <h5><strong>PT. Karya Murni Sentosa</strong></h5>
-                  <span>Jl. Siliwangi Km.17 No. 50</span><br></br>
-                  <span>Caringin Rawalumbu - Bekasi</span><br></br>
-                  <span>021-82420757</span>
+                  <h6><strong>PT. Karya Murni Sentosa</strong></h6>
+                  <span t-field="res_company.street"/><br></br>
+                  <span t-field="res_company.street2"/> - <span t-field="res_company.city"/><br></br>
+                  <span t-field="res_company.phone"/>
                 </div>
                 <div class="col-8">
                   <h2 style="padding-top:25px;padding-left:25px;">
@@ -66,12 +66,12 @@
                 </div>
                 <div class="col-5 text-center">
                   <span>KASIR</span>
-                  <div style="height:80px"/>
+                  <div style="height:70px"/>
                   <span>(....................)</span>
                 </div>
                 <div class="col-4">
                   <span>SECURITY</span>
-                  <div style="height:80px"/>
+                  <div style="height:70px"/>
                   <span>(....................)</span>
                 </div>
               </div>
