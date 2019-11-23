@@ -9,7 +9,7 @@
     Custom Invoicing
     """,
     'data': [
-        'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/account_report_settings.xml',
         'views/account_pdf_reports.xml',
         'views/partner_views.xml',
