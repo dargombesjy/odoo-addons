@@ -66,6 +66,7 @@ class ServiceOrder(models.Model):
                     # 'name': 'Service-%s' % service.name,
                     'origin': service.name,
                     'service_id': service.id,
+                    'eq_name': service.equipment_id.name,
                     'partner_id': item[0].id,
                     'state': 'draft',
                 })

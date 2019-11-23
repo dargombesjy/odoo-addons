@@ -50,7 +50,7 @@
                 <tr>
                   <td style="width:30%">Tipe Kendaraan</td>
                   <td>:</td>
-                  <td><span t-field="o.model"/></td>
+                  <td><span t-field="o.make"/> <span t-field="o.model"/> / <span t-field="o.equipment_id.name"/></td>
                 </tr>
               </table>
             </div>

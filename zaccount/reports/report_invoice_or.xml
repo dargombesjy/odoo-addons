@@ -293,7 +293,7 @@
                 <div class="col-4 text-center">
                   <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
                   <div style="height:100px"/>
-                    <span>REFDISON</span>
+                    <span t-esc="user.name"/>
                 </div>
               </div>
 
