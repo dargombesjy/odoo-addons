@@ -97,7 +97,7 @@
 									<field name="has_move_lines" invisible="1" />
 									<field name="is_locked" invisible="1" />
 									<field name="product_id" required="1"
-										attrs="{'readonly': ['|', '&amp;', ('state', '!=', 'draft'), ('additional', '=', False), ('has_move_lines', '=', True)]}" />
+										attrs="{'readonly': ['|', '&amp;', ('additional', '=', False), ('has_move_lines', '=', True)]}" />
 									<field name="name" invisible="0" />
 									<field name="vendor_id" invisible="0" />
 									<field name="vendor_qty" invisible="0" />
