@@ -1,379 +1,500 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <!-- Main template -->
-    <template id="report_serviceorder">
-      <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="o">
-          <t t-call="service.report_serviceorder_document" t-lang="o.partner_id.lang"/>
-        </t>
-      </t>
-    </template>
+	<data>
+		<!-- Main template -->
+		<template id="report_serviceorder">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="service.report_serviceorder_document"
+						t-lang="o.partner_id.lang" />
+				</t>
+			</t>
+		</template>
 
-    <!-- Translatable template -->
-    <template id="report_serviceorder_document">
-      <!-- <t t-set="o" t-value="doc"/> -->
-      <t t-call="web.external_layout">
-        <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
-        <div class="page" style="font-size:0.9rem">
-          <style type="text/css">
-            .table-sm td {
-              padding-top: 0.1rem;
-              padding-bottom: 0.1rem;
-            }
-            .signature-block {
-              page-break-inside: avoid;
-            }
-          </style>
-          <div class="oe_structure" style="height:45px"/>
-          <h4 class="text-center">
-            <span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
-            <span t-if="o.state != 'draft'">SURAT PERINTAH KERJA BENGKEL</span>
-          </h4>
+		<!-- Translatable template -->
+		<template id="report_serviceorder_document">
+			<!-- <t t-set="o" t-value="doc"/> -->
+			<t t-call="web.external_layout">
+				<t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+				<div class="page" style="font-size:0.9rem">
+					<style type="text/css">
+						.table-sm td {
+						padding-top: 0.1rem;
+						padding-bottom: 0.1rem;
+						}
+						.signature-block {
+						page-break-inside: avoid;
+						}
+					</style>
+					<div class="oe_structure" style="height:45px" />
+					<h4 class="text-center">
+						<span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
+						<span t-if="o.state != 'draft'">SURAT PERINTAH KERJA BENGKEL</span>
+					</h4>
 
-          <div id="informations" class="row mt32 mb32">
-            <div class="col-6 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">No. Estimasi</td>
-                  <td>:</td>
-                  <td><span t-field="o.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Asuransi</td>
-                  <td>:</td>
-                  <td><span t-field="o.insurance_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Customer</td>
-                  <td>:</td>
-                  <td><span t-field="o.partner_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Tipe Kendaraan</td>
-                  <td>:</td>
-                  <td><span t-field="o.make"/> <span t-field="o.model"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">No. Polisi</td>
-                  <td>:</td>
-                  <td><span t-field="o.equipment_id.name"/></td>
-                </tr>
-              </table>
-            </div>
-            <!-- <div class="col-2 bm-2">
-              <table class="table table-sm">
-              </table>
-            </div> -->
-            <div class="col-6 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">Warna</td>
-                  <td>:</td>
-                  <td><span t-field="o.base_colour"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Dempul / Cat</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Las / Ketok</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <t t-if="o.state != 'draft'">
-                    <td style="width:30%">Estimasi Selesai</td>
-                    <td>:</td>
-                    <td><span t-field="o.planned_date"/></td>
-                  </t>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </table>
-            </div>
-          </div>
+					<div id="informations" class="row mt32 mb32">
+						<div class="col-6 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">No. Estimasi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Asuransi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.insurance_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Customer</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.partner_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Tipe Kendaraan</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.make" />
+										<span t-field="o.model" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">No. Polisi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.equipment_id.name" />
+									</td>
+								</tr>
+							</table>
+						</div>
+						<!-- <div class="col-2 bm-2"> <table class="table table-sm"> </table> 
+							</div> -->
+						<div class="col-6 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">Warna</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.base_colour" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Dempul / Cat</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="width:30%">Las / Ketok</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<t t-if="o.state != 'draft'">
+										<td style="width:30%">Estimasi Selesai</td>
+										<td>:</td>
+										<td>
+											<span t-field="o.planned_date" />
+										</td>
+									</t>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</table>
+						</div>
+					</div>
 
-          <table class="table table-sm o_main_table border-all">
-            <thead>
-              <tr>
-                <th style="width:5%;">No.</th>
-                <t t-if="o.state == 'draft'">
-                  <th>Part Number</th>
-                </t>
-                <t t-else="">
-                  <th style="width:20%;">Supply Type</th>
-                </t>
-                <th>Description</th>
-                <th class="text-right">Quantity</th>
-                <t t-if="o.state == 'draft'">
-                  <th class="text-right">Unit Price</th>
-                  <!-- <th class="text-center">Tax</th> -->
-                  <th class="text-right">Price</th>
-                </t>
-              </tr>
-            </thead>
-            <tbody>
-              <t t-if="o.fees_lines">
-                <t t-set="m" t-value="1"/>
-                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Repairs</strong></td></tr>
-                <tr t-foreach="o.fees_lines" t-as="fees">
-                  <t t-if="o.state == 'draft'">
-                  	<t t-if="fees.approved">
-                   	  <td style="width:5%;"><span t-esc="m"/></td>
-                   	  <td colspan="2"><span t-field="fees.name"/></td>
-                      <td class="text-right">
-                        <span t-field="fees.product_uom_qty"/>
-                        <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                      </td>
-                      <td class="text-right"><span t-field="fees.price_unit"/></td>
-                      <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/></td> -->
-                      <td class="text-right o_price_total">
-                        <span t-field="fees.price_subtotal"/> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                      </td>
-                    </t>
-                  </t>
-                  <t t-elif="fees.approved">
-                    <td style="width:5%;"><span t-esc="m"/></td>
-                    <td colspan="2"><span t-field="fees.name"/></td>
-                    <td class="text-right">
-                      <span t-field="fees.product_uom_qty"/>
-                      <span t-field="fees.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                  </t>
-                  <t t-set="m" t-value="m+1"/>
-                </tr>
-              </t>
-              <t t-if="o.operations">
-                <t t-set="i" t-value="1"/>
-                <tr class="bg-200 o_line_section"><td colspan="6"><strong>Spareparts</strong></td></tr>
-                <tr t-foreach="o.operations" t-as="line">
-                  <t t-if="o.state == 'draft'">
-                    <t t-if="line.approved">
-                      <td style="width:5%;"><span t-esc="i"/></td>
-                      <!-- <td style="width:20%;"><span t-field="line.supply_type"/></td> -->
-                      <td><span t-field="line.part_number"/></td>
-                      <td><span t-field="line.name"/></td>
-                      <td class="text-right">
-                        <span t-field="line.product_uom_qty"/>
-                        <span t-field="line.product_uom.name" groups="uom.group_uom"/>
-                      </td>
-                      <td class="text-right"><span t-field="line.price_unit"/></td>
-                      <!-- <td class="text-center"><span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/></td> -->
-                      <td class="text-right o_price_total">
-                        <span t-field="line.price_subtotal"/><!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                      </td>
-                    </t>
-                  </t>
-                  <t t-elif="line.approved">
-                    <td style="width:5%;"><span t-esc="i"/></td>
-                    <td style="width:20%;"><span t-field="line.supply_type"/></td>
-                    <td><span t-field="line.name"/></td>
-                    <td class="text-right">
-                      <span t-field="line.product_uom_qty"/>
-                      <span t-field="line.product_uom.name" groups="uom.group_uom"/>
-                    </td>
-                  </t>
-                  <t t-set="i" t-value="i+1"/>
-                </tr>
-              </t>
-            </tbody>
-          </table>
+					<table class="table table-sm o_main_table border-all">
+						<thead>
+							<tr>
+								<th style="width:5%;">No.</th>
+								<t t-if="o.state == 'draft'">
+									<th>Part Number</th>
+								</t>
+								<t t-else="">
+									<th style="width:20%;">Supply Type</th>
+								</t>
+								<th>Description</th>
+								<th class="text-right">Quantity</th>
+								<t t-if="o.state == 'draft'">
+									<th class="text-right">Unit Price</th>
+									<!-- <th class="text-center">Tax</th> -->
+									<th class="text-right">Price</th>
+								</t>
+							</tr>
+						</thead>
+						<tbody>
+							<t t-if="o.fees_lines">
+								<t t-set="m" t-value="1" />
+								<tr class="bg-200 o_line_section">
+									<td colspan="6">
+										<strong>Repairs</strong>
+									</td>
+								</tr>
+								<tr t-foreach="o.fees_lines" t-as="fees">
+									<t t-if="o.state == 'draft'">
+										<t t-if="fees.approved">
+											<td style="width:5%;">
+												<span t-esc="m" />
+											</td>
+											<td colspan="2">
+												<span t-field="fees.name" />
+											</td>
+											<td class="text-right">
+												<span t-field="fees.product_uom_qty" />
+												<span t-field="fees.product_uom.name"
+													groups="uom.group_uom" />
+											</td>
+											<td class="text-right">
+												<span t-field="fees.price_unit" />
+											</td>
+											<!-- <td class="text-center"><span t-esc="','.join(map( lambda 
+												x: x.name, fees.tax_id))"/></td> -->
+											<td class="text-right o_price_total">
+												<span t-field="fees.price_subtotal" /> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+											</td>
+										</t>
+									</t>
+									<t t-elif="fees.approved">
+										<td style="width:5%;">
+											<span t-esc="m" />
+										</td>
+										<td colspan="2">
+											<span t-field="fees.name" />
+										</td>
+										<td class="text-right">
+											<span t-field="fees.product_uom_qty" />
+											<span t-field="fees.product_uom.name"
+												groups="uom.group_uom" />
+										</td>
+									</t>
+									<t t-set="m" t-value="m+1" />
+								</tr>
+							</t>
+							<t t-if="o.operations">
+								<t t-set="i" t-value="1" />
+								<tr class="bg-200 o_line_section">
+									<td colspan="6">
+										<strong>Spareparts</strong>
+									</td>
+								</tr>
+								<tr t-foreach="o.operations" t-as="line">
+									<t t-if="o.state == 'draft'">
+										<t t-if="line.approved">
+											<td style="width:5%;">
+												<span t-esc="i" />
+											</td>
+											<!-- <td style="width:20%;"><span t-field="line.supply_type"/></td> -->
+											<td>
+												<span t-field="line.part_number" />
+											</td>
+											<td>
+												<span t-field="line.name" />
+											</td>
+											<td class="text-right">
+												<span t-field="line.product_uom_qty" />
+												<span t-field="line.product_uom.name"
+													groups="uom.group_uom" />
+											</td>
+											<td class="text-right">
+												<span t-field="line.price_unit" />
+											</td>
+											<!-- <td class="text-center"><span t-esc="','.join(map( lambda 
+												x: x.name, line.tax_id))"/></td> -->
+											<td class="text-right o_price_total">
+												<span t-field="line.price_subtotal" /><!-- t-options='{"widget": 
+													"monetary", "display_currency": o.currency_id}'/ -->
+											</td>
+										</t>
+									</t>
+									<t t-elif="line.approved">
+										<td style="width:5%;">
+											<span t-esc="i" />
+										</td>
+										<td style="width:20%;">
+											<span t-field="line.supply_type" />
+										</td>
+										<td>
+											<span t-field="line.name" />
+										</td>
+										<td class="text-right">
+											<span t-field="line.product_uom_qty" />
+											<span t-field="line.product_uom.name"
+												groups="uom.group_uom" />
+										</td>
+									</t>
+									<t t-set="i" t-value="i+1" />
+								</tr>
+							</t>
+						</tbody>
+					</table>
 
-          <t t-if="o.state == 'draft'">
-            <div id="total" class="row justify-content-end mb32">
-              <div class="col-4">
-                <table class="table table-sm">
-                  <t t-if="o.invoice_method != 'none'">
-                    <tr class="border-black o_subtotal">
-                      <t t-if="o.print_tax">
-                        <td><strong>Subtotal</strong></td>
-                      </t>
-                      <t t-else="">
-                        <td><strong>Total</strong></td>
-                      </t>
-                      <td class="text-right">
-                        <span t-field="o.amount_untaxed"/> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                      </td>
-                    </tr>
-                    <t t-if="o.print_tax">
-                      <tr>
-                        <td>Pajak</td>
-                        <td class="text-right">
-                          <span t-field="o.amount_tax"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                        </td>
-                      </tr>
-                      <tr class="border-black 0_total">
-                        <td>Total</td>
-                        <td class="text-right o_price_total">
-                          <span t-field="o.amount_total"/>  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/-->
-                        </td>
-                      </tr>
-                    </t>
-                  </t>
-                </table>
-              </div>
-            </div>
-          </t>
-          <div class="oe_structure"/>
-          <t t-if="o.state != 'draft'">
-            <div id="spk-footer" class="row mb32">
-              <div class="col-12">
-                <table class="table table-sm">
-                  <thead>
-                    <tr style="vertical-align:middle">
-                      <th>Proses</th>
-                      <th>Dikerjakan oleh</th>
-                      <th>Tanggal Paraf</th>
-                      <th>Mulai</th>
-                      <th>Selesai</th>
-                      <th>TTD</th>
-                      <th>QC Check</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- <tr>
-                      <td>Bongkar</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr> -->
-                    <tr>
-                      <td>Bongkar</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Las Ketok</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Dempul / Epoxy</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Cat</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Poles</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Pasang</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Finishing</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Aksesoris</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                      <td>Quality Control</td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="oe_structure"/>
-            </div>
-            <div class="row mb32">
-              <div class="col-4">
-                <p>Est. Pemakaian Cat: ........... Gram</p>
-                <table class="table">
-                  <tr><td></td><td></td></tr>
-                  <tr><td></td><td></td></tr>
-                  <tr><td></td><td></td></tr>
-                </table>
-                <p>Total Formula Cat: ............ Gram</p>
-              </div>
-              <div class="col-3">
-                <table>
-                  <tr><td>ACC WARNA</td><td>TTD</td></tr>
-                  <tr><td></td><td></td></tr>
-                  <tr><td></td><td></td></tr>
-                </table>
-              </div>
-              <div class="col-3">
-<!--                 <h4>PART SUPPLY</h4> -->
-<!--                 <p></p> -->
-              </div>
-            </div>
-          </t>
-          <div class="row signature-block">
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <span></span>
-                <div style="height:100px"/>
-                <span>( Service Advisor )</span>
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <span>Disiapkan Oleh</span>
-                <div style="height:100px"/>
-                <span>( Ka. Prod )</span>\
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <span>Pengecekan</span>
-                <div style="height:100px"/>
-                <span>( Foreman )</span>
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <span>Diterima Oleh</span>
-              </t>
-              <t t-else="">
-                <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
-              </t>
-              <div style="height:100px"/>
-              <t t-if="o.state == 'draft'">
-                <span>REFDISON</span>
-              </t>
-              <t t-else="">
-                <span>( Pelaksana )</span>
-              </t>
-            </div>
-          </div>
-          <div class="row signature-block">
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <span></span>
-                <div style="height:100px"/>
-                <span>( Foreman )</span>
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <div style="height:100px"/>
-                <span>( Ka. Prod )</span>\
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <t t-if="o.state != 'draft'">
-                <div style="height:100px"/>
-                <span>( Service advisor )</span>
-              </t>
-            </div>
-            <div class="col-3 text-center">
-              <div style="height:100px"/>
-              <span>( CS )</span>
-            </div>
-          </div>
-          <!-- </t> -->
+					<t t-if="o.state == 'draft'">
+						<div id="total" class="row justify-content-end mb32">
+							<div class="col-4">
+								<table class="table table-sm">
+									<t t-if="o.invoice_method != 'none'">
+										<tr class="border-black o_subtotal">
+											<t t-if="o.print_tax">
+												<td>
+													<strong>Subtotal</strong>
+												</td>
+											</t>
+											<t t-else="">
+												<td>
+													<strong>Total</strong>
+												</td>
+											</t>
+											<td class="text-right">
+												<span t-field="o.amount_untaxed" /> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+											</td>
+										</tr>
+										<t t-if="o.print_tax">
+											<tr>
+												<td>Pajak</td>
+												<td class="text-right">
+													<span t-field="o.amount_tax" />  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+												</td>
+											</tr>
+											<tr class="border-black 0_total">
+												<td>Total</td>
+												<td class="text-right o_price_total">
+													<span t-field="o.amount_total" />  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+												</td>
+											</tr>
+										</t>
+									</t>
+								</table>
+							</div>
+						</div>
+					</t>
+					<div class="oe_structure" />
+					<t t-if="o.state != 'draft'">
+						<div id="spk-footer" class="row mb32">
+							<div class="col-12">
+								<table class="table table-sm">
+									<thead>
+										<tr style="vertical-align:middle">
+											<th>Proses</th>
+											<th>Dikerjakan oleh</th>
+											<th>Tanggal Paraf</th>
+											<th>Mulai</th>
+											<th>Selesai</th>
+											<th>TTD</th>
+											<th>QC Check</th>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- <tr> <td>Bongkar</td> <td></td><td></td><td></td><td></td><td></td><td></td> 
+											</tr> -->
+										<tr>
+											<td>Bongkar</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Las Ketok</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Dempul / Epoxy</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Cat</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Poles</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Pasang</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Finishing</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Aksesoris</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>Quality Control</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="oe_structure" />
+						</div>
+						<div class="row mb32">
+							<div class="col-4">
+								<p>Est. Pemakaian Cat: ........... Gram</p>
+								<table class="table">
+									<tr>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+									</tr>
+								</table>
+								<p>Total Formula Cat: ............ Gram</p>
+							</div>
+							<div class="col-3">
+								<table>
+									<tr>
+										<td>ACC WARNA</td>
+										<td>TTD</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+									</tr>
+								</table>
+							</div>
+							<div class="col-3">
+								<!-- <h4>PART SUPPLY</h4> -->
+								<!-- <p></p> -->
+							</div>
+						</div>
+					</t>
+					<div class="row signature-block">
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<span></span>
+								<div style="height:100px" />
+								<span>( Service Advisor )</span>
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<span>Disiapkan Oleh</span>
+								<div style="height:100px" />
+								<span>( Ka. Prod )</span>
+								\
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<span>Pengecekan</span>
+								<div style="height:100px" />
+								<span>( Foreman )</span>
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<span>Diterima Oleh</span>
+							</t>
+							<t t-else="">
+								<span
+									t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')" />
+							</t>
+							<div style="height:100px" />
+							<t t-if="o.state == 'draft'">
+								<span>REFDISON</span>
+							</t>
+							<t t-else="">
+								<span>( Pelaksana )</span>
+							</t>
+						</div>
+					</div>
+					<div class="row signature-block">
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<span></span>
+								<div style="height:100px" />
+								<span>( Foreman )</span>
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<div style="height:100px" />
+								<span>( Ka. Prod )</span>
+								\
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<t t-if="o.state != 'draft'">
+								<div style="height:100px" />
+								<span>( Service advisor )</span>
+							</t>
+						</div>
+						<div class="col-3 text-center">
+							<div style="height:100px" />
+							<span>( CS )</span>
+						</div>
+					</div>
+					<!-- </t> -->
 
-          <p t-field="o.quotation_notes"/>
-          <div class="oe_structure"/>
-        </div>
-      </t>
-    </template>
+					<p t-field="o.quotation_notes" />
+					<div class="oe_structure" />
+				</div>
+			</t>
+		</template>
 
-  </data>
+	</data>
 </odoo>

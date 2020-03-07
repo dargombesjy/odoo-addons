@@ -124,6 +124,7 @@ class ServiceOrder(models.Model):
                         'service_line_id': operation.id,
                         'name': operation.name,
                         'product_category': 'Sparepart',
+                        'supply_type': operation.supply_type,
                         'picking_id': picking.id,
                         'product_id': operation.product_id.id,
                         'product_uom_qty': operation.product_uom_qty,

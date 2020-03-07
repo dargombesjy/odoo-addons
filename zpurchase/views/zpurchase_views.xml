@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <record id="zpurchase_order_form" model="ir.ui.view">
-      <field name="name">zpurchase.order.form</field>
-      <field name="model">purchase.order</field>
-      <field name="inherit_id" ref="purchase.purchase_order_form"/>
-      <field name="arch" type="xml">
-        <xpath expr="//field[@name='partner_id']" position="before">
-          <field name="po_type"/>
-        </xpath>
-        <xpath expr="//field[@name='company_id']" position="after">
-          <field name="service_id" attrs="{'invisible': [('po_type','=','general')]}"/>
-          <field name="eq_name" attrs="{'invisible': [('po_type','=','general')]}"/>
-          <field name="eq_model" attrs="{'invisible': [('po_type','=','general')]}"/>
-          <field name="receiver"/>
-        </xpath>
-        <xpath expr="//field[@name='price_unit']" position="after">
-          <field name="discount"/>
-        </xpath>
-      </field>
-    </record>
+	<data>
+		<record id="zpurchase_order_form" model="ir.ui.view">
+			<field name="name">zpurchase.order.form</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="before">
+					<field name="po_type" />
+				</xpath>
+				<xpath expr="//field[@name='company_id']" position="after">
+					<field name="service_id"
+						attrs="{'invisible': [('po_type','=','general')]}" />
+					<field name="eq_name"
+						attrs="{'invisible': [('po_type','=','general')]}" />
+					<field name="eq_model"
+						attrs="{'invisible': [('po_type','=','general')]}" />
+					<field name="receiver" />
+				</xpath>
+				<xpath expr="//field[@name='price_unit']" position="after">
+					<field name="discount" />
+				</xpath>
+			</field>
+		</record>
 
-    <record id="zpurchase_order_tree" model="ir.ui.view">
-      <field name="name">zpurchase.order.tree</field>
-      <field name="model">purchase.order</field>
-      <field name="inherit_id" ref="purchase.purchase_order_tree"/>
-      <field name="arch" type="xml">
-        <xpath expr="//field[@name='name']" position="before">
-          <field name="po_type"/>
-        </xpath>
-        <xpath expr="//field[@name='origin']" position="after">
-          <field name="items_count"/>
-        </xpath>
-      </field>
-    </record>
-  </data>
+		<record id="zpurchase_order_tree" model="ir.ui.view">
+			<field name="name">zpurchase.order.tree</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_tree" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="before">
+					<field name="po_type" />
+				</xpath>
+				<xpath expr="//field[@name='origin']" position="after">
+					<field name="items_count" />
+				</xpath>
+			</field>
+		</record>
+	</data>
 </odoo>

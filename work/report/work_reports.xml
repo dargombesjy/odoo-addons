@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <report
-      string="Sparepart Request"
-      id="action_work_sparepart_request"
-      model="service.order"
-      name="work.sparepart_request"
-      file="work.sparepart_request"
-      report_type="qweb-pdf"/>
+	<data>
+		<report string="Sparepart Request"
+			id="action_work_sparepart_request" model="service.order"
+			name="work.sparepart_request" file="work.sparepart_request"
+			report_type="qweb-pdf" />
 
-      <report
-        string="Consumable Request"
-        id="action_work_consumable_request"
-        model="service.order"
-        name="work.consumable_request"
-        file="work.consumable_request"
-        report_type="qweb-pdf"/>
-  </data>
+		<report string="Consumable Request"
+			id="action_work_consumable_request" model="service.order"
+			name="work.consumable_request" file="work.consumable_request"
+			report_type="qweb-pdf" />
+	</data>
 </odoo>

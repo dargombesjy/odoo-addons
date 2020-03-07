@@ -1,60 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <record id="view_equipment_tree" model="ir.ui.view">
-      <field name="name">equipment.tree</field>
-      <field name="model">service.equipment</field>
-      <field name="arch" type="xml">
-        <tree string="Equipment">
-          <field name="name"/>
-          <field name="make_id"/>
-          <field name="model_id"/>
-          <field name="partner_id"/>
-        </tree>
-      </field>
-    </record>
-    
-    <record id="view_equipment_form" model="ir.ui.view">
-      <field name="name">equipment.form</field>
-      <field name="model">service.equipment</field>
-      <field name="arch" type="xml">
-        <form string="Equipment">
-          <sheet>
-            <label for="name"/>
-            <h2>
-              <field name="name"/>
-            </h2>
-            <group>
-              <field name="make_id"/>
-              <field name="model_id" domain="[('manufacturer_id','=',make_id)]" attrs="{'invisible': [('make_id','=',False)]}"/>
-              <field name="chassis_no"/>
-              <field name="engine_no"/>
-            </group>
-            <group>
-              <field name="manuf_year"/>
-              <field name="base_colour"/>
-              <field name="partner_id" domain="[('customer', '=', True)]"/>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
+	<data>
+		<record id="view_equipment_tree" model="ir.ui.view">
+			<field name="name">equipment.tree</field>
+			<field name="model">service.equipment</field>
+			<field name="arch" type="xml">
+				<tree string="Equipment">
+					<field name="name" />
+					<field name="make_id" />
+					<field name="model_id" />
+					<field name="partner_id" />
+				</tree>
+			</field>
+		</record>
 
-    <record id="action_equipment_view" model="ir.actions.act_window">
-      <field name="name">Equipment</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">service.equipment</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-      <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">Create Service Equipment</p>
-      </field>
-    </record>
+		<record id="view_equipment_form" model="ir.ui.view">
+			<field name="name">equipment.form</field>
+			<field name="model">service.equipment</field>
+			<field name="arch" type="xml">
+				<form string="Equipment">
+					<sheet>
+						<label for="name" />
+						<h2>
+							<field name="name" />
+						</h2>
+						<group>
+							<field name="make_id" />
+							<field name="model_id"
+								domain="[('manufacturer_id','=',make_id)]"
+								attrs="{'invisible': [('make_id','=',False)]}" />
+							<field name="chassis_no" />
+							<field name="engine_no" />
+						</group>
+						<group>
+							<field name="manuf_year" />
+							<field name="base_colour" />
+							<field name="partner_id" domain="[('customer', '=', True)]" />
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
 
-    <menuitem id="menu_service_equipment"
-      parent="menu_service_order"
-      name="Equipment"
-      action="action_equipment_view"/>
+		<record id="action_equipment_view"
+			model="ir.actions.act_window">
+			<field name="name">Equipment</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">service.equipment</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">Create Service Equipment</p>
+			</field>
+		</record>
 
-  </data>
+		<menuitem id="menu_service_equipment"
+			parent="menu_service_order" name="Equipment"
+			action="action_equipment_view" />
+
+	</data>
 </odoo>

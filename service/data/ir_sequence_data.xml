@@ -1,93 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data noupdate="1">
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order01</field>
-      <field name="code">service.order01</field>
-      <field name="prefix">KMS01/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+	<data noupdate="1">
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order01</field>
+			<field name="code">service.order01</field>
+			<field name="prefix">KMS01/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order02</field>
-      <field name="code">service.order02</field>
-      <field name="prefix">KMS02/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order02</field>
+			<field name="code">service.order02</field>
+			<field name="prefix">KMS02/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order03</field>
-      <field name="code">service.order03</field>
-      <field name="prefix">KMS103/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order03</field>
+			<field name="code">service.order03</field>
+			<field name="prefix">KMS103/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order04</field>
-      <field name="code">service.order04</field>
-      <field name="prefix">KMS04/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order04</field>
+			<field name="code">service.order04</field>
+			<field name="prefix">KMS04/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order05</field>
-      <field name="code">service.order05</field>
-      <field name="prefix">KMS05/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order05</field>
+			<field name="code">service.order05</field>
+			<field name="prefix">KMS05/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order06</field>
-      <field name="code">service.order06</field>
-      <field name="prefix">KMS06/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order06</field>
+			<field name="code">service.order06</field>
+			<field name="prefix">KMS06/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order07</field>
-      <field name="code">service.order07</field>
-      <field name="prefix">KMS07/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order07</field>
+			<field name="code">service.order07</field>
+			<field name="prefix">KMS07/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order08</field>
-      <field name="code">service.order08</field>
-      <field name="prefix">KMS08/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order08</field>
+			<field name="code">service.order08</field>
+			<field name="prefix">KMS08/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order09</field>
-      <field name="code">service.order09</field>
-      <field name="prefix">KMS09/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order09</field>
+			<field name="code">service.order09</field>
+			<field name="prefix">KMS09/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order10</field>
-      <field name="code">service.order10</field>
-      <field name="prefix">KMS10/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order10</field>
+			<field name="code">service.order10</field>
+			<field name="prefix">KMS10/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-    <record id="seq_service" model="ir.sequence">
-      <field name="name">Service Order11</field>
-      <field name="code">service.order11</field>
-      <field name="prefix">KMS11/</field>
-      <field name="suffix">/%(month)s/%(year)s</field>
-      <field name="padding">4</field>
-    </record>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Service Order11</field>
+			<field name="code">service.order11</field>
+			<field name="prefix">KMS11/</field>
+			<field name="suffix">/%(month)s/%(year)s</field>
+			<field name="padding">4</field>
+		</record>
 
-  </data>
+	</data>
 </odoo>

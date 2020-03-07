@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <record id="zinvoice_form" model="ir.ui.view">
-      <field name="name">zaccount.invoice.form</field>
-      <field name="model">account.invoice</field>
-      <field name="inherit_id" ref="account.invoice_form"/>
-      <field name="arch" type="xml">
-        <xpath expr="//header/button[@name='preview_invoice']" position="after">
-          <button name="action_print_invoice_or" string="Print Invoice OR" type="object"/>
-        </xpath>
-        <xpath expr="//tree/field[@name='sequence']" position="after">
-          <field name="product_category"/>
-        </xpath>
-        <xpath expr="//group[@class='oe_subtotal_footer oe_right']" position="replace">
-          <group class="oe_subtotal_footer oe_right">
-            <field name="sub_spareparts"/>
-            <field name="sub_material"/>
-            <field name="wht_base" string="Jasa"/>
-            <field name="amount_untaxed" string="Subtotal"/>
-            <field name="amount_tax"/>
-            <field name="amount_wht" string="WHT"/>
-            <field name="own_risk"/>
-            <field name="amount_total" class="oe_subtotal_footer_separator"/>
-            <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
-            <field name="residual" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
-            <field name="reconciled" invisible="1"/>
-            <field name="outstanding_credits_debits_widget" colspan="2" nolabel="1" widget="payment" attrs="{'invisible': [('state', 'not in', 'open')]}"/>
-          </group>
-        </xpath>
-      </field>
-    </record>
+	<data>
+		<record id="zinvoice_form" model="ir.ui.view">
+			<field name="name">zaccount.invoice.form</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//header/button[@name='preview_invoice']"
+					position="after">
+					<button name="action_print_invoice_or"
+						string="Print Invoice OR" type="object" />
+				</xpath>
+				<xpath expr="//tree/field[@name='sequence']" position="after">
+					<field name="product_category" />
+				</xpath>
+				<xpath expr="//group[@class='oe_subtotal_footer oe_right']"
+					position="replace">
+					<group class="oe_subtotal_footer oe_right">
+						<field name="sub_spareparts" />
+						<field name="sub_material" />
+						<field name="wht_base" string="Jasa" />
+						<field name="amount_untaxed" string="Subtotal" />
+						<field name="amount_tax" />
+						<field name="amount_wht" string="WHT" />
+						<field name="own_risk" />
+						<field name="amount_total"
+							class="oe_subtotal_footer_separator" />
+						<field name="payments_widget" colspan="2" nolabel="1"
+							widget="payment" />
+						<field name="residual" class="oe_subtotal_footer_separator"
+							attrs="{'invisible': [('state', '=', 'draft')]}" />
+						<field name="reconciled" invisible="1" />
+						<field name="outstanding_credits_debits_widget" colspan="2"
+							nolabel="1" widget="payment"
+							attrs="{'invisible': [('state', 'not in', 'open')]}" />
+					</group>
+				</xpath>
+			</field>
+		</record>
 
-  </data>
+	</data>
 </odoo>

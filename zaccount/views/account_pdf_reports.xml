@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
+	<data>
 
-    <menuitem id="menu_finance_legal_statement"
-              name="Financial Reports"
-              parent="account.menu_finance_reports"/>
+		<menuitem id="menu_finance_legal_statement"
+			name="Financial Reports" parent="account.menu_finance_reports" />
 
-  </data>
+	</data>
 </odoo>

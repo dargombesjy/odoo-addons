@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+	<!-- Tax template for sale and purchase -->
+	<record id="tax_ST1" model="account.tax.template">
+		<field name="description">ST1</field>
+		<field name="chart_template_id" ref="id_chart_template" />
+		<field name="type_tax_use">sale</field>
+		<field name="name">10%</field>
+		<field name="amount_type">percent</field>
+		<field name="amount">10.0</field>
+		<field name="account_id" ref="conf_iva" />
+		<field name="refund_account_id" ref="conf_iva" />
+	</record>
+
+	<record id="tax_PT1" model="account.tax.template">
+		<field name="description">PT1</field>
+		<field name="chart_template_id" ref="id_chart_template" />
+		<field name="type_tax_use">purchase</field>
+		<field name="name">10%</field>
+		<field name="amount_type">percent</field>
+		<field name="amount">10.0</field>
+		<field name="account_id" ref="conf_ova" />
+		<field name="refund_account_id" ref="conf_ova" />
+	</record>
+</odoo>

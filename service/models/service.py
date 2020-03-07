@@ -12,13 +12,46 @@ class StockPicking(models.Model):
     service_id = fields.Many2one('service.order')
     eq_name = fields.Char('License Plate')
     eq_model = fields.Char('Model')
-    receiver = fields.Char('Receiver')
-    received_date = fields.Date('Received Date')
+#     receiver = fields.Char('Receiver')
+#     received_date = fields.Date('Received Date')
+    vendor_id = fields.Many2one(
+        'res.partner', 'Vendor', index=True, readonly=True,
+        states={'draft': [('readonly', False)]})
 
     @api.multi
     def action_confirm(self):
         if self.mapped('move_lines').filtered(lambda move: not move.product_id):
             raise UserError(_('All items must have Product ID'))
+        
+#         move_supply = self.env['stock.move']
+#         for move in self.move_lines:    
+#             if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_received < move.product_uom_qty:
+#                 supply = move_supply.create({
+#                     'name': move.name,
+#                     'date': move.vendor_date,
+#                     'product_id': move.product_id.id, #operation.product_id.id,
+#                     'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
+#                     'product_uom': move.product_uom.id, #operation.product_uom.id,
+#                     'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
+#                     'location_id': 8, #operation.location_id.id,
+#                     'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
+#                     'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
+#                                               #'lot_id': move.lot_id, #operation.lot_id.id,
+#                                               'product_uom_qty': move.product_uom_qty,  # bypass reservation here
+#                                               'product_uom_id': move.product_uom.id, #operation.product_uom.id,
+#                                               'qty_done': move.vendor_qty, #operation.product_uom_qty,
+#                                               'package_id': False,
+#                                               'result_package_id': False,
+#                                               #'owner_id': #owner_id,
+#                                               'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
+#                                               'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
+#                     'origin': move.service_id.id, #repair.id,
+#                     'service_id': move.service_id.id, #repair.id,
+#                     'service_line_id': move.service_line_id, #repair.name,
+#                 })
+#                 supply.write({'vendor_received': move.vendor_qty})
+#                 supply._action_done()
+        
         self.mapped('package_level_ids').filtered(lambda pl: pl.state == 'draft' and not pl.move_ids)._generate_moves()
         # call `_action_confirm` on every draft move
         self.mapped('move_lines')\
@@ -28,6 +61,54 @@ class StockPicking(models.Model):
         self.filtered(lambda picking: picking.location_id.usage in ('supplier', 'inventory', 'production') and picking.state == 'confirmed')\
             .mapped('move_lines')._action_assign()
         return True
+    
+    @api.multi
+    def action_assign(self):
+        """ Check availability of picking moves.
+        This has the effect of changing the state and reserve quants on available moves, and may
+        also impact the state of the picking as it is computed based on move's states.
+        @return: True
+        """
+        move_supply = self.env['stock.move']
+        for move in self.move_lines:    
+            if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_received < move.product_uom_qty:
+                supply = move_supply.create({
+                    'name': move.name,
+                    'date': move.vendor_date,
+                    'product_id': move.product_id.id, #operation.product_id.id,
+                    'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
+                    'product_uom': move.product_uom.id, #operation.product_uom.id,
+                    'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
+                    'location_id': 8, #operation.location_id.id,
+                    'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
+                    'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
+                                              #'lot_id': move.lot_id, #operation.lot_id.id,
+                                              'product_uom_qty': move.product_uom_qty,  # bypass reservation here
+                                              'product_uom_id': move.product_uom.id, #operation.product_uom.id,
+                                              'qty_done': move.vendor_qty, #operation.product_uom_qty,
+                                              'package_id': False,
+                                              'result_package_id': False,
+                                              #'owner_id': #owner_id,
+                                              'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
+                                              'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
+                    'origin': move.service_id.id, #repair.id,
+                    'service_id': move.service_id.id, #repair.id,
+                    'service_line_id': move.service_line_id, #repair.name,
+                })
+                supply.write({'vendor_received': move.vendor_qty})
+                supply._action_done()
+                
+        self.filtered(lambda picking: picking.state == 'draft').action_confirm()
+        moves = self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))
+        if not moves:
+            raise UserError(_('Nothing to check the availability for.'))
+        # If a package level is done when confirmed its location can be different than where it will be reserved.
+        # So we remove the move lines created when confirmed to set quantity done to the new reserved ones.
+        package_level_done = self.mapped('package_level_ids').filtered(lambda pl: pl.is_done and pl.state == 'confirmed')
+        package_level_done.write({'is_done': False})
+        moves._action_assign()
+        package_level_done.write({'is_done': True})
+        return True
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -36,9 +117,22 @@ class StockMove(models.Model):
     service_line_id = fields.Integer('Line Id')
     product_id = fields.Many2one(
         'product.product', 'Product',
-        domain=[('type', 'in', ['product', 'consu'])], index=True, required=False,
-        states={'done': [('readonly', True)]})
+        domain=[('type', 'in', ['product', 'consu'])], index=True, required=False)
+        #states={'done': [('readonly', True)]})
     product_category = fields.Char('Product Category')
+#     supply_type = fields.Selection([
+#         ('self', 'Self Supply'),
+#         ('customer', 'Customer Supply'),
+#         ('vendor', 'Vendor Supply')], 'Supply Type') #, index=True, required=True,
+#         default='vendor')
+    vendor_id = fields.Many2one(
+        'res.partner', 'Vendor', index=True) #, readonly=True,
+        #states={'draft': [('readonly', False)]})
+    vendor_qty = fields.Float('Qty. Terima') # , default=1.0) required=True)
+    vendor_date = fields.Date('Tgl. Terima') # , default=1.0) required=True)
+    vendor_received = fields.Float('Recv')
+    receiver = fields.Char('Pengambil')
+    received_date = fields.Date('Tgl. Ambil')
 
     @api.constrains('product_uom')
     def _check_uom(self):
@@ -82,6 +176,7 @@ class StockMove(models.Model):
                 else:
                     service_line = move.env['service.consumable'].search([('id', '=', move.service_line_id)], limit=1)
                 service_line.write({'received': True})
+                
             # if the move is preceeded, then it's waiting (if preceeding move is done, then action_assign has been called already and its state is already available)
             if move.move_orig_ids:
                 move_waiting |= move
@@ -120,9 +215,37 @@ class StockMove(models.Model):
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
             service_line.write({'product_id': self.product_id.id})
         product = self.product_id.with_context(lang=self.partner_id.lang or self.env.user.lang)
-        self.name = product.partner_ref
+#         self.name = product.partner_ref
         self.product_uom = product.uom_id.id
         return {'domain': {'product_uom': [('category_id', '=', product.uom_id.category_id.id)]}}
+    
+#     @api.onchange('vendor_qty')
+#     def onchange_vendor_qty(self):
+#         if self.product_category == 'Sparepart':
+#             move_supply = self.env['stock.move']
+#             if self.vendor_id and not self.vendor_received:
+#                 supply = move_supply.create({
+#                     'name': self.name,
+#                     'product_id': self.product_id.id, #operation.product_id.id,
+#                     'product_uom_qty': self.product_uom_qty, #operation.product_uom_qty,
+#                     'product_uom': self.product_uom.id, #operation.product_uom.id,
+#                     'partner_id': self.picking_id.partner_id.id, #repair.address_id.id,
+#                     'location_id': 8, #operation.location_id.id,
+#                     'location_dest_id': self.location_id.id, #operation.location_dest_id.id,
+#                     'move_line_ids': [(0, 0, {'product_id': self.product_id.id, #operation.product_id.id,
+#                                               #'lot_id': move.lot_id, #operation.lot_id.id,
+#                                               'product_uom_qty': 0,  # bypass reservation here
+#                                               'product_uom_id': self.product_uom.id, #operation.product_uom.id,
+#                                               'qty_done': self.vendor_qty, #operation.product_uom_qty,
+#                                               'package_id': False,
+#                                               'result_package_id': False,
+#                                               'owner_id': self.picking_id.eq_name, #owner_id,
+#                                               'location_id': 8, #self.location_id, #operation.location_id.id, #TODO: owner stuff
+#                                               'location_dest_id': self.location_id.id })], #operation.location_dest_id.id,})],
+#                     'service_id': self.service_id.id, #repair.id,
+#                     'service_line_id': self.service_line_id, #repair.name,
+#                 })
+#                 self.write({'vendor_received': True})
 
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'

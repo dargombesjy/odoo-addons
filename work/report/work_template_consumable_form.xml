@@ -1,163 +1,161 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <!-- Main template -->
-    <template id="consumable_request">
-      <t t-call="web.html_container">
-        <t t-foreach="docs"  t-as="o">
-          <t t-call="work.consumable_request_document" t-lang="o.partner_id.lang"/>
-        </t>
-      </t>
-    </template>
+	<data>
+		<!-- Main template -->
+		<template id="consumable_request">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="work.consumable_request_document"
+						t-lang="o.partner_id.lang" />
+				</t>
+			</t>
+		</template>
 
-    <!-- Translatable template -->
-    <template id="consumable_request_document">
-      <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
-      <t t-call="web.external_layout">
-        <div class="page" style="font-size:0.9rem">
-          <style type="text/css">
-            .table td {
-              padding-top: 0.1rem;
-              padding-bottom: 0.1rem;
-            }
-            .signature-block {
-              page-break-inside: avoid;
-            }
-          </style>
-          <div class="oe_structure"/>
-          <h3 class="text-center">
-            <span>PERMINTAAN BAHAN BAKU</span>
-          </h3>
+		<!-- Translatable template -->
+		<template id="consumable_request_document">
+			<t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+			<t t-call="web.external_layout">
+				<div class="page" style="font-size:0.9rem">
+					<style type="text/css">
+						.table td {
+						padding-top: 0.1rem;
+						padding-bottom: 0.1rem;
+						}
+						.signature-block {
+						page-break-inside: avoid;
+						}
+					</style>
+					<div class="oe_structure" />
+					<h3 class="text-center">
+						<span>PERMINTAAN BAHAN BAKU</span>
+					</h3>
 
-          <div class="row">
-            <div class="col-5 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">No. Estimasi</td>
-                  <td>:</td>
-                  <td><span t-field="o.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Asuransi</td>
-                  <td>:</td>
-                  <td><span t-field="o.insurance_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Customer</td>
-                  <td>:</td>
-                  <td><span t-field="o.partner_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Tipe Kendaraan</td>
-                  <td>:</td>
-                  <td><span t-field="o.make"/> <span t-field="o.model"/> / <span t-field="o.equipment_id.name"/></td>
-                </tr>
-              </table>
-            </div>
-            <div class="col-2 bm-2">
-              <table class="table table-sm">
-              </table>
-            </div>
-            <div class="col-5 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">Warna</td>
-                  <td>:</td>
-                  <td><span t-field="o.base_colour"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Dempul / Cat</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Las / Ketok</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Estimasi Selesai</td>
-                  <td>:</td>
-                  <td><span t-field="o.planned_date"/></td>
-                </tr>
-              </table>
-            </div>
-          </div>
+					<div class="row">
+						<div class="col-5 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">No. Estimasi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Asuransi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.insurance_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Customer</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.partner_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Tipe Kendaraan</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.make" />
+										<span t-field="o.model" />
+										/
+										<span t-field="o.equipment_id.name" />
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-2 bm-2">
+							<table class="table table-sm">
+							</table>
+						</div>
+						<div class="col-5 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">Warna</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.base_colour" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Dempul / Cat</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="width:30%">Las / Ketok</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="width:30%">Estimasi Selesai</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.planned_date" />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 
-          <!-- Looping item content -->
-          <!-- table class="table o_main_table text-center" style="vertical-align:middle">
-            <thead>
-              <tr>
-                <th rowspan="2" style="vertical-align:middle">Tanggal</th>
-                <th colspan="8">Amplas Besi</th>
-                <th rowspan="2" style="vertical-align:middle">Kertas Lem</th>
-                <th rowspan="2" style="vertical-align:middle">Epoxy</th>
-                <th rowspan="2" style="vertical-align:middle">Dempul</th>
-                <th rowspan="2" style="vertical-align:middle">Pernish</th>
-                <th colspan="2">Thinner</th>
-                <th rowspan="2" style="vertical-align:middle">Paraf</th>
-              </tr>
-              <tr>
-                <th>60</th><th>120</th><th>240</th><th>400</th><th>800</th><th>1200</th><th>2000</th><th></th><th>PU</th><th>CPI</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table -->
+					<!-- Looping item content -->
+					<!-- table class="table o_main_table text-center" style="vertical-align:middle"> 
+						<thead> <tr> <th rowspan="2" style="vertical-align:middle">Tanggal</th> <th 
+						colspan="8">Amplas Besi</th> <th rowspan="2" style="vertical-align:middle">Kertas 
+						Lem</th> <th rowspan="2" style="vertical-align:middle">Epoxy</th> <th rowspan="2" 
+						style="vertical-align:middle">Dempul</th> <th rowspan="2" style="vertical-align:middle">Pernish</th> 
+						<th colspan="2">Thinner</th> <th rowspan="2" style="vertical-align:middle">Paraf</th> 
+						</tr> <tr> <th>60</th><th>120</th><th>240</th><th>400</th><th>800</th><th>1200</th><th>2000</th><th></th><th>PU</th><th>CPI</th> 
+						</tr> </thead> <tbody> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> <tr> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+						</tr> </tbody> </table -->
 
-          <table class="table text-center" style="vertical-align:middle">
-            <thead>
-              <tr>
-                <th rowspan="2" style="vertical-align:middle">TGL</th>
-                <th rowspan="2" style="vertical-align:middle">NAMA BARANG</th>
-                <th rowspan="2" style="vertical-align:middle">SATUAN</th>
-                <th colspan="2">PARAF / NAMA</th>
-              </tr>
-              <tr>
-                <th>Ka.Prod</th>
-                <th>Foreman</th>
-                <th>WH Admin</th>
-                <th>Penerima</th>
-              </tr>
-            </thead>
-            <tbody>
-              <t t-if="o.consumable_lines">
-                <t t-set="i" t-value="i"/>
-                <tr t-foreach="o.consumable_lines" t-as="line">
-                  <td></td>
-                  <td><span t-field="line.name"/></td>
-                  <td><span t-field="line.product_uom_qty"/></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <t t-set="i" value="i+1"/>
-                </tr>
-              </t>
-            </tbody>
-          </table>
-          <div class="oe_structure"/>
-        </div>
-      </t>
-    </template>
+					<table class="table text-center"
+						style="vertical-align:middle">
+						<thead>
+							<tr>
+								<th rowspan="2" style="vertical-align:middle">TGL</th>
+								<th rowspan="2" style="vertical-align:middle">NAMA BARANG</th>
+								<th rowspan="2" style="vertical-align:middle">SATUAN</th>
+								<th colspan="2">PARAF / NAMA</th>
+							</tr>
+							<tr>
+								<th>Ka.Prod</th>
+								<th>Foreman</th>
+								<th>WH Admin</th>
+								<th>Penerima</th>
+							</tr>
+						</thead>
+						<tbody>
+							<t t-if="o.consumable_lines">
+								<t t-set="i" t-value="i" />
+								<tr t-foreach="o.consumable_lines" t-as="line">
+									<td></td>
+									<td>
+										<span t-field="line.name" />
+									</td>
+									<td>
+										<span t-field="line.product_uom_qty" />
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<t t-set="i" value="i+1" />
+								</tr>
+							</t>
+						</tbody>
+					</table>
+					<div class="oe_structure" />
+				</div>
+			</t>
+		</template>
 
-  </data>
+	</data>
 </odoo>

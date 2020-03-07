@@ -1,145 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <!-- Main template -->
-    <template id="sparepart_request">
-      <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="o">
-          <t t-call="work.sparepart_request_document" t-lang="o.partner_id.lang"/>
-        </t>
-      </t>
-    </template>
+	<data>
+		<!-- Main template -->
+		<template id="sparepart_request">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="work.sparepart_request_document"
+						t-lang="o.partner_id.lang" />
+				</t>
+			</t>
+		</template>
 
-    <!-- Translatable template -->
-    <template id="sparepart_request_document">
-      <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
-      <t t-call="web.external_layout">
-        <div class="page" style="font-size:0.9rem">
-          <style type="text/css">
-            .table td {
-              padding-top: 0.1rem;
-              padding-bottom: 0.1rem;
-            }
-            .signature-block {
-              page-break-inside: avoid;
-            }
-          </style>
-          <div class="oe_structure"/>
-          <h3 class="text-center">
-            <span>SURAT PERMINTAAN BARANG</span>
-          </h3>
+		<!-- Translatable template -->
+		<template id="sparepart_request_document">
+			<t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+			<t t-call="web.external_layout">
+				<div class="page" style="font-size:0.9rem">
+					<style type="text/css">
+						.table td {
+						padding-top: 0.1rem;
+						padding-bottom: 0.1rem;
+						}
+						.signature-block {
+						page-break-inside: avoid;
+						}
+					</style>
+					<div class="oe_structure" />
+					<h3 class="text-center">
+						<span>SURAT PERMINTAAN BARANG</span>
+					</h3>
 
-          <div class="row">
-            <div class="col-5 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">No. Estimasi</td>
-                  <td>:</td>
-                  <td><span t-field="o.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Asuransi</td>
-                  <td>:</td>
-                  <td><span t-field="o.insurance_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Customer</td>
-                  <td>:</td>
-                  <td><span t-field="o.partner_id.name"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Tipe Kendaraan</td>
-                  <td>:</td>
-                  <td><span t-field="o.make"/> <span t-field="o.model"/> / <span t-field="o.equipment_id.name"/></td>
-                </tr>
-              </table>
-            </div>
-            <div class="col-2 bm-2">
-              <table class="table table-sm">
-              </table>
-            </div>
-            <div class="col-5 bm-2">
-              <table class="table table-sm">
-                <tr>
-                  <td style="width:30%">Warna</td>
-                  <td>:</td>
-                  <td><span t-field="o.base_colour"/></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Dempul / Cat</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Las / Ketok</td>
-                  <td>:</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td style="width:30%">Estimasi Selesai</td>
-                  <td>:</td>
-                  <td><span t-field="o.planned_date"/></td>
-                </tr>
-              </table>
-            </div>
-          </div>
+					<div class="row">
+						<div class="col-5 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">No. Estimasi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Asuransi</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.insurance_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Customer</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.partner_id.name" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Tipe Kendaraan</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.make" />
+										<span t-field="o.model" />
+										/
+										<span t-field="o.equipment_id.name" />
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-2 bm-2">
+							<table class="table table-sm">
+							</table>
+						</div>
+						<div class="col-5 bm-2">
+							<table class="table table-sm">
+								<tr>
+									<td style="width:30%">Warna</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.base_colour" />
+									</td>
+								</tr>
+								<tr>
+									<td style="width:30%">Dempul / Cat</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="width:30%">Las / Ketok</td>
+									<td>:</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="width:30%">Estimasi Selesai</td>
+									<td>:</td>
+									<td>
+										<span t-field="o.planned_date" />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 
-          <!-- Looping item content -->
-          <table class="table o_main_table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Supply type</th>
-                <th>Parts Number</th>
-                <th>Description</th>
-                <th>Qty DMD</th>
-                <th>Qty Sup</th>
-                <th>Remark</th>
-              </tr>
-            </thead>
-            <tbody>
-              <t t-if="o.operations">
-                <t t-set="i" t-value="1"/>
-                <tr t-foreach="o.operations" t-as="line">
-                  <td><span t-esc="i"/></td>
-                  <td><span t-field="line.supply_type"/></td>
-                  <td><span t-field="line.product_id.name"/></td>
-                  <td><span t-field="line.name"/></td>
-                  <td><span t-field="line.product_uom_qty"/></td>
-                  <td></td>
-                  <td></td>
-                  <t t-set="i" t-value="i+1"/>
-                </tr>
-              </t>
-            </tbody>
-          </table>
+					<!-- Looping item content -->
+					<table class="table o_main_table">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Supply type</th>
+								<th>Parts Number</th>
+								<th>Description</th>
+								<th>Qty DMD</th>
+								<th>Qty Sup</th>
+								<th>Remark</th>
+							</tr>
+						</thead>
+						<tbody>
+							<t t-if="o.operations">
+								<t t-set="i" t-value="1" />
+								<tr t-foreach="o.operations" t-as="line">
+									<td>
+										<span t-esc="i" />
+									</td>
+									<td>
+										<span t-field="line.supply_type" />
+									</td>
+									<td>
+										<span t-field="line.product_id.name" />
+									</td>
+									<td>
+										<span t-field="line.name" />
+									</td>
+									<td>
+										<span t-field="line.product_uom_qty" />
+									</td>
+									<td></td>
+									<td></td>
+									<t t-set="i" t-value="i+1" />
+								</tr>
+							</t>
+						</tbody>
+					</table>
 
-          <div class="row signature-block">
-            <div class="col-3 text-center">
-              <span>Pemohon</span>
-              <div style="height:100px"/>
-              <span>....</span>
-            </div>
-            <div class="col-3 text-center">
-              <span>Disetujui</span>
-              <div style="height:100px"/>
-              <span>Ka. Bengkel</span>
-            </div>
-            <div class="col-3 text-center">
-              <span>Disiapkan</span>
-              <div style="height:100px"/>
-              <span>Gudang</span>
-            </div>
-            <div class="col-3 text-center">
-              <span>Diterima</span>
-              <div style="height:100px"/>
-              <span></span>
-            </div>
-          </div>
+					<div class="row signature-block">
+						<div class="col-3 text-center">
+							<span>Pemohon</span>
+							<div style="height:100px" />
+							<span>....</span>
+						</div>
+						<div class="col-3 text-center">
+							<span>Disetujui</span>
+							<div style="height:100px" />
+							<span>Ka. Bengkel</span>
+						</div>
+						<div class="col-3 text-center">
+							<span>Disiapkan</span>
+							<div style="height:100px" />
+							<span>Gudang</span>
+						</div>
+						<div class="col-3 text-center">
+							<span>Diterima</span>
+							<div style="height:100px" />
+							<span></span>
+						</div>
+					</div>
 
-          <div class="oe_structure"/>
-        </div>
-      </t>
-    </template>
-  </data>
+					<div class="oe_structure" />
+				</div>
+			</t>
+		</template>
+	</data>
 </odoo>
