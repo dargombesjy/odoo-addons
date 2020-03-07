@@ -70,33 +70,43 @@ class StockPicking(models.Model):
         @return: True
         """
         move_supply = self.env['stock.move']
-        for move in self.move_lines:    
-            if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_received < move.product_uom_qty:
-                supply = move_supply.create({
-                    'name': move.name,
-                    'date': move.vendor_date,
-                    'product_id': move.product_id.id, #operation.product_id.id,
-                    'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
-                    'product_uom': move.product_uom.id, #operation.product_uom.id,
-                    'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
-                    'location_id': 8, #operation.location_id.id,
-                    'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
-                    'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
-                                              #'lot_id': move.lot_id, #operation.lot_id.id,
-                                              'product_uom_qty': move.product_uom_qty,  # bypass reservation here
-                                              'product_uom_id': move.product_uom.id, #operation.product_uom.id,
-                                              'qty_done': move.vendor_qty, #operation.product_uom_qty,
-                                              'package_id': False,
-                                              'result_package_id': False,
-                                              #'owner_id': #owner_id,
-                                              'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
-                                              'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
-                    'origin': move.service_id.id, #repair.id,
-                    'service_id': move.service_id.id, #repair.id,
-                    'service_line_id': move.service_line_id, #repair.name,
-                })
-                supply.write({'vendor_received': move.vendor_qty})
-                supply._action_done()
+        for move in self.move_lines:     
+            if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0:
+                total_received = move.vendor_received + move.vendor_qty
+                move_qty = 0
+                if total_received <= move.product_uom_qty:
+                    move_qty = move.vendor_qty
+                else:
+                    if move.vendor_received < move.product_uom_qty:
+                        move_qty = move.product_uom_qty - move.vendor_received
+                        total_received = move.product_uom_qty
+                        
+                if move_qty > 0:
+                    supply = move_supply.create({
+                        'name': move.name,
+                        'date': move.vendor_date,
+                        'product_id': move.product_id.id, #operation.product_id.id,
+                        'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
+                        'product_uom': move.product_uom.id, #operation.product_uom.id,
+                        'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
+                        'location_id': 8, #operation.location_id.id,
+                        'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
+                        'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
+                                                  #'lot_id': move.lot_id, #operation.lot_id.id,
+                                                  'product_uom_qty': move.product_uom_qty,  # bypass reservation here
+                                                  'product_uom_id': move.product_uom.id, #operation.product_uom.id,
+                                                  'qty_done': move_qty, #operation.product_uom_qty,
+                                                  'package_id': False,
+                                                  'result_package_id': False,
+                                                  #'owner_id': #owner_id,
+                                                  'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
+                                                  'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
+                        'origin': move.service_id.id, #repair.id,
+                        'service_id': move.service_id.id, #repair.id,
+                        'service_line_id': move.service_line_id, #repair.name,
+                    })
+                    move.write({'vendor_received': total_received})
+                    supply._action_done()
                 
         self.filtered(lambda picking: picking.state == 'draft').action_confirm()
         moves = self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))
