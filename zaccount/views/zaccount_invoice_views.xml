@@ -11,6 +11,10 @@
 					<button name="action_print_invoice_or"
 						string="Print Invoice OR" type="object" />
 				</xpath>
+				<xpath expr="//sheet/group/group/field[@name='payment_term_id']" position="after">
+					<field name="service_id" />
+					<field name="eq_name" />
+				</xpath>
 				<xpath expr="//tree/field[@name='sequence']" position="after">
 					<field name="product_category" />
 				</xpath>
@@ -35,6 +39,28 @@
 							nolabel="1" widget="payment"
 							attrs="{'invisible': [('state', 'not in', 'open')]}" />
 					</group>
+				</xpath>
+			</field>
+		</record>
+		
+		<record id="zinvoice_tree" model="ir.ui.view">
+			<field name="name">zaccount.invoice.tree</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_tree" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='date_due']" position="after">
+					<field name="eq_name" />
+				</xpath>
+			</field>
+		</record>
+		
+		<record id="zaccount_view_invoice_filter" model="ir.ui.view">
+			<field name="name">zaccount_view_invoice_filter</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.view_account_invoice_filter" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='number']" position="after">
+					<field name="eq_name" />
 				</xpath>
 			</field>
 		</record>

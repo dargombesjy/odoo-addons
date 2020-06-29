@@ -116,12 +116,21 @@ class AccountInvoice(models.Model):
     # def _onchange_partner_id(self):
     #     res = super(AccountInvoice, self)._onchange_partner_id()
     #     return res
+    
+    @api.onchange('service_id')
+    def onchange_service_id(self):
+        eq = self.service_id.equipment_id
+        self.eq_name = eq.name
+#         details = eq.get_details()
+#         self.eq_make = details['make']
+#         self.eq_model = details['model']
 
     origin_type = fields.Selection([
         ('general', 'General'),
         ('service', 'Service'),
         ('own_risk', 'Own Risk')], 'Origin Type', required=True, default='general')
     service_id = fields.Many2one('service.order', string='Service', copy='False')
+    eq_name = fields.Char('No. Plat')
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
     sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
     sub_others = fields.Monetary('Others', compute='_compute_wht', store=True, readonly=True)
