@@ -12,7 +12,7 @@ class PurchaseOrder(models.Model):
         ('entertain', 'PO Entertain')], 'PO Type', required=True, default='general')
     items_count = fields.Integer('Items', compute='_count_items')
     service_id = fields.Many2one('service.order', 'Service', copy=False)
-    eq_name = fields.Char('License Plate')
+    eq_name = fields.Char('No. Plat')
     eq_model = fields.Char('Model')
     # eq_name = fields.Char('License Plate', compute="_compute_equipment", store=True)
     # eq_model = fields.Char('Model', compute="_compute_equipment")

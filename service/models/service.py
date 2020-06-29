@@ -141,7 +141,7 @@ class StockMove(models.Model):
     vendor_qty = fields.Float('Qty. Terima') # , default=1.0) required=True)
     vendor_date = fields.Date('Tgl. Terima') # , default=1.0) required=True)
     vendor_received = fields.Float('Recv')
-    receiver = fields.Char('Pengambil')
+    receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
 
     @api.constrains('product_uom')

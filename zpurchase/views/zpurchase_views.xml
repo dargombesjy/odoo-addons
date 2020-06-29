@@ -11,11 +11,11 @@
 				</xpath>
 				<xpath expr="//field[@name='company_id']" position="after">
 					<field name="service_id"
-						attrs="{'invisible': [('po_type','=','general')]}" />
+						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 					<field name="eq_name"
-						attrs="{'invisible': [('po_type','=','general')]}" />
+						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 					<field name="eq_model"
-						attrs="{'invisible': [('po_type','=','general')]}" />
+						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 					<field name="receiver" />
 				</xpath>
 				<xpath expr="//field[@name='price_unit']" position="after">
@@ -31,9 +31,22 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='name']" position="before">
 					<field name="po_type" />
+					<field name="eq_name" 
+						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 				</xpath>
 				<xpath expr="//field[@name='origin']" position="after">
 					<field name="items_count" />
+				</xpath>
+			</field>
+		</record>
+		
+		<record id="zpurchase_order_tree_search" model="ir.ui.view">
+			<field name="name">zpurchase.order.tree.search</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.view_purchase_order_filter" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="before">
+					<field name="eq_name" />
 				</xpath>
 			</field>
 		</record>
