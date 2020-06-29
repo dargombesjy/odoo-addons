@@ -31,6 +31,8 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='name']" position="before">
 					<field name="po_type" />
+				</xpath>
+				<xpath expr="//field[@name='date_planned']" position="replace">
 					<field name="eq_name" 
 						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 				</xpath>
