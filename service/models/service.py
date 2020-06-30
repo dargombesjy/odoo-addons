@@ -799,7 +799,7 @@ class ServiceOrder(models.Model):
             'name': _('Invoice created'),
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
-            'res_model': 'account_invoice',
+            'res_model': 'account.invoice',
             'view_id': self.env.ref('account.invoice_form').id,
             'target': 'current',
             'res_id': self.invoice_id.id,
