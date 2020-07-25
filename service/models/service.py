@@ -386,6 +386,9 @@ class ServiceOrder(models.Model):
     invoice_id = fields.Many2one(
         'account.invoice', 'Invoice',
         copy=False, readonly=True, track_visibility="onchange")
+    invoice__or_id = fields.Many2one(
+        'account.invoice', 'Invoice OR',
+        copy=False, readonly=True, track_visibility="onchange")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
     repaired = fields.Boolean('Repaired', copy=False, readonly=True)
     amount_untaxed = fields.Float('Untaxed Amount', compute='_amount_untaxed', store=True, digits=(12,0))
@@ -618,7 +621,7 @@ class ServiceOrder(models.Model):
                     'price_unit': own_risk.price_unit,
                     'price_subtotal': own_risk.product_uom_qty * own_risk.price_unit
                 })
-            service.write({'own_risk_invoiced': True,})
+            service.write({'own_risk_invoiced': True, 'invoice_or_id': invoice_or.id})
 
     @api.multi
     def action_invoice_create(self, group=False):
@@ -757,7 +760,7 @@ class ServiceOrder(models.Model):
                             raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
 
                         if other.name == 'Own Risk':
-                            price = other.price_unit * -1
+                            price = other.price_unit * (-1)
     #                     if invoice_or and other.name == 'Own Risk':
     #                         invoice_line_or = InvoiceLine.create({
     #                             'invoice_id': invoice_or.id,
@@ -785,7 +788,7 @@ class ServiceOrder(models.Model):
                             'product_id': other.product_id and other.product_id.id or False,
                             'product_category': other.product_id.categ_id.name,
                             'price_unit': price,  # other.price_unit,
-                            'price_subtotal': other.product_uom_qty * other.price_unit
+                            'price_subtotal': other.product_uom_qty * price  # other.price_unit
                         })
 
                 invoice.compute_taxes()
@@ -817,7 +820,7 @@ class ServiceOrder(models.Model):
             'res_model': 'account.invoice',
             'view_id': self.env.ref('account.invoice_form').id,
             'target': 'current',
-            'res_id': self.invoice_id.id,
+            'res_id': self.invoice_or_id.id,
         }
 
     @api.multi

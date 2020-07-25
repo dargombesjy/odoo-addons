@@ -25,7 +25,8 @@ class AccountInvoice(models.Model):
         self.wht_base = wht_base_rev
         self.sub_material = wht_base - wht_base_rev
         self.sub_spareparts = sum(sp.price_subtotal for sp in self.invoice_line_ids.filtered(lambda s: s.product_category == 'Spareparts'))
-        self.sub_others = sum(oth.price_subtotal for oth in self.invoice_line_ids.filtered(lambda o: o.product_category == 'Service Other'))
+        other = sum(oth.price_subtotal for oth in self.invoice_line_ids.filtered(lambda o: o.product_category == 'Service Other'))
+        self.sub_others = other + self.own_risk
         self.amount_wht = sum(round_curr(wh.amount_total) for wh in self.tax_line_ids.filtered(lambda w: w.tax_id == self.wht_tax))
 
     def prepare_wht_tax(self):
@@ -100,8 +101,9 @@ class AccountInvoice(models.Model):
         tax_total = sum(round_curr(line.amount_total) for line in self.tax_line_ids)
         # self.amount_tax = sum(round_curr(line.amount_total) for line in self.tax_line_ids)
         # self.amount_total = self.amount_untaxed + self.amount_tax
-        self.amount_tax = tax_total - self.amount_wht
-        self.amount_total = self.amount_untaxed + self.amount_tax - self.amount_wht - self.own_risk
+        self.amount_tax = sum(round_curr(ln.amount_total) for ln in self.tax_line_ids.filtered(lambda w: w.tax_id != self.wht_tax))
+        # self.amount_tax = tax_total + self.amount_wht
+        self.amount_total = self.amount_untaxed + self.own_risk
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
         if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
@@ -116,7 +118,7 @@ class AccountInvoice(models.Model):
     # def _onchange_partner_id(self):
     #     res = super(AccountInvoice, self)._onchange_partner_id()
     #     return res
-    
+
     @api.onchange('service_id')
     def onchange_service_id(self):
         eq = self.service_id.equipment_id
