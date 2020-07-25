@@ -22,9 +22,9 @@ class StockPicking(models.Model):
     def action_confirm(self):
         if self.mapped('move_lines').filtered(lambda move: not move.product_id):
             raise UserError(_('All items must have Product ID'))
-        
+
 #         move_supply = self.env['stock.move']
-#         for move in self.move_lines:    
+#         for move in self.move_lines:
 #             if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_received < move.product_uom_qty:
 #                 supply = move_supply.create({
 #                     'name': move.name,
@@ -51,7 +51,7 @@ class StockPicking(models.Model):
 #                 })
 #                 supply.write({'vendor_received': move.vendor_qty})
 #                 supply._action_done()
-        
+
         self.mapped('package_level_ids').filtered(lambda pl: pl.state == 'draft' and not pl.move_ids)._generate_moves()
         # call `_action_confirm` on every draft move
         self.mapped('move_lines')\
@@ -61,7 +61,7 @@ class StockPicking(models.Model):
         self.filtered(lambda picking: picking.location_id.usage in ('supplier', 'inventory', 'production') and picking.state == 'confirmed')\
             .mapped('move_lines')._action_assign()
         return True
-    
+
     @api.multi
     def action_assign(self):
         """ Check availability of picking moves.
@@ -70,7 +70,7 @@ class StockPicking(models.Model):
         @return: True
         """
         move_supply = self.env['stock.move']
-        for move in self.move_lines:     
+        for move in self.move_lines:
             if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0:
                 total_received = move.vendor_received + move.vendor_qty
                 move_qty = 0
@@ -80,7 +80,7 @@ class StockPicking(models.Model):
                     if move.vendor_received < move.product_uom_qty:
                         move_qty = move.product_uom_qty - move.vendor_received
                         total_received = move.product_uom_qty
-                        
+
                 if move_qty > 0:
                     supply = move_supply.create({
                         'name': move.name,
@@ -107,7 +107,7 @@ class StockPicking(models.Model):
                     })
                     move.write({'vendor_received': total_received})
                     supply._action_done()
-                
+
         self.filtered(lambda picking: picking.state == 'draft').action_confirm()
         moves = self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))
         if not moves:
@@ -186,7 +186,7 @@ class StockMove(models.Model):
                 else:
                     service_line = move.env['service.consumable'].search([('id', '=', move.service_line_id)], limit=1)
                 service_line.write({'received': True})
-                
+
             # if the move is preceeded, then it's waiting (if preceeding move is done, then action_assign has been called already and its state is already available)
             if move.move_orig_ids:
                 move_waiting |= move
@@ -228,7 +228,7 @@ class StockMove(models.Model):
 #         self.name = product.partner_ref
         self.product_uom = product.uom_id.id
         return {'domain': {'product_uom': [('category_id', '=', product.uom_id.category_id.id)]}}
-    
+
 #     @api.onchange('vendor_qty')
 #     def onchange_vendor_qty(self):
 #         if self.product_category == 'Sparepart':
@@ -755,9 +755,9 @@ class ServiceOrder(models.Model):
                             account_id = other.product_id.categ_id.property_account_income_categ_id.id
                         else:
                             raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
-                        
+
                         if other.name == 'Own Risk':
-							price = other.price_unit * -1
+                            price = other.price_unit * -1
     #                     if invoice_or and other.name == 'Own Risk':
     #                         invoice_line_or = InvoiceLine.create({
     #                             'invoice_id': invoice_or.id,
@@ -784,7 +784,7 @@ class ServiceOrder(models.Model):
                             'uom_id': other.product_uom.id,
                             'product_id': other.product_id and other.product_id.id or False,
                             'product_category': other.product_id.categ_id.name,
-                            'price_unit': other.price_unit,
+                            'price_unit': price,  # other.price_unit,
                             'price_subtotal': other.product_uom_qty * other.price_unit
                         })
 
@@ -806,7 +806,7 @@ class ServiceOrder(models.Model):
             'target': 'current',
             'res_id': self.invoice_id.id,
         }
-        
+
     @api.multi
     def action_created_invoice_or(self):
         self.ensure_one()
