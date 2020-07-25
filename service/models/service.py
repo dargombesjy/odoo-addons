@@ -755,7 +755,9 @@ class ServiceOrder(models.Model):
                             account_id = other.product_id.categ_id.property_account_income_categ_id.id
                         else:
                             raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
-
+                        
+                        if other.name == 'Own Risk':
+							price = other.price_unit * -1
     #                     if invoice_or and other.name == 'Own Risk':
     #                         invoice_line_or = InvoiceLine.create({
     #                             'invoice_id': invoice_or.id,
@@ -771,20 +773,20 @@ class ServiceOrder(models.Model):
     #                             'price_subtotal': other.product_uom_qty * other.price_unit
     #                         })
     #                     else:
-                        if other.name != 'Own Risk':
-                            invoice_line = InvoiceLine.create({
-                                'invoice_id': invoice.id,
-                                'name': name,
-                                'origin': other.name,
-                                'account_id': account_id,
-                                'quantity': other.product_uom_qty,
-                                'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
-                                'uom_id': other.product_uom.id,
-                                'product_id': other.product_id and other.product_id.id or False,
-                                'product_category': other.product_id.categ_id.name,
-                                'price_unit': other.price_unit,
-                                'price_subtotal': other.product_uom_qty * other.price_unit
-                            })
+                        # if other.name != 'Own Risk':
+                        invoice_line = InvoiceLine.create({
+                            'invoice_id': invoice.id,
+                            'name': name,
+                            'origin': other.name,
+                            'account_id': account_id,
+                            'quantity': other.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+                            'uom_id': other.product_uom.id,
+                            'product_id': other.product_id and other.product_id.id or False,
+                            'product_category': other.product_id.categ_id.name,
+                            'price_unit': other.price_unit,
+                            'price_subtotal': other.product_uom_qty * other.price_unit
+                        })
 
                 invoice.compute_taxes()
                 # invoice_or.compute_taxes()
@@ -797,6 +799,19 @@ class ServiceOrder(models.Model):
         self.ensure_one()
         return {
             'name': _('Invoice created'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'account.invoice',
+            'view_id': self.env.ref('account.invoice_form').id,
+            'target': 'current',
+            'res_id': self.invoice_id.id,
+        }
+        
+    @api.multi
+    def action_created_invoice_or(self):
+        self.ensure_one()
+        return {
+            'name': _('Invoice OR created'),
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'account.invoice',
