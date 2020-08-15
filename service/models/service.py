@@ -4,6 +4,7 @@ import base64
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from num2words import num2words
+from html5lib._ihatexml import digit
 
 
 class StockPicking(models.Model):
@@ -392,6 +393,10 @@ class ServiceOrder(models.Model):
     amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True, digits=(12,0))
     amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True, digits=(12,0))
     amount_total = fields.Float('Total', compute='_amount_total', store=True, digits=(12,0))
+    cost_operations = fields.Float('Cost Sparepart', compute='_cost_untaxed', store=True, digits=(12,0))
+    cost_fees = fields.Float('Cost Jasa', compute='_cost_untaxed', store=True, digits=(12,0))
+    cost_others = fields.Float('Cost Others', compute='_cost_untaxed', store=True, digit=(12,0))
+    cost_bahan = fields.Float('Cost Bahan', compute='_cost_untaxed', store=True, digits=(12,0))
     cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True, digits=(12,0))
     own_risk_invoiced = fields.Boolean('Own Risk invoiced')
     print_tax = fields.Boolean('Print Tax?')
@@ -468,13 +473,18 @@ class ServiceOrder(models.Model):
     @api.depends('operations.cost_subtotal', 'invoice_method', 'fees_lines.cost_subtotal',
                  'others_lines.cost_subtotal', 'consumable_lines.cost_subtotal')
     def _cost_untaxed(self):
-        total = sum(operation.cost_subtotal for operation in self.operations)
-        total += sum(fee.cost_subtotal for fee in self.fees_lines)
+        cost_part = sum(operation.cost_subtotal for operation in self.operations)
+        cost_jasa = sum(fee.cost_subtotal for fee in self.fees_lines)
+        cost_others = 0
         for other in self.others_lines:
             if other.product_id.name != 'Own Risk':
-                total += other.cost_subtotal
-        total += sum(consumable.cost_subtotal for consumable in self.consumable_lines)
-        self.cost_total = total
+                cost_others += other.cost_subtotal
+        cost_bahan = sum(consumable.cost_subtotal for consumable in self.consumable_lines)
+        self.cost_operations = cost_part
+        self.cost_fees = cost_jasa
+        self.cost_others = cost_others
+        self.cost_bahan = cost_bahan
+        self.cost_total = cost_part + cost_jasa + cost_others + cost_bahan
 
     _sql_constraints = [
         ('name', 'unique (name)', 'The name of the Service Order must be unique!')
