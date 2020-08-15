@@ -65,6 +65,12 @@
 	                            icon="fa-pencil-square-o" string="Invoice" attrs="{'invisible': [('state','in',('confirmed','2binvoiced','draft'))]}"
 	                            groups="account.group_account_invoice">
 	                        </button>
+	                        <button name="action_created_invoice_or"
+	                            type="object"
+	                            class="oe_stat_button"
+	                            icon="fa-pencil-square-o" string="Invoice OR" attrs="{'invisible': [('state','in',('confirmed','2binvoiced','draft'))]}"
+	                            groups="account.group_account_invoice">
+	                        </button>
 						</div>
 						<label for="name" />
 						<h1>
