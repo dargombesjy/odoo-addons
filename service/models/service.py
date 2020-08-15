@@ -1087,8 +1087,9 @@ class ServiceLine(models.Model):
 
     @api.onchange('price_unit')
     def onchange_price_unit(self):
-        if not self.service_id.has_confirmed:
-            self.estimate_unit = self.price_unit
+        pass
+#         if not self.service_id.has_confirmed:
+#             self.estimate_unit = self.price_unit
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
@@ -1154,8 +1155,9 @@ class ServiceFee(models.Model):
 
     @api.onchange('price_unit')
     def onchange_price_unit(self):
-        if not self.service_id.has_confirmed:
-            self.estimate_unit = self.price_unit
+        pass
+#         if not self.service_id.has_confirmed:
+#             self.estimate_unit = self.price_unit
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):

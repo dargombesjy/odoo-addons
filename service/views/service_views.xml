@@ -128,6 +128,8 @@
 														</div>
 														<field name="supply_type" invisible="1" />
 														<field name="price_unit" />
+														<field name="estimate_unit" groups="service.group_service_manager"/>
+														<field name="cost_unit" invisible="1" />
 														<field name="tax_id" widget="many2many_tags"
 															domain="[('type_tax_use','=','sale')]" />
 														<field name="price_subtotal" widget="monetary" />
@@ -152,6 +154,8 @@
 										<field name="product_uom" string="Unit of Measure"
 											groups="uom.group_uom" />
 										<field name="price_unit" />
+										<field name="estimate_unit" groups="service.group_service_manager"/>
+										<field name="cost_unit" invisible="1" />
 										<field name="tax_id" widget="many2many_tags"
 											domain="[('type_tax_use','=','sale')]" />
 										<field name="invoiced" invisible="1" />
@@ -185,6 +189,8 @@
 													groups="uom.group_uom" />
 											</div>
 											<field name="price_unit" />
+											<field name="estimate_unit" groups="service.group_service_manager"/>
+											<field name="cost_unit" invisible="1" />
 											<field name="tax_id" widget="many2many_tags"
 												domain="[('type_tax_use','=','sale')]" />
 											<field name="price_subtotal" widget="monetary" />
@@ -200,6 +206,7 @@
 										<field name="product_uom" string="Unit of Measure"
 											groups="uom.group_uom" />
 										<field name="price_unit" />
+										<field name="estimate_unit" groups="service.group_service_manager"/>
 										<field name="cost_unit" invisible="1" />
 										<field name="tax_id" widget="many2many_tags"
 											domain="[('type_tax_use','=','sale')]" />
@@ -224,6 +231,7 @@
 													groups="uom.group_uom" />
 											</div>
 											<field name="price_unit" />
+											<field name="cost_unit" invisible="1" />
 											<field name="tax_id" widget="many2many_tags"
 												domain="[('type_tax_use','=','sale')]" />
 											<field name="price_subtotal" widget="monetary" />
