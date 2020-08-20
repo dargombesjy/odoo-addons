@@ -10,6 +10,10 @@ class AccountInvoice(models.Model):
     def action_print_invoice_or(self):
         return self.env.ref('zaccount.action_invoice_or').report_action(self)
 
+    @api.multi
+    def action_invoice_aab(self):
+        return self.env.ref('zaccount.action_invoice_aab').report_action(self)
+
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
                  'currency_id', 'company_id', 'date_invoice', 'type')

@@ -19,11 +19,14 @@
 				<div class="page" style="font-size:0.9rem">
 					<style type="text/css">
 						.table-sm td {
-						padding-top: 0.1rem;
-						padding-bottom: 0.1rem;
+							padding-top: 0.1rem;
+							padding-bottom: 0.1rem;
 						}
 						.signature-block {
 						page-break-inside: avoid;
+						}
+						.bold {
+							font-weight: bold;
 						}
 					</style>
 					<div class="oe_structure" style="height:45px" />
@@ -73,7 +76,7 @@
 								</tr>
 							</table>
 						</div>
-						<!-- <div class="col-2 bm-2"> <table class="table table-sm"> </table> 
+						<!-- <div class="col-2 bm-2"> <table class="table table-sm"> </table>
 							</div> -->
 						<div class="col-6 bm-2">
 							<table class="table table-sm">
@@ -133,7 +136,8 @@
 						</thead>
 						<tbody>
 							<t t-if="o.fees_lines">
-								<t t-set="m" t-value="1" />
+								<t t-set="m" t-value="1"/>
+								<t t-set="n" t-value="0"/>
 								<tr class="bg-200 o_line_section">
 									<td colspan="6">
 										<strong>Repairs</strong>
@@ -156,7 +160,7 @@
 											<td class="text-right">
 												<span t-field="fees.price_unit" />
 											</td>
-											<!-- <td class="text-center"><span t-esc="','.join(map( lambda 
+											<!-- <td class="text-center"><span t-esc="','.join(map( lambda
 												x: x.name, fees.tax_id))"/></td> -->
 											<td class="text-right o_price_total">
 												<span t-field="fees.price_subtotal" /> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
@@ -176,11 +180,28 @@
 												groups="uom.group_uom" />
 										</td>
 									</t>
-									<t t-set="m" t-value="m+1" />
+									<t t-set="m" t-value="m+1"/>
+									<t t-set="n" t-value="n+fees.price_subtotal"/>
+								</tr>
+								<t t-set="val_jasa" t-value="'{:,}'.format(int(n))"/>
+								<tr class="o_line_section">
+									<td colspan="5">
+										<strong>Subtotal Jasa</strong>
+									</td>
+									<td class="text-right">
+										<span class="bold" t-esc="val_jasa"/>
+									</td>
 								</tr>
 							</t>
+
+							<tr style="border-top: 1px solid grey;">
+								<td></td>
+							</tr>
+
+							<!-- Sparepart lines -->
 							<t t-if="o.operations">
-								<t t-set="i" t-value="1" />
+								<t t-set="i" t-value="1"/>
+								<t t-set="j" t-value="0"/>
 								<tr class="bg-200 o_line_section">
 									<td colspan="6">
 										<strong>Spareparts</strong>
@@ -207,10 +228,10 @@
 											<td class="text-right">
 												<span t-field="line.price_unit" />
 											</td>
-											<!-- <td class="text-center"><span t-esc="','.join(map( lambda 
+											<!-- <td class="text-center"><span t-esc="','.join(map( lambda
 												x: x.name, line.tax_id))"/></td> -->
 											<td class="text-right o_price_total">
-												<span t-field="line.price_subtotal" /><!-- t-options='{"widget": 
+												<span t-field="line.price_subtotal" /><!-- t-options='{"widget":
 													"monetary", "display_currency": o.currency_id}'/ -->
 											</td>
 										</t>
@@ -231,7 +252,17 @@
 												groups="uom.group_uom" />
 										</td>
 									</t>
-									<t t-set="i" t-value="i+1" />
+									<t t-set="i" t-value="i+1"/>
+									<t t-set="j" t-value="j+line.price_subtotal"/>
+								</tr>
+								<t t-set="val_sparepart" t-value="'{:,}'.format(int(j))"/>
+								<tr class="o_line_section">
+									<td colspan="5">
+										<strong>Subtotal Sparepart</strong>
+									</td>
+									<td class="text-right">
+										<span class="bold" t-esc="val_sparepart"/>
+									</td>
 								</tr>
 							</t>
 						</tbody>
@@ -254,7 +285,7 @@
 												</td>
 											</t>
 											<td class="text-right">
-												<span t-field="o.amount_untaxed" /> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+												<span class="bold" t-field="o.amount_untaxed" /> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
 											</td>
 										</tr>
 										<t t-if="o.print_tax">
@@ -267,7 +298,7 @@
 											<tr class="border-black 0_total">
 												<td>Total</td>
 												<td class="text-right o_price_total">
-													<span t-field="o.amount_total" />  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+													<span class="bold" t-field="o.amount_total" />  <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
 												</td>
 											</tr>
 										</t>
@@ -276,6 +307,7 @@
 							</div>
 						</div>
 					</t>
+
 					<div class="oe_structure" />
 					<t t-if="o.state != 'draft'">
 						<div id="spk-footer" class="row mb32">
@@ -293,7 +325,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<!-- <tr> <td>Bongkar</td> <td></td><td></td><td></td><td></td><td></td><td></td> 
+										<!-- <tr> <td>Bongkar</td> <td></td><td></td><td></td><td></td><td></td><td></td>
 											</tr> -->
 										<tr>
 											<td>Bongkar</td>
@@ -435,7 +467,6 @@
 								<span>Disiapkan Oleh</span>
 								<div style="height:100px" />
 								<span>( Ka. Prod )</span>
-								\
 							</t>
 						</div>
 						<div class="col-3 text-center">
@@ -474,7 +505,6 @@
 							<t t-if="o.state != 'draft'">
 								<div style="height:100px" />
 								<span>( Ka. Prod )</span>
-								\
 							</t>
 						</div>
 						<div class="col-3 text-center">
@@ -484,8 +514,10 @@
 							</t>
 						</div>
 						<div class="col-3 text-center">
-							<div style="height:100px" />
-							<span>( CS )</span>
+							<t t-if="o.state != 'draft'">
+								<div style="height:100px" />
+								<span>( CS )</span>
+							</t>
 						</div>
 					</div>
 					<!-- </t> -->

@@ -1018,7 +1018,7 @@ class ServiceLine(models.Model):
     product_uom_qty = fields.Float('Quantity', default=1.0, required=True)
     product_uom = fields.Many2one(
         'uom.uom', 'Product Unit od Measure')
-    estimate_unit = fields.Float('Estimation')
+    estimate_unit = fields.Float('Estimation', digits=(12,0))
     price_unit = fields.Float('Unit Price', digits=(12,0))
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
@@ -1046,10 +1046,10 @@ class ServiceLine(models.Model):
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
     approved = fields.Boolean('Approved', default=True)
-    cost_unit = fields.Float('Unit Cost') #, required=True)
+    cost_unit = fields.Float('Unit Cost', digits=(12,0)) #, required=True)
     # cost_tax_id = fields.Many2many(
     #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
-    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=(12,0))
     # purchased = fields.Boolean('Purchased', copy=False, required=True)
     # purchase_line_id = fields.Many2one(
     #     'purchase.order.line', 'Purchase Line', copy=False)
@@ -1087,9 +1087,9 @@ class ServiceLine(models.Model):
 
     @api.onchange('price_unit')
     def onchange_price_unit(self):
-        pass
+        if not self.estimate_unit:
 #         if not self.service_id.has_confirmed:
-#             self.estimate_unit = self.price_unit
+            self.estimate_unit = self.price_unit
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
@@ -1123,7 +1123,7 @@ class ServiceFee(models.Model):
         index=True, ondelete='cascade', required=True)
     product_id = fields.Many2one('product.product', 'Service Fee', required=True)
     product_uom_qty = fields.Float('Quantity', required=True, default=1.0)
-    estimate_unit = fields.Float('Estimation')
+    estimate_unit = fields.Float('Estimation', digits=(12,0))
     price_unit = fields.Float('Unit Price', required=True, digits=(12,0))
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=(12,0))
@@ -1133,10 +1133,10 @@ class ServiceFee(models.Model):
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 
     # ------ Production ------ #
-    cost_unit = fields.Float('Unit Cost', required=True)
+    cost_unit = fields.Float('Unit Cost', required=True, digits=(12,0))
     # cost_tax_id = fields.Many2many(
     #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
-    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=(12,0))
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
@@ -1155,9 +1155,9 @@ class ServiceFee(models.Model):
 
     @api.onchange('price_unit')
     def onchange_price_unit(self):
-        pass
+        if not self.estimate_unit:
 #         if not self.service_id.has_confirmed:
-#             self.estimate_unit = self.price_unit
+            self.estimate_unit = self.price_unit
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):

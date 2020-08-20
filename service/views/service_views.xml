@@ -129,7 +129,7 @@
 														<field name="supply_type" invisible="1" />
 														<field name="price_unit" />
 														<field name="estimate_unit" groups="service.group_service_manager"/>
-														<field name="cost_unit" invisible="1" />
+														<field name="cost_unit" groups="service.group_service_user" />
 														<field name="tax_id" widget="many2many_tags"
 															domain="[('type_tax_use','=','sale')]" />
 														<field name="price_subtotal" widget="monetary" />
@@ -155,7 +155,7 @@
 											groups="uom.group_uom" />
 										<field name="price_unit" />
 										<field name="estimate_unit" groups="service.group_service_manager"/>
-										<field name="cost_unit" invisible="1" />
+										<field name="cost_unit" groups="service.group_service_user" />
 										<field name="tax_id" widget="many2many_tags"
 											domain="[('type_tax_use','=','sale')]" />
 										<field name="invoiced" invisible="1" />

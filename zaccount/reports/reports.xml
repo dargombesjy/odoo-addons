@@ -14,5 +14,10 @@
 			groups="account.group_account_invoice"
 			paperformat="zaccount.paperformat_invoice_or" />
 
+		<report id="action_invoice_aab" model="account.invoice"
+			string="Invoice AAB" report_type="qweb-pdf"
+			name="zaccount.report_invoice_aab" file="zaccount.report_invoice_aab"
+			groups="account.group_account_invoice" />
+
 	</data>
 </odoo>

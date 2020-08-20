@@ -18,6 +18,7 @@
         'reports/paperformat.xml',
         'reports/reports.xml',
         'reports/report_invoice_or.xml',
+        'reports/report_invoice_aab.xml'
         # 'reports/report_general_ledger.xml',
         # 'wizards/general_ledger.xml',
     ],
