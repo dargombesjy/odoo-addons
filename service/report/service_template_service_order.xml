@@ -184,14 +184,16 @@
 									<t t-set="n" t-value="n+fees.price_subtotal"/>
 								</tr>
 								<t t-set="val_jasa" t-value="'{:,}'.format(int(n))"/>
-								<tr class="o_line_section">
-									<td colspan="5">
-										<strong>Subtotal Jasa</strong>
-									</td>
-									<td class="text-right">
-										<span class="bold" t-esc="val_jasa"/>
-									</td>
-								</tr>
+								<t t-if="o.state == 'draft'">
+									<tr class="o_line_section">
+										<td colspan="5">
+											<strong>Subtotal Jasa</strong>
+										</td>
+										<td class="text-right">
+											<span class="bold" t-esc="val_jasa"/>
+										</td>
+									</tr>
+								</t>
 							</t>
 
 							<tr style="border-top: 1px solid grey;">
@@ -256,14 +258,16 @@
 									<t t-set="j" t-value="j+line.price_subtotal"/>
 								</tr>
 								<t t-set="val_sparepart" t-value="'{:,}'.format(int(j))"/>
-								<tr class="o_line_section">
-									<td colspan="5">
-										<strong>Subtotal Sparepart</strong>
-									</td>
-									<td class="text-right">
-										<span class="bold" t-esc="val_sparepart"/>
-									</td>
-								</tr>
+								<t t-if="o.state == 'draft'">
+									<tr class="o_line_section">
+										<td colspan="5">
+											<strong>Subtotal Sparepart</strong>
+										</td>
+										<td class="text-right">
+											<span class="bold" t-esc="val_sparepart"/>
+										</td>
+									</tr>
+								</t>
 							</t>
 						</tbody>
 					</table>
