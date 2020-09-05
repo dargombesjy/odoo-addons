@@ -30,7 +30,7 @@ class AccountInvoice(models.Model):
         self.sub_material = wht_base - wht_base_rev
         self.sub_spareparts = sum(sp.price_subtotal for sp in self.invoice_line_ids.filtered(lambda s: s.product_category == 'Spareparts'))
         other = sum(oth.price_subtotal for oth in self.invoice_line_ids.filtered(lambda o: o.product_category == 'Service Other'))
-        self.sub_others = other  # + self.own_risk
+        self.sub_others = other + self.own_risk
         self.amount_wht = sum(round_curr(wh.amount_total) for wh in self.tax_line_ids.filtered(lambda w: w.tax_id == self.wht_tax))
 
     def prepare_wht_tax(self):
