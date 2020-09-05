@@ -689,7 +689,7 @@ class ServiceOrder(models.Model):
 #                             'fiscal_position_id': service.partner_id.property_account_position_id
 #                         })
                     if own_risk and self.bill_type == 'claim':
-                        or_total = own_risk.product_uom_qty * own_risk.unit_price
+                        or_total = own_risk.product_uom_qty * own_risk.price_unit
                         invoice.write({'own_risk': or_total})
                         # invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
