@@ -643,11 +643,12 @@ class ServiceOrder(models.Model):
         invoices_group = {}
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
-        own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
+#         own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
         for service in self.filtered(lambda service: service.state not in ('draft', 'cancel') and not service.invoice_id):
             if not service.partner_id.id and not service.partner_invoice_id.id:
                 raise UserError(_('You have to select an invoice address in the service form.'))
             comment = service.quotation_notes
+            own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.invoice_method != 'none':
                 if group and service.partner_invoice_id.id in invoices_group:
                     invoice = invoices_group[service.partner_invoice_id.id]
@@ -689,9 +690,7 @@ class ServiceOrder(models.Model):
 #                             'fiscal_position_id': service.partner_id.property_account_position_id
 #                         })
                     if own_risk and self.bill_type == 'claim':
-                        or_total = own_risk.product_uom_qty * own_risk.price_unit
-                        invoice.write({'own_risk': or_total})
-                        # invoice.write({'own_risk': own_risk.price_subtotal})
+                        invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
 
                 service.write({'invoiced': True, 'invoice_id': invoice.id})
