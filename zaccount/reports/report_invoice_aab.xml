@@ -206,17 +206,30 @@
                     <div style="border-bottom:1px solid grey;">: <span t-field="o.own_risk" /></div>
                   </div>
                 </div>
+                <t t-set="total_tagihan" t-value="o.residual - o.amount_wht"/>
                 <div class="row mb8">
                   <div class="col-4">
                     <div><span>Total Tagihan Bersih</span></div>
                   </div>
                   <div class="col-3">
-                    <div>: <span id="residual" t-field="o.residual" /></div>
+                  	<div>: <span id="residual" t-esc="total_tagihan"
+                  				 t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                  	</div>
+<!--                     <div>: <span id="residual" t-field="o.residual" /></div> -->
                   </div>
                 </div>
                 <div class="row mb8">
                   <div class="col-4">
-                    <div><span><strong>Jumlah: </strong></span><span><strong t-field="o.residual"/></span></div>
+                    <div>
+                    	<span>
+                    		<strong>Jumlah: </strong>
+                    	</span>
+                    	<span>
+                    		<strong t-esc="total_tagihan"
+                    				t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+<!--                     		<strong t-field="o.residual"/> -->
+                    	</span>
+                    </div>
                   </div>
                   <div class="col-8">
                     <div><span id="terbilang" class="bold"></span></div>

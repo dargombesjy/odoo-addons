@@ -648,7 +648,7 @@ class ServiceOrder(models.Model):
             if not service.partner_id.id and not service.partner_invoice_id.id:
                 raise UserError(_('You have to select an invoice address in the service form.'))
             comment = service.quotation_notes
-            own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
+#             own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.invoice_method != 'none':
                 if group and service.partner_invoice_id.id in invoices_group:
                     invoice = invoices_group[service.partner_invoice_id.id]
@@ -689,8 +689,8 @@ class ServiceOrder(models.Model):
 #                             # 'comment': service.quotation_notes,
 #                             'fiscal_position_id': service.partner_id.property_account_position_id
 #                         })
-                    if own_risk and service.bill_type == 'claim':
-                        invoice.write({'own_risk': own_risk.price_subtotal})
+#                     if own_risk and service.bill_type == 'claim':
+#                         invoice.write({'own_risk': own_risk.price_subtotal})
                     invoices_group[service.partner_invoice_id.id] = invoice
 
                 service.write({'invoiced': True, 'invoice_id': invoice.id})
@@ -772,8 +772,8 @@ class ServiceOrder(models.Model):
 
                         if other.name == 'Own Risk':
                             price = other.price_unit * (-1)
-#                             if service.bill_type == 'claim':
-#                                 invoice.write({'own_risk': other.price_subtotal})
+                            if service.bill_type == 'claim':
+                                invoice.write({'own_risk': other.price_subtotal})
     #                     if invoice_or and other.name == 'Own Risk':
     #                         invoice_line_or = InvoiceLine.create({
     #                             'invoice_id': invoice_or.id,

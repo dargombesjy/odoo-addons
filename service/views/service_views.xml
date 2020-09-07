@@ -313,6 +313,15 @@
 			<field name="view_mode">tree,form</field>
 			<field name="domain">[('state','=','2binvoiced')]</field>
 		</record>
+		
+		<record id="action_master_products_list"
+			model="ir.actions.act_window">
+			<field name="name">Master Data</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">product.template</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">kanban,tree</field>
+		</record>
 
 		<menuitem id="menu_service_order" name="Service"
 			sequence="36" groups="service.group_service_menu" />
@@ -320,6 +329,10 @@
 		<menuitem id="menu_service_order_form"
 			parent="menu_service_order" action="action_service_order_tree"
 			name="Services" />
+		
+		<menuitem id="menu_master_product_list"
+			parent="menu_service_order" action="action_master_products_list"
+			name="Product Master" />
 
 		<menuitem id="menu_account_work_order_list"
 			parent="account.menu_finance_receivables"
