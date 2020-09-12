@@ -201,9 +201,9 @@ class ServiceOrder(models.Model):
         self.mapped('operations').write({'state': 'confirmed'})
         return self.write({'state': 'under_repair'})
 
-    @api.multi
-    def action_service_cancel_draft(self):
-        return self.write({'state': 'draft'})
+#     @api.multi
+#     def action_service_cancel_draft(self):
+#         return self.write({'state': 'draft'})
 
 # class ServiceLine(models.Model):
 #     _inherit = 'service.line'

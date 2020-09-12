@@ -13,8 +13,8 @@ class StockPicking(models.Model):
     service_id = fields.Many2one('service.order')
     eq_name = fields.Char('License Plate')
     eq_model = fields.Char('Model')
-#     receiver = fields.Char('Receiver')
-#     received_date = fields.Date('Received Date')
+    receiver = fields.Char('Receiver')
+    received_date = fields.Date('Received Date')
     vendor_id = fields.Many2one(
         'res.partner', 'Vendor', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
@@ -697,6 +697,9 @@ class ServiceOrder(models.Model):
 
                 if service.operations:
                     for operation in service.operations:
+                        if not operation.approved:
+                            continue
+                        
                         if group:
                             name = service.name + '-' + operation.name
                         else:
@@ -726,6 +729,9 @@ class ServiceOrder(models.Model):
 
                 if service.fees_lines:
                     for fee in service.fees_lines:
+                        if not fee.approved:
+                            continue
+                        
                         if group:
                             name = service.name + '-' + fee.name
                         else:
@@ -756,6 +762,9 @@ class ServiceOrder(models.Model):
 
                 if service.others_lines:
                     for other in service.others_lines:
+#                         if not other.approved:
+#                             continue
+                        
                         if group:
                             name = service.name + '-' + other.name
                         else:
@@ -835,6 +844,10 @@ class ServiceOrder(models.Model):
             'target': 'current',
             'res_id': self.invoice_or_id.id,
         }
+        
+    @api.multi
+    def action_service_cancel_draft(self):
+        return self.write({'state': 'draft'})
 
     @api.multi
     def action_export_xls(self):
@@ -1200,6 +1213,7 @@ class ServiceOther(models.Model):
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
+    approved = fields.Boolean('Approved', default=True)
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 

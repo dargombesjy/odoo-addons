@@ -48,6 +48,8 @@
 							class="oe_highlight" groups="account.group_account_invoice" />
 						<button name="action_service_end" states="ready"
 							string="Close Order" type="object" class="oe_highlight" />
+						<button name="action_service_cancel_draft"
+							string="Set to Draft" type="object" groups="service.group_service_finance" />
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
 							attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
@@ -235,6 +237,7 @@
 											<field name="tax_id" widget="many2many_tags"
 												domain="[('type_tax_use','=','sale')]" />
 											<field name="price_subtotal" widget="monetary" />
+											<field name="approved" string="Acc?" />
 										</group>
 									</form>
 									<tree string="Others" editable="bottom">
@@ -251,6 +254,7 @@
 											domain="[('type_tax_use','=','sale')]" />
 										<field name="invoiced" invisible="1" />
 										<field name="price_subtotal" widget="monetary" />
+										<field name="approved" string="Acc?" />
 									</tree>
 								</field>
 							</page>

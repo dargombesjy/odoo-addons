@@ -6,11 +6,20 @@
 			<field name="model">stock.picking</field>
 			<field name="inherit_id" ref="stock.view_picking_form" />
 			<field name="arch" type="xml">
-				<xpath expr="//field[@name='origin']" position="after">
+				<xpath expr="//field[@name='backorder_id']" position="after">
+					<field name="picking_type_code" invisible="0" />
 					<field name="service_id" />
 					<field name="eq_name" />
 					<field name="eq_model" />
 				</xpath>
+				
+				<xpath expr="//field[@name='origin']" position="after">
+					<field name="receiver"
+						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
+					<field name="received_date"
+						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
+				</xpath>
+				
 				<xpath expr="//notebook" position="replace">
 					<notebook>
 						<page string="Detailed Operations"
@@ -88,7 +97,7 @@
 									<field name="location_id" invisible="1" />
 									<field name="location_dest_id" invisible="1" />
 									<field name="scrapped" invisible="1" />
-									<field name="picking_code" invisible="1" />
+									<field name="picking_code" invisible="0" />
 									<field name="product_type" invisible="1" />
 									<field name="show_details_visible" invisible="1" />
 									<field name="show_reserved_availability" invisible="1" />
@@ -99,7 +108,8 @@
 									<field name="product_id" required="1"
 										attrs="{'readonly': ['|', '&amp;', ('additional', '=', False), ('has_move_lines', '=', True)]}" />
 									<field name="name" invisible="0" />
-									<field name="vendor_id" invisible="0" />
+									<field name="vendor_id"/>
+<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
 									<field name="vendor_qty" invisible="0" />
 									<field name="vendor_date" invisible="0" />
 									<field name="vendor_received" invisible="1" />
@@ -115,8 +125,10 @@
 										attrs="{'readonly': [('state', '!=', 'draft'), ('additional', '=', False)]}"
 										options="{'no_open': True, 'no_create': True}"
 										string="Unit of Measure" groups="uom.group_uom" />
-									<field name="receiver" invisible="0" />
-									<field name="received_date" invisible="0" />
+									<field name="receiver"/>
+<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
+									<field name="received_date"/>
+<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
 									<button name="action_show_details"
 										string="Register lots, packs, location" type="object"
 										icon="fa-list"
