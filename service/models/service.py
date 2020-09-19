@@ -288,7 +288,7 @@ class ServiceOrder(models.Model):
     bill_type = fields.Selection([
         ('self', 'Bill to Customer'),
         ('claim', 'Bill to Insurance')], string="Billing Type", copy=False, required=True,
-        default='claim')
+        default='self')
     claim_reference = fields.Char('AMC')
     claim_id = fields.Char('Claim ID')
     policy_no = fields.Char('Policy No.')
@@ -325,10 +325,16 @@ class ServiceOrder(models.Model):
         self.chassis_no = details['chassis_no']
         self.engine_no = details['engine_no']
         self.base_colour = details['base_colour']
+    
+    @api.one
+    @api.depends('partner_id')
+    def _compute_partner(self):
+        self.partner_type = self.partner_id.company_type
 
     partner_id = fields.Many2one(
         'res.partner', 'Customer', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
+    partner_type = fields.Char('Customer Type', compute='_compute_partner', store=True)
     service_advisor = fields.Char('Service Advisor')
     address_id = fields.Many2one(
         'res.partner', 'Delivery Address', index=True, readonly=True,

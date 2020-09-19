@@ -86,11 +86,12 @@
 								<field name="claim_id" />
 								<field name="policy_no" />
 								<field name="insurance_id"
-									domain="[('is_insurance', '=', True)]" />
+									domain="[('is_insurance', '=', True)]"
+                                    attrs="{'invisible': [('bill_type', '=', 'self')]}" />
 								<field name="partner_id"
 									domain="[('customer', '=', True)]"
-									attrs="{'invisible': [('state', '=', 'draft')]}" />
-								<field name="service_advisor" />
+                                    attrs="{'invisible': [('state', '=', 'draft')]}" />
+                                <field name="service_advisor" />
 								<field name="print_tax" />
 								<field name="address_id" invisible="1" />
 								<field name="partner_invoice_id" invisible="1" />
