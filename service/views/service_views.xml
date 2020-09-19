@@ -16,6 +16,7 @@
 					<field name="equipment_id" />
 					<field name="status_unit" />
 					<field name="insurance_id" />
+					<field name="bill_type" groups="service.group_service_manager"/>
 					<field name="claim_id" />
 					<field name="state" />
 					<field name="planned_date" string="Pln. Finish" />
