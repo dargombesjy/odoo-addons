@@ -1,338 +1,335 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-  <data>
-    <record id="view_work_order_tree" model="ir.ui.view">
-      <field name="name">work.tree</field>
-      <field name="model">service.order</field>
-      <field name="arch" type="xml">
-        <tree string="Work Order"
-          decoration-muted="state in ('done','cancel')"
-          decoration-info="state=='draft'">
-          <field name="name" />
-          <field name="company_id"
-            groups="base.group_multi_company" invisible="1" />
-          <field name="register_date" />
-          <field name="claim_reference" />
-          <field name="claim_id" />
-          <field name="insurance_id" />
-          <field name="equipment_id" />
-          <field name="model" />
-          <field name="received_date" />
-          <field name="planned_date" />
-          <field name="state" />
-          <field name="work_stage" />
-        </tree>
-      </field>
-    </record>   
-    
-    <record id="view_work_order_form" model="ir.ui.view">
-      <field name="name">work.form</field>
-      <field name="model">service.order</field>
-      <field name="priority" eval="1" />
-      <field name="arch" type="xml">
-        <form string="Work Order">
-          <header>
-            <button name="action_service_start"
-              attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}"
-              type="object" string="Start Repair" class="oe_highlight" />
-            <!-- <button name="action_service_cancel_draft" states="cancel" 
-              string="Set to Draft" type="object"/> -->
-            <button name="action_service_cancel_draft"
-              states="under_repair" string="Set to Draft" type="object" />
-            <!-- <button name="action_service_start" attrs="{'invisible': 
-              ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" 
-              type="object" string="Start Repair" class="oe_highlight"/> -->
-            <!-- <button name="action_print_sparepart_request" states="under_repair" 
-              string="Req. Sparepart" type="object"/> -->
-            <!-- <button name="action_print_consumable_request" states="under_repair" 
-              string="Req. Consumables" type="object"/> -->
-            <button name="action_create_sparepart_transfer"
-              states="under_repair" string="Req. Sparepart"
-              type="object" />
-            <button name="action_create_consumable_transfer"
-              states="under_repair" string="Req. Bahan" type="object" />
-            <button name="action_create_purchase_fee"
-              states="under_repair" string="Create PO" type="object" />
-            <button name="action_service_ready"
-              states="under_repair" string="Repair Done" type="object"
-              class="oe_highlight" />
-            <field name="state" widget="statusbar"
-              statusbar_visible="draft,confirmed,under_repair,ready,done" />
-          </header>
-          <sheet>
-            <!-- <div class="oe_button_box" name="button_box"/> -->
-            <div class="oe_button_box" name="button_box" />
-            <label for="name" />
-            <h1>
-              <field name="name" />
-            </h1>
-            <group>
-              <group>
-                <field name="company_id" attrs="{'readonly': 1}" />
-                <field name="bill_type" attrs="{'readonly': 1}" />
-                <field name="claim_reference"
-                  attrs="{'readonly': 1}" />
-                <field name="claim_id" attrs="{'readonly': 1}" />
-                <field name="policy_no" attrs="{'readonly': 1}" />
-                <field name="insurance_id" />
-                <field name="partner_id" />
-              </group>
-              <group>
-                <field name="equipment_id" />
-                <field name="planned_date" attrs="{'readonly': 1}" />
-                <field name="received_date" required="True" />
-                <field name="work_stage" />
-                <field name="finish_date" />
-                <field name="vendor_ids" string="Repair Vendor"
-                  domain="[('supplier', '=', True)]"
-                  widget="many2many_tags" />
-                <field name="purchase_ids" widget="many2many_tags"
-                  attrs="{'readonly': 1}" />
-                <field name="sparepart_picking_id" />
-                <field name="consumable_picking_id" />
-                <field name="invoice_method" invisible="1" />
-                <field name="items_ok" invisible="0" />
-              </group>
-            </group>
-            <notebook>
-              <page string="Spareparts">
-                <field name="operations"
-                  attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
-                  <form string="Sparepartsss">
-                    <notebook>
-                      <page string="Sparepart Line">
-                        <group>
-                          <group>
-                            <field name="supply_type" />
-                            <field name="product_id" />
-                            <field name="name" />
-                            <label for="product_uom_qty" />
-                            <div class="o_row">
-                              <field name="product_uom_qty" />
-                              <field name="product_uom"
-                                groups="uom.group_uom" />
-                            </div>
-                            <field name="approved" string="Acc?"
-                              attrs="{'readonly': 1}" />
-                            <field name="received" />
-                          </group>
-                        </group>
-                      </page>
-                      <page string="History"> History </page>
-                    </notebook>
-                  </form>
-                  <tree string="Spareparts" editable="bottom">
-                    <field name="supply_type" />
-                    <field name="product_id" />
-                    <field name="name" />
-                    <field name="product_uom_qty"
-                      string="Quantity" />
-                    <field name="product_uom"
-                      string="Unit of Measure" groups="uom.group_uom" />
-                    <field name="approved" string="Acc?"
-                      attrs="{'readonly': 1}" />
-                    <field name="requested" string="Req" />
-                    <field name="received" string="Rcv"
-                      attrs="{'readonly': 1}" />
-                  </tree>
-                </field>
-                <div class="oe_clear" />
-              </page>
-              <page string="Operations">
-                <field name="fees_lines"
-                  attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
-                  <form string="Fees">
-                    <group>
-                      <field name="product_id" />
-                      <field name="name" />
-                      <label for="product_uom_qty" />
-                      <div class="o_row">
-                        <field name="product_uom_qty"
-                          string="Quantity" />
-                        <field name="product_uom"
-                          string="Unit of Measure"
-                          groups="uom.group_uom" />
-                      </div>
-                      <field name="cost_unit" />
-                      <field name="cost_subtotal"
-                        widget="monetary" />
-                      <field name="vendor_ids"
-                        domain="[('supplier', '=', True)]" />
-                      <field name="approved" string="Acc?"
-                        attrs="{'readonly': 1}" />
-                    </group>
-                  </form>
-                  <tree string="Fees" editable="bottom">
-                    <field name="product_id"
-                      domain="[('type','=','service')]" required="True" />
-                    <field name="name" />
-                    <field name="product_uom_qty"
-                      string="Quantity" />
-                    <field name="product_uom"
-                      string="Unit of Measure" groups="uom.group_uom" />
-                    <field name="cost_unit" />
-                    <field name="cost_subtotal" widget="monetary" />
-                    <field name="vendor_ids"
-                      widget="many2many_tags"
-                      domain="[('supplier', '=', True)]" />
-                    <field name="approved" string="Acc?"
-                      attrs="{'readonly': 1}" />
-                  </tree>
-                </field>
-              </page>
-              <page string="Others">
-                <field name="others_lines"
-                  attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
-                  <form string="Others">
-                    <group>
-                      <field name="product_id"
-                        domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" />
-                      <field name="name" />
-                      <field name="name" />
-                      <label for="product_uom_qty" />
-                      <div class="o_row">
-                        <field name="product_uom_qty"
-                          string="Quantity" />
-                        <field name="product_uom"
-                          string="Unit of Measure"
-                          groups="uom.group_uom" />
-                      </div>
-                      <field name="cost_unit" />
-                      <field name="cost_subtotal"
-                        widget="monetary" />
-                      <field name="vendor_ids"
-                        domain="[('supplier', '=', True)]" />
-                    </group>
-                  </form>
-                  <tree string="Others" editable="bottom">
-                    <field name="product_id"
-                      domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" />
-                    <field name="name" />
-                    <field name="product_uom_qty"
-                      string="Quantity" />
-                    <field name="product_uom"
-                      string="Unit of Measure" groups="uom.group_uom" />
-                    <field name="cost_unit" />
-                    <field name="cost_subtotal" widget="monetary" />
-                    <field name="vendor_ids"
-                      widget="many2many_tags"
-                      domain="[('supplier', '=', True)]" />
-                  </tree>
-                </field>
-              </page>
-              <page string="Consumables">
-                <field name="consumable_lines"
-                  attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
-                  <form string="Consumables">
-                    <group>
-                      <field name="product_id"
-                        domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
-                      <field name="name" />
-                      <label for="product_uom_qty" />
-                      <div class="o_row">
-                        <field name="product_uom_qty"
-                          string="Quantity" />
-                        <field name="product_uom"
-                          string="Unit of Measure"
-                          groups="uom.group_uom" />
-                      </div>
-                      <field name="cost_unit" />
-                      <field name="cost_subtotal"
-                        widget="monetary" />
-                      <field name="received" invisible="0" />
-                    </group>
-                  </form>
-                  <tree string="Consumables" editable="bottom">
-                    <field name="product_id" string="Bahan"
-                      domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
-                    <field name="name" invisible="1" />
-                    <field name="product_uom_qty"
-                      string="Quantity" />
-                    <field name="product_uom"
-                      string="Unit of Measure" groups="uom.group_uom" />
-                    <field name="cost_unit" />
-                    <field name="cost_subtotal" widget="monetary" />
-                    <field name="requested" string="Req" />
-                    <field name="received" string="Rcv"
-                      attrs="{'readonly': 1}" />
-                  </tree>
-                </field>
-              </page>
-            </notebook>
-          </sheet>
-          <div class="oe_chatter">
-            <field name="message_follower_ids"
-              widget="mail_followers" />
-            <field name="activity_ids" widget="mail_activity" />
-            <field name="message_ids" widget="mail_thread" />
-          </div>
-        </form>
-      </field>
-    </record>
-    
-    <record id="view_work_order_pivot" model="ir.ui.view">
-      <field name="name">work.pivot</field>
-      <field name="model">service.order</field>
-      <field name="arch" type="xml">
-        <pivot string="Service Order" display_quantity="True">
-          <field name="company_id" type="row" />
-          <field name="amount_total" type="measure" />
-        </pivot>
-      </field>
-    </record>
-    
-    <record id="action_work_order_list"
-      model="ir.actions.act_window">
-      <field name="name">Work Order</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">service.order</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    
-    <record id="action_work_order_tree"
-      model="ir.actions.act_window.view">
-      <field name="sequence" eval="1" />
-      <field name="view_mode">tree</field>
-      <field name="view_id" ref="view_work_order_tree" />
-      <field name="act_window_id" ref="action_work_order_list" />
-    </record>
-    
-    <record id="action_work_order_form"
-      model="ir.actions.act_window.view">
-      <field name="sequence" eval="2" />
-      <field name="view_mode">form</field>
-      <field name="view_id" ref="view_work_order_form" />
-      <field name="act_window_id" ref="action_work_order_list" />
-    </record>
-    
-    <record id="action_work_purchase_order_list"
-      model="ir.actions.act_window">
-      <field name="name">PO from Work</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">purchase.order</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-      <field name="domain">[('po_type','=','service')]</field>
-    </record>
-    
-    <menuitem id="menu_work_order" name="Production"
-      groups="work.group_work_user" />
+	<data>
+		<record id="view_work_order_tree" model="ir.ui.view">
+			<field name="name">work.tree</field>
+			<field name="model">service.order</field>
+			<field name="arch" type="xml">
+				<tree string="Work Order"
+					decoration-muted="state in ('done','cancel')"
+					decoration-info="state=='draft'">
+					<field name="name" />
+					<field name="company_id" groups="base.group_multi_company"
+						invisible="1" />
+					<field name="register_date" />
+					<field name="claim_reference" />
+					<field name="claim_id" />
+					<field name="insurance_id" />
+					<field name="equipment_id" />
+					<field name="model" />
+					<field name="received_date" />
+					<field name="planned_date" />
+					<field name="state" />
+					<field name="work_stage" />
+				</tree>
+			</field>
+		</record>
 
-    <menuitem id="menu_work_order_list"
-      parent="menu_work_order" action="action_work_order_list"
-      name="Work Order" />
+		<record id="view_work_order_form" model="ir.ui.view">
+			<field name="name">work.form</field>
+			<field name="model">service.order</field>
+			<field name="priority" eval="1" />
+			<field name="arch" type="xml">
+				<form string="Work Order">
+					<header>
+						<button name="action_service_start"
+							attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}"
+							type="object" string="Start Repair" class="oe_highlight" />
+						<!-- <button name="action_service_cancel_draft" states="cancel" string="Set 
+							to Draft" type="object"/> -->
+						<button name="action_service_cancel_draft"
+							states="under_repair" string="Set to Draft" type="object" />
+						<!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', 
+							('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" 
+							string="Start Repair" class="oe_highlight"/> -->
+						<!-- <button name="action_print_sparepart_request" states="under_repair" 
+							string="Req. Sparepart" type="object"/> -->
+						<!-- <button name="action_print_consumable_request" states="under_repair" 
+							string="Req. Consumables" type="object"/> -->
+						<button name="action_create_sparepart_transfer"
+							states="under_repair" string="Req. Sparepart" type="object" />
+						<button name="action_create_consumable_transfer"
+							states="under_repair" string="Req. Bahan" type="object" />
+						<button name="action_create_purchase_fee"
+							states="under_repair" string="Create PO" type="object" />
+						<button name="action_service_ready" states="under_repair"
+							string="Repair Done" type="object" class="oe_highlight" />
+						<field name="state" widget="statusbar"
+							statusbar_visible="draft,confirmed,under_repair,ready,done" />
+					</header>
+					<sheet>
+						<!-- <div class="oe_button_box" name="button_box"/> -->
+						<div class="oe_button_box" name="button_box" />
+						<label for="name" />
+						<h1>
+							<field name="name" />
+						</h1>
+						<group>
+							<group>
+								<field name="company_id" attrs="{'readonly': 1}" />
+								<field name="bill_type" attrs="{'readonly': 1}" />
+								<field name="claim_reference" attrs="{'readonly': 1}" />
+								<field name="claim_id" attrs="{'readonly': 1}" />
+								<field name="policy_no" attrs="{'readonly': 1}" />
+								<field name="insurance_id" />
+								<field name="partner_id" />
+							</group>
+							<group>
+								<field name="equipment_id" />
+								<field name="planned_date" attrs="{'readonly': 1}" />
+								<field name="received_date" required="True" />
+								<field name="work_stage" />
+								<field name="finish_date" />
+								<field name="vendor_ids" string="Repair Vendor"
+									domain="[('supplier', '=', True)]" widget="many2many_tags" />
+								<field name="purchase_ids" widget="many2many_tags"
+									attrs="{'readonly': 1}" />
+								<field name="sparepart_picking_id" />
+								<field name="consumable_picking_id" />
+								<field name="invoice_method" invisible="1" />
+								<field name="items_ok" invisible="0" />
+							</group>
+						</group>
+						<notebook>
+							<page string="Spareparts">
+								<field name="operations"
+									attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
+									<form string="Sparepartsss">
+										<notebook>
+											<page string="Sparepart Line">
+												<group>
+													<group>
+														<field name="supply_type" />
+														<field name="product_id" />
+														<field name="name" />
+														<label for="product_uom_qty" />
+														<div class="o_row">
+															<field name="product_uom_qty" />
+															<field name="product_uom" groups="uom.group_uom" />
+														</div>
+														<field name="approved" string="Acc?"
+															attrs="{'readonly': 1}" />
+														<field name="received" />
+													</group>
+												</group>
+											</page>
+											<page string="History"> History </page>
+										</notebook>
+									</form>
+									<tree string="Spareparts" editable="bottom">
+										<field name="supply_type" />
+										<field name="product_id" />
+										<field name="name" />
+										<field name="product_uom_qty" string="Quantity" />
+										<field name="product_uom" string="Unit of Measure"
+											groups="uom.group_uom" />
+										<field name="approved" string="Acc?"
+											attrs="{'readonly': 1}" />
+										<field name="requested" string="Req" />
+										<field name="received" string="Rcv"
+											attrs="{'readonly': 1}" />
+									</tree>
+								</field>
+								<div class="oe_clear" />
+							</page>
+							<page string="Operations">
+								<field name="fees_lines"
+									attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
+									<form string="Fees">
+										<group>
+											<field name="product_id" />
+											<field name="name" />
+											<label for="product_uom_qty" />
+											<div class="o_row">
+												<field name="product_uom_qty" string="Quantity" />
+												<field name="product_uom" string="Unit of Measure"
+													groups="uom.group_uom" />
+											</div>
+											<field name="cost_unit" />
+											<field name="cost_subtotal" widget="monetary" />
+											<field name="vendor_ids"
+												domain="[('supplier', '=', True)]" />
+											<field name="approved" string="Acc?"
+												attrs="{'readonly': 1}" />
+										</group>
+									</form>
+									<tree string="Fees" editable="bottom">
+										<field name="product_id"
+											domain="[('type','=','service')]" required="True" />
+										<field name="name" />
+										<field name="product_uom_qty" string="Quantity" />
+										<field name="product_uom" string="Unit of Measure"
+											groups="uom.group_uom" />
+										<field name="cost_unit" />
+										<field name="cost_subtotal" widget="monetary" />
+										<field name="vendor_ids" widget="many2many_tags"
+											domain="[('supplier', '=', True)]" />
+										<field name="approved" string="Acc?"
+											attrs="{'readonly': 1}" />
+									</tree>
+								</field>
+							</page>
+							<page string="Others">
+								<field name="others_lines"
+									attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
+									<form string="Others">
+										<group>
+											<field name="product_id"
+												domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" />
+											<field name="name" />
+											<field name="name" />
+											<label for="product_uom_qty" />
+											<div class="o_row">
+												<field name="product_uom_qty" string="Quantity" />
+												<field name="product_uom" string="Unit of Measure"
+													groups="uom.group_uom" />
+											</div>
+											<field name="cost_unit" />
+											<field name="cost_subtotal" widget="monetary" />
+											<field name="vendor_ids"
+												domain="[('supplier', '=', True)]" />
+										</group>
+									</form>
+									<tree string="Others" editable="bottom">
+										<field name="product_id"
+											domain="[('type', '=', 'service'), ('categ_id', '=', 6)]" />
+										<field name="name" />
+										<field name="product_uom_qty" string="Quantity" />
+										<field name="product_uom" string="Unit of Measure"
+											groups="uom.group_uom" />
+										<field name="cost_unit" />
+										<field name="cost_subtotal" widget="monetary" />
+										<field name="vendor_ids" widget="many2many_tags"
+											domain="[('supplier', '=', True)]" />
+									</tree>
+								</field>
+							</page>
+							<page string="Consumables">
+								<field name="consumable_lines"
+									attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
+									<form string="Consumables">
+										<group>
+											<field name="product_id"
+												domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
+											<field name="name" />
+											<label for="product_uom_qty" />
+											<div class="o_row">
+												<field name="product_uom_qty" string="Quantity" />
+												<field name="product_uom" string="Unit of Measure"
+													groups="uom.group_uom" />
+											</div>
+											<field name="cost_unit" />
+											<field name="cost_subtotal" widget="monetary" />
+											<field name="received" invisible="0" />
+										</group>
+									</form>
+									<tree string="Consumables" editable="bottom">
+										<field name="product_id" string="Bahan"
+											domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
+										<field name="name" invisible="1" />
+										<field name="product_uom_qty" string="Quantity" />
+										<field name="product_uom" string="Unit of Measure"
+											groups="uom.group_uom" />
+										<field name="cost_unit" />
+										<field name="cost_subtotal" widget="monetary" />
+										<field name="requested" string="Req" />
+										<field name="received" string="Rcv"
+											attrs="{'readonly': 1}" />
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" />
+						<field name="activity_ids" widget="mail_activity" />
+						<field name="message_ids" widget="mail_thread" />
+					</div>
+				</form>
+			</field>
+		</record>
 
-    <menuitem id="menu_work_purchase_order_list"
-      parent="menu_work_order" action="action_work_purchase_order_list"
-      name="PO from Work Order" />
-      
-    <act_window id="action_bill_vendor"
-      name="Action Bill Vendor"
-      res_model="service.order.excel.wizard"
-      src_model="service.order"
-      key2="client_action_multi"
-      view_mode="form" view_type="form"
-      target="new"/>
-  </data>
+		<record id="view_work_order_pivot" model="ir.ui.view">
+			<field name="name">work.pivot</field>
+			<field name="model">service.order</field>
+			<field name="arch" type="xml">
+				<pivot string="Service Order" display_quantity="True">
+					<field name="company_id" type="row" />
+					<field name="bill_type" type="row" />
+					<field name="state" type="col" />
+					<field name="amount_total" type="measure" />
+				</pivot>
+			</field>
+		</record>
+
+		<record id="action_work_order_list"
+			model="ir.actions.act_window">
+			<field name="name">Work Order</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">service.order</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<record id="action_work_order_tree"
+			model="ir.actions.act_window.view">
+			<field name="sequence" eval="1" />
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="view_work_order_tree" />
+			<field name="act_window_id" ref="action_work_order_list" />
+		</record>
+
+		<record id="action_work_order_form"
+			model="ir.actions.act_window.view">
+			<field name="sequence" eval="2" />
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="view_work_order_form" />
+			<field name="act_window_id" ref="action_work_order_list" />
+		</record>
+
+		<record id="action_work_purchase_order_list"
+			model="ir.actions.act_window">
+			<field name="name">PO from Work</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">purchase.order</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('po_type','=','service')]</field>
+		</record>
+		
+		<record id="action_work_invoice_supplier_list"
+			model="ir.actions.act_window">
+			<field name="name">Vendor Billing</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">account.invoice</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="view_id" ref="account.invoice_supplier_tree"/>
+<!-- 			<field name="groups" ref="work.group_work_user"/> -->
+			<field name="domain">[('user_id','=','user.id')]</field>
+		</record>
+
+		<menuitem id="menu_work_order" name="Production"
+			groups="work.group_work_user" />
+
+		<menuitem id="menu_work_order_list" parent="menu_work_order"
+			action="action_work_order_list" name="Work Order" />
+			
+		<menuitem id="menu_work_purchase" name="Purchasing"
+			parent="menu_work_order"
+			groups="work.group_work_user" />
+		
+		<menuitem id="menu_work_purchase_order_list"
+			name="PO from Work Orders"
+			parent="menu_work_purchase" 
+			groups="work.group_work_user"
+			action="action_work_purchase_order_list"/>
+			
+		<menuitem id="menu_work_transfer_list"
+			name="Vendor Billing"
+			parent="menu_work_purchase"
+			groups="work.group_work_user"
+			action="action_work_invoice_supplier_list"/>
+	
+	</data>
 </odoo>

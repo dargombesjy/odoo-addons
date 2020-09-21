@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<report string="Vendor Bill"
+			id="vendor_bill_request"
+			model="purchase.order"
+			name="zpurchase.vendor_bill_request_list"
+			report_type="qweb-pdf"/>
+	</data>
+</odoo>

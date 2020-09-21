@@ -10,6 +10,7 @@
     """,
     'data': [
         'views/zpurchase_views.xml',
+        'wizards/bill_vendor_view.xml'
     ],
     'installable': True,
     'auto_install': True,

@@ -393,7 +393,7 @@ class ServiceOrder(models.Model):
     invoice_id = fields.Many2one(
         'account.invoice', 'Invoice',
         copy=False, readonly=True, track_visibility="onchange")
-    invoice__or_id = fields.Many2one(
+    invoice_or_id = fields.Many2one(
         'account.invoice', 'Invoice OR',
         copy=False, readonly=True, track_visibility="onchange")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
@@ -592,52 +592,59 @@ class ServiceOrder(models.Model):
     def action_invoice_or_create(self):
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
+        own_risk_found = False
         for service in self.filtered(lambda x: not x.own_risk_invoiced):
-            own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
+#             own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.bill_type != 'claim':
                 raise UserError(_('Only Insurance Claim needs Own Risk billing'))
             if service.own_risk_invoiced:
                 raise UserError(_('Own Risk had invoiced'))
-            if not own_risk:
-                raise UserError(_('No Own Risk line item found in "Others" section'))
-
-            if own_risk.product_id.property_account_income_id:
-                account_id = own_risk.product_id.property_account_income_id.id
-            elif own_risk.product_id.categ_id.property_account_income_categ_id:
-                account_id = own_risk.product_id.categ_id.property_account_income_categ_id.id
-            else:
-                raise UserError(_('No account defined for product "%s%".') % own_risk.product_id.name)
-
-            invoice_or = Invoice.create({
-                # 'name': service.name,
-                'origin': '%s-%s' % ('OR', service.name),
-                'origin_type': 'own_risk',
-                'service_id': service.id,
-                'eq_name': service.equipment_id.name,
-                'type': 'out_invoice',
-                'account_id': service.partner_id.property_account_receivable_id.id,
-                # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
-                'partner_id': service.partner_id.id,
-                'currency_id': service.currency_id.id,
-                # 'comment': service.quotation_notes,
-                'fiscal_position_id': service.partner_id.property_account_position_id
-            })
-
-            if invoice_or:
-                InvoiceLine.create({
-                    'invoice_id': invoice_or.id,
-                    'name': own_risk.name,
-                    'origin': own_risk.name,
-                    'account_id': account_id,
-                    'quantity': own_risk.product_uom_qty,
-                    'invoice_line_tax_ids': [(6, 0, [x.id for x in own_risk.tax_id])],
-                    'uom_id': own_risk.product_uom.id,
-                    'product_id': own_risk.product_id and own_risk.product_id.id or False,
-                    'product_category': own_risk.product_id.categ_id.name,
-                    'price_unit': own_risk.price_unit,
-                    'price_subtotal': own_risk.product_uom_qty * own_risk.price_unit
-                })
-            service.write({'own_risk_invoiced': True, 'invoice_or_id': invoice_or.id})
+            if not service.others_lines:
+                raise UserError(_('No "Others" section'))
+            
+            for other in service.others_lines:
+                if other.name == 'Own Risk':
+                    own_risk_found = True
+                    if other.product_id.property_account_income_id:
+                        account_id = other.product_id.property_account_income_id.id
+                    elif other.product_id.categ_id.property_account_income_categ_id:
+                        account_id = other.product_id.categ_id.property_account_income_categ_id.id
+                    else:
+                        raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
+        
+                    invoice_or = Invoice.create({
+                        # 'name': service.name,
+                        'origin': '%s-%s' % ('OR', service.name),
+                        'origin_type': 'own_risk',
+                        'service_id': service.id,
+                        'eq_name': service.equipment_id.name,
+                        'type': 'out_invoice',
+                        'account_id': service.partner_id.property_account_receivable_id.id,
+                        # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
+                        'partner_id': service.partner_id.id,
+                        'currency_id': service.currency_id.id,
+                        # 'comment': service.quotation_notes,
+                        'fiscal_position_id': service.partner_id.property_account_position_id
+                    })
+        
+                    if invoice_or:
+                        InvoiceLine.create({
+                            'invoice_id': invoice_or.id,
+                            'name': other.name,
+                            'origin': other.name,
+                            'account_id': account_id,
+                            'quantity': other.product_uom_qty,
+                            'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
+                            'uom_id': other.product_uom.id,
+                            'product_id': other.product_id and other.product_id.id or False,
+                            'product_category': other.product_id.categ_id.name,
+                            'price_unit': other.price_unit,
+                            'price_subtotal': other.product_uom_qty * other.price_unit
+                        })
+                    service.write({'own_risk_invoiced': True, 'invoice_or_id': invoice_or.id})
+            
+            if not own_risk_found:
+                raise UserError(_('No Own Risk line found in "Others" section'))
 
     @api.multi
     def action_invoice_create(self, group=False):
@@ -657,7 +664,7 @@ class ServiceOrder(models.Model):
 #             own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.invoice_method != 'none':
                 if group and service.partner_invoice_id.id in invoices_group:
-                    invoice = invoices_group[service.partner_invoice_id.id]
+                    invoice = invoices_group[servistatece.partner_invoice_id.id]
                     invoice.write({
                         'name': invoice.name + ', ' + service.name,
                         'origin': invoice.origin + ', ' + service.name,

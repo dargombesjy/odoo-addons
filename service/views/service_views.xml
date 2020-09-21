@@ -41,7 +41,8 @@
 						<button name="action_service_confirm" states="draft"
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"
-							string="Create Own Risk" groups="account.group_account_invoice" />
+							string="Create Own Risk" groups="account.group_account_invoice"
+							attrs="{'invisible': ['|', ('bill_type', '=', 'self'), ('own_risk_invoiced', '=', True)]}"/>
 						<button name="action_print_pass_keluar" type="object"
 							string="Print Pass Keluar" groups="account.group_account_invoice" />
 						<button name="action_service_invoice_create"
@@ -65,13 +66,13 @@
 							<button name="action_created_invoice"
 	                            type="object"
 	                            class="oe_stat_button"
-	                            icon="fa-pencil-square-o" string="Invoice" attrs="{'invisible': [('state','in',('confirmed','2binvoiced','draft'))]}"
+	                            icon="fa-pencil-square-o" string="Invoice" attrs="{'invisible': [('invoiced','=',False)]}"
 	                            groups="account.group_account_invoice">
 	                        </button>
 	                        <button name="action_created_invoice_or"
 	                            type="object"
 	                            class="oe_stat_button"
-	                            icon="fa-pencil-square-o" string="Invoice OR" attrs="{'invisible': [('state','in',('confirmed','2binvoiced','draft'))]}"
+	                            icon="fa-pencil-square-o" string="Invoice OR" attrs="{'invisible': [('own_risk_invoiced','=',False)]}"
 	                            groups="account.group_account_invoice">
 	                        </button>
 						</div>
@@ -96,6 +97,8 @@
 								<field name="print_tax" />
 								<field name="address_id" invisible="1" />
 								<field name="partner_invoice_id" invisible="1" />
+								<field name="invoiced" invisible="1"/>
+								<field name="own_risk_invoiced" invisible="1"/>
 							</group>
 							<group>
 								<field name="register_date" />

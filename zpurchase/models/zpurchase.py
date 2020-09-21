@@ -30,7 +30,7 @@ class PurchaseOrder(models.Model):
         details = eq.get_details()
 #         self.eq_make = details['make']
         self.eq_model = details['model']
-
+        
 #     @api.one
 #     @api.depends('service_id')
 #     def _compute_equipment(self):
