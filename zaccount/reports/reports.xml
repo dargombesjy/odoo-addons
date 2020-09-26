@@ -18,6 +18,14 @@
 			string="Invoice AAB" report_type="qweb-pdf"
 			name="zaccount.report_invoice_aab" file="zaccount.report_invoice_aab"
 			groups="account.group_account_invoice" />
+			
+		<report string="Vendor Bill"
+			id="action_vendor_bill_request"
+			model="account.invoice"
+			name="zaccount.vendor_bill_request_list"
+			report_type="qweb-pdf"
+			menu="True"
+			groups="work.group_work_user"/>
 
 	</data>
 </odoo>

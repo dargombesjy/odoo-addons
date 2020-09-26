@@ -13,6 +13,11 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_invoice_aab(self):
         return self.env.ref('zaccount.action_invoice_aab').report_action(self)
+    
+#     @api.multi
+#     def action_vendor_bill_request(self):
+#         self.write({'bill_printed': True})     
+#         return self.env.ref('zaccount.action_vendor_bill_request').report_action(self)
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
@@ -140,7 +145,9 @@ class AccountInvoice(models.Model):
     origin_type = fields.Selection([
         ('general', 'General'),
         ('service', 'Service'),
-        ('own_risk', 'Own Risk')], 'Origin Type', required=True, default='general')
+        ('own_risk', 'Own Risk'),
+        ('warehouse', 'Warehouse'),
+        ('entertain', 'Entertain')], 'Origin Type', required=True, default='general')
     service_id = fields.Many2one('service.order', string='Service', copy='False')
     eq_name = fields.Char('No. Plat', compute='_compute_equipment', store=True)
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
@@ -154,7 +161,8 @@ class AccountInvoice(models.Model):
         readonly=True, track_visibility='always')
     amount_wht = fields.Monetary('Amount WHT', compute='_compute_wht', store=True, readonly=True)
     own_risk = fields.Monetary('Own Risk', digits=0)
-
+    bill_printed = fields.Boolean('Billing List Printed')
+    
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'

@@ -18,9 +18,9 @@
         'reports/paperformat.xml',
         'reports/reports.xml',
         'reports/report_invoice_or.xml',
-        'reports/report_invoice_aab.xml'
-        # 'reports/report_general_ledger.xml',
-        # 'wizards/general_ledger.xml',
+        'reports/report_invoice_aab.xml',
+        'reports/report_vendor_billing_list.xml',
+        'wizards/bill_vendor_view.xml',
     ],
     'installable': True,
     'auto_install': True,

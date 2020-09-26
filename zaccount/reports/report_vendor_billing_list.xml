@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<template id="vendor_bill_request_list">
+			<t t-call="web.html_container">
+			<t t-call="web.external_layout">
+				<div class="page" style="font-size:0.95rem">
+					<style type="text/css">
+		                .bold {
+		                  font-weight: bold;
+		                }
+		                .table tr {
+		                  border: none;
+		                }
+	                </style>
+	                
+	                <div class="mb-16">              
+		                <table class="table o_main_table">
+		                	<thead>
+		                		<tr>
+		                			<th>#</th>
+		                			<th>No. SPK</th>
+		                			<th>No Billing</th>
+		                			<th>Vendor</th>
+		                			<th>No. Pol</th>
+		                			<th>Model</th>
+		                			<th>Total Tagihan</th>
+		                		</tr>
+		                	</thead>
+		                	
+		                	<tbody>
+		                		<t t-set="i" t-value="1"/>
+		                		<tr t-foreach="docs" t-as="doc">
+		                			<td><span t-esc="i"/></td>
+		                			<td><span t-field="doc.service_id.name"/></td>
+		                			<td><span t-field="doc.number"/></td>
+		                			<td><span t-field="doc.partner_id.name"/></td>
+		                			<td><span t-field="doc.service_id.equipment_id.name"/></td>
+		                			<td><span t-field="doc.service_id.model"/></td>
+		                			<td><span t-field="doc.residual"/></td>
+		                			<t t-set="i" t-value="i+1"/>
+		                		</tr>
+		                	</tbody>
+		                </table>
+	                </div>
+	                <div>
+	                	<div class="row">
+	                		<div class="col-8">
+	                		</div>
+	                		<div class="col-4 text-center">
+	                			<span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+	                			<div style="height: 100px;"></div>
+                    			<div><span class="bold">( ............. )</span></div>
+	                		</div>
+	                	</div>
+	                </div>
+				</div>
+			</t>	
+			</t>
+		</template>
+	</data>
+</odoo>

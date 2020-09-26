@@ -28,8 +28,18 @@ class PurchaseOrder(models.Model):
         eq = self.service_id.equipment_id
         self.eq_name = eq.name
         details = eq.get_details()
-#         self.eq_make = details['make']
         self.eq_model = details['model']
+        
+    @api.multi
+    def action_view_invoice(self):
+        '''
+        This to override the original function.
+        '''
+        res = super(PurchaseOrder, self).action_view_invoice()
+        res['context']['default_service_id'] = self.service_id.id
+        res['context']['default_eq_name'] = self.service_id.equipment_id.name
+        res['context']['default_origin_type'] = self.po_type
+        return res
         
 #     @api.one
 #     @api.depends('service_id')

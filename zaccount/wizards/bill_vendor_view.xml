@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="bill_vendor_view_wizard"
+			model="ir.ui.view">
+			<field name="name">Print Vendor Billing</field>
+			<field name="model">zaccount.bill.vendor.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Print Vendor Billing">
+					<span class="o_form_label">Click on Execute below to start the process...</span>
+					<footer>
+						<button name="get_values" string="Execute" type="object" class="oe_highlight"/>
+						<button string="Cancel" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<!-- <act_window id="action_bill_vendor"
+			name="Action Bill Vendor"
+			res_model="zaccount.bill.vendor.wizard"
+			src_model="account.invoice"
+			key2="client_action_multi"
+			view_mode="form"
+			view_type="form"
+			groups="work.group_work_user" target="new" /> -->
+			
+	</data>
+</odoo>
