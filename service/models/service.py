@@ -1032,7 +1032,7 @@ class ServiceLine(models.Model):
         ('cancel', 'Cancelled')], 'Status', default='draft',
         copy=False, readonly=True, required=True,
         help='The status of a repair line is set automatically to the one of the linked repair order.')
-    approved = fields.Boolean('Approved', default=True)
+    approved = fields.Boolean('Approved', default=False)
     cost_unit = fields.Float('Unit Cost', digits=(12,0)) #, required=True)
     # cost_tax_id = fields.Many2many(
     #     'account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
@@ -1118,7 +1118,7 @@ class ServiceFee(models.Model):
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     approved = fields.Boolean('Approved', default=True)
-    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    invoiced = fields.Boolean('Invoiced', copy=False, readonly=False)
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True, digits=(12,0))
@@ -1185,7 +1185,7 @@ class ServiceOther(models.Model):
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
-    approved = fields.Boolean('Approved', default=True)
+    approved = fields.Boolean('Approved', default=False)
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
 

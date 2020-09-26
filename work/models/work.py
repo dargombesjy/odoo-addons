@@ -157,7 +157,7 @@ class ServiceOrder(models.Model):
         partner = self.partner_id
         for service in self:
             outs_sp = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
-            outs = service.consumable_lines.filtered(lambda line: line.approved == True and line.requested == False)
+            outs = service.consumable_lines.filtered(lambda line: line.requested == False)
 
             if not outs_sp and not outs:
                 raise UserError(_('No Material items left to transfer'))
