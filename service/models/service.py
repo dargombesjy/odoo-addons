@@ -6,6 +6,11 @@ from odoo.exceptions import UserError
 from num2words import num2words
 from html5lib._ihatexml import digit
 
+SUPPLY_TYPES = [
+        ('self', 'Self Supply'),
+        ('customer', 'Customer Supply'),
+        ('vendor', 'Vendor Supply')]
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -23,35 +28,6 @@ class StockPicking(models.Model):
     def action_confirm(self):
         if self.mapped('move_lines').filtered(lambda move: not move.product_id):
             raise UserError(_('All items must have Product ID'))
-
-#         move_supply = self.env['stock.move']
-#         for move in self.move_lines:
-#             if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_received < move.product_uom_qty:
-#                 supply = move_supply.create({
-#                     'name': move.name,
-#                     'date': move.vendor_date,
-#                     'product_id': move.product_id.id, #operation.product_id.id,
-#                     'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
-#                     'product_uom': move.product_uom.id, #operation.product_uom.id,
-#                     'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
-#                     'location_id': 8, #operation.location_id.id,
-#                     'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
-#                     'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
-#                                               #'lot_id': move.lot_id, #operation.lot_id.id,
-#                                               'product_uom_qty': move.product_uom_qty,  # bypass reservation here
-#                                               'product_uom_id': move.product_uom.id, #operation.product_uom.id,
-#                                               'qty_done': move.vendor_qty, #operation.product_uom_qty,
-#                                               'package_id': False,
-#                                               'result_package_id': False,
-#                                               #'owner_id': #owner_id,
-#                                               'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
-#                                               'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
-#                     'origin': move.service_id.id, #repair.id,
-#                     'service_id': move.service_id.id, #repair.id,
-#                     'service_line_id': move.service_line_id, #repair.name,
-#                 })
-#                 supply.write({'vendor_received': move.vendor_qty})
-#                 supply._action_done()
 
         self.mapped('package_level_ids').filtered(lambda pl: pl.state == 'draft' and not pl.move_ids)._generate_moves()
         # call `_action_confirm` on every draft move
@@ -129,18 +105,11 @@ class StockMove(models.Model):
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], index=True, required=False)
-        #states={'done': [('readonly', True)]})
     product_category = fields.Char('Product Category')
-#     supply_type = fields.Selection([
-#         ('self', 'Self Supply'),
-#         ('customer', 'Customer Supply'),
-#         ('vendor', 'Vendor Supply')], 'Supply Type') #, index=True, required=True,
-#         default='vendor')
-    vendor_id = fields.Many2one(
-        'res.partner', 'Vendor', index=True) #, readonly=True,
-        #states={'draft': [('readonly', False)]})
-    vendor_qty = fields.Float('Qty. Terima') # , default=1.0) required=True)
-    vendor_date = fields.Date('Tgl. Terima') # , default=1.0) required=True)
+    supply_type = fields.Selection(SUPPLY_TYPES, 'Supply Type')
+    vendor_id = fields.Many2one('res.partner', 'Vendor', index=True)
+    vendor_qty = fields.Float('Qty. Terima')
+    vendor_date = fields.Date('Tgl. Terima')
     vendor_received = fields.Float('Recv')
     receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
@@ -224,39 +193,25 @@ class StockMove(models.Model):
     def onchange_product_id(self):
         if self.product_category == 'Sparepart':
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
-            service_line.write({'product_id': self.product_id.id})
+            cost = service_line.cost_unit
+            if service_line.supply_type == 'self' and cost == 0:
+                cost = self.product_id.standard_price
+            service_line.write({'product_id': self.product_id.id, 'cost_unit': cost})
+            if not self.supply_type:
+                self.supply_type = service_line.supply_type
+
         product = self.product_id.with_context(lang=self.partner_id.lang or self.env.user.lang)
-#         self.name = product.partner_ref
         self.product_uom = product.uom_id.id
         return {'domain': {'product_uom': [('category_id', '=', product.uom_id.category_id.id)]}}
 
-#     @api.onchange('vendor_qty')
-#     def onchange_vendor_qty(self):
-#         if self.product_category == 'Sparepart':
-#             move_supply = self.env['stock.move']
-#             if self.vendor_id and not self.vendor_received:
-#                 supply = move_supply.create({
-#                     'name': self.name,
-#                     'product_id': self.product_id.id, #operation.product_id.id,
-#                     'product_uom_qty': self.product_uom_qty, #operation.product_uom_qty,
-#                     'product_uom': self.product_uom.id, #operation.product_uom.id,
-#                     'partner_id': self.picking_id.partner_id.id, #repair.address_id.id,
-#                     'location_id': 8, #operation.location_id.id,
-#                     'location_dest_id': self.location_id.id, #operation.location_dest_id.id,
-#                     'move_line_ids': [(0, 0, {'product_id': self.product_id.id, #operation.product_id.id,
-#                                               #'lot_id': move.lot_id, #operation.lot_id.id,
-#                                               'product_uom_qty': 0,  # bypass reservation here
-#                                               'product_uom_id': self.product_uom.id, #operation.product_uom.id,
-#                                               'qty_done': self.vendor_qty, #operation.product_uom_qty,
-#                                               'package_id': False,
-#                                               'result_package_id': False,
-#                                               'owner_id': self.picking_id.eq_name, #owner_id,
-#                                               'location_id': 8, #self.location_id, #operation.location_id.id, #TODO: owner stuff
-#                                               'location_dest_id': self.location_id.id })], #operation.location_dest_id.id,})],
-#                     'service_id': self.service_id.id, #repair.id,
-#                     'service_line_id': self.service_line_id, #repair.name,
-#                 })
-#                 self.write({'vendor_received': True})
+    @api.multi
+    def write(self, values):
+        lines = super(StockMove, self).write(values)
+        for line in self:
+            if line.product_id and line.supply_type == 'self':
+                if line.product_id.standard_price == 0:
+                    raise UserError(_('Product "%s" belum memiliki harga standar') % line.product_id.name)
+        return lines
 
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
@@ -325,7 +280,7 @@ class ServiceOrder(models.Model):
         self.chassis_no = details['chassis_no']
         self.engine_no = details['engine_no']
         self.base_colour = details['base_colour']
-    
+
     @api.one
     @api.depends('partner_id')
     def _compute_partner(self):
@@ -431,6 +386,11 @@ class ServiceOrder(models.Model):
         'service_order_id', 'purchase_order_id', 'Purchase Orders')
     vendor_ids = fields.Many2many('res.partner', 'service_order_vendor',
         'service_order_id', 'vendor_id', 'Vendors')
+#     sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart Pick ID',
+#         readonly=True, copy=False, index=True)
+#     consumable_picking_id = fields.Many2one('stock.picking', 'Consumable Pick ID',
+#         readonly=True, copy=False, index=True)
+#     items_ok = fields.Boolean('Materials received',  compute="_compute_received_flag", store=True)
 
     @api.onchange('equipment_id')
     def onchange_equipment_id(self):
@@ -601,7 +561,7 @@ class ServiceOrder(models.Model):
                 raise UserError(_('Own Risk had invoiced'))
             if not service.others_lines:
                 raise UserError(_('No "Others" section'))
-            
+
             for other in service.others_lines:
                 if other.name == 'Own Risk':
                     own_risk_found = True
@@ -611,7 +571,7 @@ class ServiceOrder(models.Model):
                         account_id = other.product_id.categ_id.property_account_income_categ_id.id
                     else:
                         raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
-        
+
                     invoice_or = Invoice.create({
                         # 'name': service.name,
                         'origin': '%s-%s' % ('OR', service.name),
@@ -626,7 +586,7 @@ class ServiceOrder(models.Model):
                         # 'comment': service.quotation_notes,
                         'fiscal_position_id': service.partner_id.property_account_position_id
                     })
-        
+
                     if invoice_or:
                         InvoiceLine.create({
                             'invoice_id': invoice_or.id,
@@ -642,7 +602,7 @@ class ServiceOrder(models.Model):
                             'price_subtotal': other.product_uom_qty * other.price_unit
                         })
                     service.write({'own_risk_invoiced': True, 'invoice_or_id': invoice_or.id})
-            
+
             if not own_risk_found:
                 raise UserError(_('No Own Risk line found in "Others" section'))
 
@@ -712,7 +672,7 @@ class ServiceOrder(models.Model):
                     for operation in service.operations:
                         if not operation.approved:
                             continue
-                        
+
                         if group:
                             name = service.name + '-' + operation.name
                         else:
@@ -744,7 +704,7 @@ class ServiceOrder(models.Model):
                     for fee in service.fees_lines:
                         if not fee.approved:
                             continue
-                        
+
                         if group:
                             name = service.name + '-' + fee.name
                         else:
@@ -777,7 +737,7 @@ class ServiceOrder(models.Model):
                     for other in service.others_lines:
 #                         if not other.approved:
 #                             continue
-                        
+
                         if group:
                             name = service.name + '-' + other.name
                         else:
@@ -857,7 +817,7 @@ class ServiceOrder(models.Model):
             'target': 'current',
             'res_id': self.invoice_or_id.id,
         }
-        
+
     @api.multi
     def action_service_cancel_draft(self):
         return self.write({'state': 'draft'})
@@ -1037,10 +997,8 @@ class ServiceLine(models.Model):
     service_id = fields.Many2one(
         'service.order', 'Service Order reference',
         index=True, ondelete='cascade')
-    supply_type = fields.Selection([
-        ('self', 'Self Supply'),
-        ('customer', 'Customer Supply'),
-        ('vendor', 'Vendor Supply')], 'Supply Type', index=True, required=True,
+    supply_type = fields.Selection(
+        SUPPLY_TYPES, 'Supply Type', index=True, required=True,
         default='vendor')
     product_id = fields.Many2one('product.product', 'Part Number') # , required=True)
     part_number = fields.Char('Kode Part Admin')
@@ -1097,6 +1055,7 @@ class ServiceLine(models.Model):
         @param product: Changed operation type.
         @param guarantee_limit: Guarantee limit of current record.
         @return: Dictionary of values.
+    _name = 'service.order'
         """
         self.onchange_product_id()
         args = self.service_id.company_id and [('company_id', '=', self.service_id.company_id.id)] or []

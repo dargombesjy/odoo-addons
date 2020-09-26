@@ -7,12 +7,10 @@ from odoo.tools import float_compare
 class ServiceOrder(models.Model):
     _inherit = 'service.order'
 
-    # received_date = fields.Datetime('Doc. Receive Date')
     sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart Pick ID',
         readonly=True, copy=False, index=True)
     consumable_picking_id = fields.Many2one('stock.picking', 'Consumable Pick ID',
         readonly=True, copy=False, index=True)
-    # readonly=True states={'draft': [('readonly', False)]})
     items_ok = fields.Boolean('Materials received',  compute="_compute_received_flag", store=True)
 
     @api.one
@@ -94,6 +92,15 @@ class ServiceOrder(models.Model):
         for service in self:
             if not service.operations:
                 raise UserError(_('No Sparepart items to transfer'))
+
+            outs_all = service.operations.filtered(lambda line: line.requested == False)
+            outs_bhn = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
+
+            outs = [item for item in outs_all if item not in outs_bhn]
+#             outs = outs_all
+            if not outs:
+                raise UserError(_('No Requested item(s) left to transfer'))
+
             if not service.sparepart_picking_id:
                 # raise UserError('Sparepart request already created')
                 picking = Picking.create({
@@ -113,7 +120,6 @@ class ServiceOrder(models.Model):
             else:
                 picking = service.sparepart_picking_id
 
-            outs = service.operations.filtered(lambda line: line.requested == False)
             if outs:
                 for operation in outs:
                     if operation.product_id:
@@ -148,8 +154,13 @@ class ServiceOrder(models.Model):
         Move_Line = self.env['stock.move']
         partner = self.partner_id
         for service in self:
-            if not service.consumable_lines:
-                raise UserError(_('No Consumable items to transfer'))
+            outs_sp = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
+            outs = service.consumable_lines.filtered(lambda line: line.requested == False)
+
+            if not outs_sp and not outs:
+                raise UserError(_('No Material items left to transfer'))
+#             if not service.consumable_lines:
+#                 raise UserError(_('No Consumable items to transfer'))
             if not service.consumable_picking_id:
                 # raise UserError('Consumable request already created')
                 picking = Picking.create({
@@ -169,7 +180,24 @@ class ServiceOrder(models.Model):
             else:
                 picking = service.consumable_picking_id
 
-            outs = service.consumable_lines.filtered(lambda line: line.requested == False)
+            if outs_sp:
+                for bahan_sp in outs_sp:
+                    moving = Move_Line.create({
+                        'service_id': service.id,
+                        'service_line_id': bahan_sp.id,
+                        'name': bahan_sp.name,
+                        'product_category': 'Bahan',
+                        'picking_id': picking.id,
+                        'product_id': bahan_sp.product_id.id,
+                        'product_uom_qty': bahan_sp.product_uom_qty,
+                        'product_uom': bahan_sp.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': bahan_sp.service_id.location_id.id, # 12,  # other.location_id.id,
+                        'location_dest_id': 9,
+                    })
+                    bahan_sp.write({'move_id': moving.id, 'requested': True})
+
             if outs:
                 for bahan in outs:
                     moving = Move_Line.create({
@@ -236,4 +264,3 @@ class ServiceOrder(models.Model):
     #                 },
     #                 'target': 'new'
     #             }
-
