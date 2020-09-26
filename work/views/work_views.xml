@@ -306,7 +306,7 @@
 			<field name="view_mode">tree,form</field>
 			<field name="view_id" ref="account.invoice_supplier_tree"/>
 <!-- 			<field name="groups" ref="work.group_work_user"/> -->
-			<field name="domain">[('user_id','=','user.id')]</field>
+			<field name="domain">['&amp;', ('origin_type','=','service'), ('bill_printed','=',False)]</field>
 		</record>
 
 		<menuitem id="menu_work_order" name="Production"
