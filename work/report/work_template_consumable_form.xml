@@ -133,9 +133,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							<t t-if="o.consumable_lines">
+<!-- 							<t t-if="o.consumable_lines"> -->
+							<t t-if="o.consumable_picking_id">
 								<t t-set="i" t-value="i" />
-								<tr t-foreach="o.consumable_lines" t-as="line">
+<!-- 								<tr t-foreach="o.consumable_lines" t-as="line"> -->
+								<tr t-foreach="o.consumable_picking_id.move_ids_without_package" t-as="line">
 									<td></td>
 									<td>
 										<span t-field="line.name" />

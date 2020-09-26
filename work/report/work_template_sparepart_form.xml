@@ -114,9 +114,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							<t t-if="o.operations">
+<!-- 							<t t-if="o.operations"> -->
+							<t t-if="o.sparepart_picking_id">
 								<t t-set="i" t-value="1" />
-								<tr t-foreach="o.operations" t-as="line">
+<!-- 								<tr t-foreach="o.operations" t-as="line"> -->
+								<tr t-foreach="o.sparepart_picking_id.move_ids_without_package" t-as="line">
 									<td>
 										<span t-esc="i" />
 									</td>

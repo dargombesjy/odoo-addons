@@ -7,7 +7,7 @@
 			<field name="inherit_id" ref="stock.view_picking_form" />
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='backorder_id']" position="after">
-					<field name="picking_type_code" invisible="0" />
+					<field name="picking_type_code" invisible="1" />
 					<field name="service_id" />
 					<field name="eq_name" />
 					<field name="eq_model" />
@@ -89,15 +89,16 @@
 									decoration-danger="not parent.immediate_transfer and state != 'done' and quantity_done > reserved_availability and show_reserved_availability"
 									decoration-muted="scrapped == True or state == 'cancel' or (state == 'done' and is_locked == True)"
 									string="Stock Moves" editable="bottom">
+									<field name="service_id" invisible="1"/>
 									<field name="service_line_id" invisible="1" />
-									<field name="product_category" invisible="1" />
+									<field name="product_category" invisible="0" />
 									<field name="date_expected" invisible="1" />
 									<field name="state" invisible="1" readonly="0" />
 									<field name="picking_type_id" invisible="1" />
 									<field name="location_id" invisible="1" />
 									<field name="location_dest_id" invisible="1" />
 									<field name="scrapped" invisible="1" />
-									<field name="picking_code" invisible="0" />
+									<field name="picking_code" invisible="1" />
 									<field name="product_type" invisible="1" />
 									<field name="show_details_visible" invisible="1" />
 									<field name="show_reserved_availability" invisible="1" />
@@ -105,11 +106,13 @@
 									<field name="additional" invisible="1" />
 									<field name="has_move_lines" invisible="1" />
 									<field name="is_locked" invisible="1" />
+									<field name="supply_type"
+										attrs="{'column_invisible': ['|', ('parent.picking_type_code', '=', 'incoming'), ('parent.origin', 'like', '%Bahan%')]}"/>
 									<field name="product_id" required="1"
 										attrs="{'readonly': ['|', '&amp;', ('additional', '=', False), ('has_move_lines', '=', True)]}" />
 									<field name="name" invisible="0" />
-									<field name="vendor_id"/>
-<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
+									<field name="vendor_id"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="vendor_qty" invisible="0" />
 									<field name="vendor_date" invisible="0" />
 									<field name="vendor_received" invisible="1" />
@@ -125,10 +128,10 @@
 										attrs="{'readonly': [('state', '!=', 'draft'), ('additional', '=', False)]}"
 										options="{'no_open': True, 'no_create': True}"
 										string="Unit of Measure" groups="uom.group_uom" />
-									<field name="receiver"/>
-<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
-									<field name="received_date"/>
-<!-- 										attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}" /> -->
+									<field name="receiver"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
+									<field name="received_date"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<button name="action_show_details"
 										string="Register lots, packs, location" type="object"
 										icon="fa-list"
