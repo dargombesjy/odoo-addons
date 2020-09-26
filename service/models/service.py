@@ -683,7 +683,7 @@ class ServiceOrder(models.Model):
                         elif operation.product_id.categ_id.property_account_income_categ_id:
                             account_id = operation.product_id.categ_id.property_account_income_categ_id.id
                         else:
-                            raise UserError(_('No account defined for product "%s%".') % operation.product_id.name)
+                            raise UserError(_('No account defined for product "%s".') % operation.product_id.name)
 
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
