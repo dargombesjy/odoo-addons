@@ -523,10 +523,10 @@ class ServiceOrder(models.Model):
         return True
 
     def action_service_ready(self):
-        if self.operations.filtered(lambda op: not op.received):
-            raise UserError(_('There are items not yet received'))
-        if self.consumable_lines.filtered(lambda op: not op.received):
-            raise UserError(_('There are consumables not yet received'))
+#         if self.operations.filtered(lambda op: not op.received):
+#             raise UserError(_('There are items not yet received'))
+#         if self.consumable_lines.filtered(lambda op: not op.received):
+#             raise UserError(_('There are consumables not yet received'))
         self.mapped('operations').write({'state': 'confirmed'})
         return self.write({'state': '2binvoiced', 'work_stage': 'done'})
 
@@ -534,10 +534,10 @@ class ServiceOrder(models.Model):
     def action_service_end(self):
         if self.filtered(lambda service: service.state != 'ready'):
             raise UserError(_("Service must done in order to close."))
-        if self.filtered(lambda service: not service.items_ok):
-            raise UserError(_('All items must received and purchased'))
-        if self.filtered(lambda service: service.work_stage != 'delivered'):
-            raise UserError(_('Stage must "Delivered" to end Service.'))
+#         if self.filtered(lambda service: not service.items_ok):
+#             raise UserError(_('All items must received and purchased'))
+#         if self.filtered(lambda service: service.work_stage != 'delivered'):
+#             raise UserError(_('Stage must "Delivered" to end Service.'))
         if self.filtered(lambda service: service.bill_type == 'claim' and not service.own_risk_invoiced):
             raise UserError(_('Own Risk not yet billed'))
         for service in self:
