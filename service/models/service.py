@@ -287,8 +287,8 @@ class ServiceOrder(models.Model):
         self.partner_type = self.partner_id.company_type
 
     partner_id = fields.Many2one(
-        'res.partner', 'Customer', index=True, readonly=True,
-        states={'draft': [('readonly', False)]})
+        'res.partner', 'Customer', index=True)  # , readonly=True,
+#         states={'draft': [('readonly', False)]})
     partner_type = fields.Char('Customer Type', compute='_compute_partner', store=True)
     service_advisor = fields.Char('Service Advisor')
     address_id = fields.Many2one(

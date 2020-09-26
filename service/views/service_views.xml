@@ -91,8 +91,8 @@
 									domain="[('is_insurance', '=', True)]"
                                     attrs="{'invisible': [('bill_type', '=', 'self')]}" />
 								<field name="partner_id"
-									domain="[('customer', '=', True)]"
-                                    attrs="{'invisible': [('state', '=', 'draft')]}" />
+									domain="[('customer', '=', True)]"/>
+<!--                                     attrs="{'invisible': [('state', '=', 'draft')]}" /> -->
                                 <field name="service_advisor" />
 								<field name="print_tax" />
 								<field name="address_id" invisible="1" />
