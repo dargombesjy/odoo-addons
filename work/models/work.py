@@ -18,12 +18,12 @@ class ServiceOrder(models.Model):
     def _compute_received_flag(self):
         ops_ng = fees_ng = consumables_ng = False
         if self.operations:
-            ops_ng = self.operations.filtered(lambda ops: not ops.received)
+            ops_ng = self.operations.filtered(lambda ops: ops.requested and not ops.received)
         if self.fees_lines:
-            fees_ng = self.fees_lines.filtered(lambda fees: not fees.purchased)
+            fees_ng = self.fees_lines.filtered(lambda fees: fees.approved and not fees.purchased)
         # others_ok = self.others_lines.filtered(lambda others: others.purchased)
         if self.consumable_lines:
-            consumables_ng = self.consumable_lines.filtered(lambda consum: not consum.received)
+            consumables_ng = self.consumable_lines.filtered(lambda consum: consum.requested and not consum.received)
 
         if not ops_ng and not fees_ng and not consumables_ng:
             self.items_ok = True
@@ -36,6 +36,8 @@ class ServiceOrder(models.Model):
     def create_po_dict(self):
         po_vendor = {}
         for fee in self.fees_lines:
+            if not fee.approved:
+                continue
             if not fee.purchased:
                 for vendor in fee.vendor_ids:
                     if vendor not in po_vendor:
@@ -93,8 +95,8 @@ class ServiceOrder(models.Model):
             if not service.operations:
                 raise UserError(_('No Sparepart items to transfer'))
 
-            outs_all = service.operations.filtered(lambda line: line.requested == False)
-            outs_bhn = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
+            outs_all = service.operations.filtered(lambda line: line.approved == True and line.requested == False)
+            outs_bhn = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
 
             outs = [item for item in outs_all if item not in outs_bhn]
 #             outs = outs_all
@@ -154,8 +156,8 @@ class ServiceOrder(models.Model):
         Move_Line = self.env['stock.move']
         partner = self.partner_id
         for service in self:
-            outs_sp = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
-            outs = service.consumable_lines.filtered(lambda line: line.requested == False)
+            outs_sp = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
+            outs = service.consumable_lines.filtered(lambda line: line.approved == True and line.requested == False)
 
             if not outs_sp and not outs:
                 raise UserError(_('No Material items left to transfer'))
