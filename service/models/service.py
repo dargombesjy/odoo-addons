@@ -287,8 +287,8 @@ class ServiceOrder(models.Model):
         self.partner_type = self.partner_id.company_type
 
     partner_id = fields.Many2one(
-        'res.partner', 'Customer', index=True)  # , readonly=True,
-#         states={'draft': [('readonly', False)]})
+        'res.partner', 'Customer', index=True, readonly=True,
+        states={'draft': [('readonly', False)]})
     partner_type = fields.Char('Customer Type', compute='_compute_partner', store=True)
     service_advisor = fields.Char('Service Advisor')
     address_id = fields.Many2one(
@@ -336,7 +336,7 @@ class ServiceOrder(models.Model):
     company_id = fields.Many2one(
         'res.company', 'Company', readonly=True, states={'draft': [('readonly', False)]},
         default=lambda self: self.env['res.company']._company_default_get('service.order'))
-    partner_invoice_id = fields.Many2one('res.partner', 'Invoicing Address', readonly=True, states={'draft': [('readonly', False)]})
+    partner_invoice_id = fields.Many2one('res.partner', 'Invoicing Address')  # , readonly=True, states={'draft': [('readonly', False)]})
     invoice_method = fields.Selection([
         ("none", "No Invoice"),
         ("b4repair", "Before Repair"),
@@ -399,8 +399,8 @@ class ServiceOrder(models.Model):
     @api.one
     @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal', 'others_lines.price_subtotal')
     def _amount_untaxed(self):
-        total = sum(operation.price_subtotal for operation in self.operations)
-        total += sum(fee.price_subtotal for fee in self.fees_lines)
+        total = sum(operation.price_subtotal for operation in self.operations if operation.approved)
+        total += sum(fee.price_subtotal for fee in self.fees_lines if fee.approved)
         for other in self.others_lines:
             if other.product_id.name == 'Own Risk':
                 self.amount_own_risk = other.price_subtotal
@@ -473,7 +473,7 @@ class ServiceOrder(models.Model):
             else:
                 addresses = self.insurance_id.address_get(['delivery', 'invoice', 'contact'])
             self.partner_invoice_id = addresses['invoice']
-            # self.pricelist_id = self.partner_id.property_product_pricelist.id
+            self.pricelist_id = self.partner_id.property_product_pricelist.id
 
     @api.multi
     def button_dummy(self):
@@ -647,23 +647,7 @@ class ServiceOrder(models.Model):
                         # 'comment': service.quotation_notes,
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
                     })
-
-#                     if own_risk and self.bill_type == 'claim' and not self.own_risk_invoiced:
-#                         invoice_or = Invoice.create({
-#                             # 'name': service.name,
-#                             'origin': '%s-%s' % ('OR', service.name),
-#                             'origin_type': 'own_risk',
-#                             'service_id': service.id,
-#                             'type': 'out_invoice',
-#                             'account_id': service.partner_id.property_account_receivable_id.id,
-#                             # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
-#                             'partner_id': service.partner_id.id,
-#                             'currency_id': service.currency_id.id,
-#                             # 'comment': service.quotation_notes,
-#                             'fiscal_position_id': service.partner_id.property_account_position_id
-#                         })
-#                     if own_risk and service.bill_type == 'claim':
-#                         invoice.write({'own_risk': own_risk.price_subtotal})
+                    
                     invoices_group[service.partner_invoice_id.id] = invoice
 
                 service.write({'invoiced': True, 'invoice_id': invoice.id})
@@ -743,35 +727,23 @@ class ServiceOrder(models.Model):
                         else:
                             name = other.name
                         if not other.product_id:
-                            raise UserError(_('No product defined on fees.'))
+                            raise UserError(_('No product defined on others.'))
 
                         if other.product_id.property_account_income_id:
                             account_id = other.product_id.property_account_income_id.id
                         elif other.product_id.categ_id.property_account_income_categ_id:
                             account_id = other.product_id.categ_id.property_account_income_categ_id.id
                         else:
-                            raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
-
-                        if other.name == 'Own Risk':
+                            raise UserError(_('No account defined for product "%s".') % other.product_id.name)
+                        
+                        if other.deductible:
                             price = other.price_unit * (-1)
+                        
+                        if other.name == 'Own Risk':
+#                             price = other.price_unit * (-1)
                             if service.bill_type == 'claim':
                                 invoice.write({'own_risk': other.price_subtotal})
-    #                     if invoice_or and other.name == 'Own Risk':
-    #                         invoice_line_or = InvoiceLine.create({
-    #                             'invoice_id': invoice_or.id,
-    #                             'name': name,
-    #                             'origin': other.name,
-    #                             'account_id': account_id,
-    #                             'quantity': other.product_uom_qty,
-    #                             'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
-    #                             'uom_id': other.product_uom.id,
-    #                             'product_id': other.product_id and other.product_id.id or False,
-    #                             'product_category': other.product_id.categ_id.name,
-    #                             'price_unit': other.price_unit,
-    #                             'price_subtotal': other.product_uom_qty * other.price_unit
-    #                         })
-    #                     else:
-                        # if other.name != 'Own Risk':
+                        
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
                             'name': name,
@@ -1117,7 +1089,7 @@ class ServiceFee(models.Model):
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=(12,0))
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
-    approved = fields.Boolean('Approved', default=True)
+    approved = fields.Boolean('Approved', default=False)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=False)
 
     # ------ Production ------ #
@@ -1185,9 +1157,10 @@ class ServiceOther(models.Model):
     product_uom = fields.Many2one('uom.uom', 'Product Unit of Measure', required=True)
     price_subtotal = fields.Float('Subtotal', compute='_compute_price_subtotal', store=True, digits=0)
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
-    approved = fields.Boolean('Approved', default=False)
+    approved = fields.Boolean('Approved', default=True)
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    deductible = fields.Boolean('Deductible')
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True)
@@ -1213,6 +1186,8 @@ class ServiceOther(models.Model):
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
+        if self.name == 'Own Risk':
+            self.deductible == True
         self.price_unit = self.product_id.list_price
         self.estimate_unit = self.product_id.list_price
         self.cost_unit = self.product_id.standard_price

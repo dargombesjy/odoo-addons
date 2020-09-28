@@ -142,6 +142,7 @@ class ServiceOrder(models.Model):
                         'package_level_id': False,
                         'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
                         'location_dest_id': 9,
+                        'state': 'draft'
                     })
                     operation.write({'move_id': moving.id, 'requested': True})
 
@@ -197,6 +198,7 @@ class ServiceOrder(models.Model):
                         'package_level_id': False,
                         'location_id': bahan_sp.service_id.location_id.id, # 12,  # other.location_id.id,
                         'location_dest_id': 9,
+                        'state': 'draft'
                     })
                     bahan_sp.write({'move_id': moving.id, 'requested': True})
 
@@ -215,6 +217,7 @@ class ServiceOrder(models.Model):
                         'package_level_id': False,
                         'location_id': bahan.service_id.location_id.id, # 12,  # other.location_id.id,
                         'location_dest_id': 9,
+                        'state': 'draft'
                     })
                     bahan.write({'move_id': moving.id, 'requested': True})
 

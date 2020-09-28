@@ -45,12 +45,26 @@
 	                </div>
 	                <div>
 	                	<div class="row">
-	                		<div class="col-8">
+	                		<div class="col-4 text-center">
+	                			<span/>
+	                			<br/>
+	                			<span>Admin Produksi</span>
+	                			<div style="height: 100px;"></div>
+	                			<div><span class="bold">.............</span></div>
 	                		</div>
 	                		<div class="col-4 text-center">
-	                			<span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+	                			<span/>
+	                			<br/>      
+	                			<span>Kepala Produksi</span>
 	                			<div style="height: 100px;"></div>
-                    			<div><span class="bold">( ............. )</span></div>
+	                			<div><span class="bold">.............</span></div>
+	                		</div>
+	                		<div class="col-4 text-center">
+	                			<span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>	                			
+	                			<br/>
+	                			<span>Mengetahui</span>
+	                			<div style="height: 100px;"></div>
+                    			<div><span class="bold">.............</span></div>
 	                		</div>
 	                	</div>
 	                </div>

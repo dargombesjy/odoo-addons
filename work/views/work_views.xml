@@ -294,7 +294,7 @@
 			<field name="res_model">purchase.order</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
-			<field name="domain">[('po_type','=','service')]</field>
+			<field name="domain">[('invoice_status','!=','invoiced'),('po_type','=','service')]</field>
 		</record>
 		
 		<record id="action_work_invoice_supplier_list"
