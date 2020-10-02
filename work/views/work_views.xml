@@ -186,6 +186,7 @@
 											</div>
 											<field name="cost_unit" />
 											<field name="cost_subtotal" widget="monetary" />
+											<field name="deductible" string="Deductible?"/>
 											<field name="vendor_ids"
 												domain="[('supplier', '=', True)]" />
 										</group>
@@ -199,6 +200,7 @@
 											groups="uom.group_uom" />
 										<field name="cost_unit" />
 										<field name="cost_subtotal" widget="monetary" />
+										<field name="deductible" string="Deductible?"/>
 										<field name="vendor_ids" widget="many2many_tags"
 											domain="[('supplier', '=', True)]" />
 									</tree>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from email.policy import default
 # from odoo.addons import decimal_precision as dp
 
 
@@ -125,17 +126,14 @@ class AccountInvoice(models.Model):
         self.amount_total_signed = self.amount_total * sign
         self.amount_untaxed_signed = amount_untaxed_signed * sign
 
-    # def _onchange_partner_id(self):
-    #     res = super(AccountInvoice, self)._onchange_partner_id()
-    #     return res
-
-#     @api.onchange('service_id')
-#     def onchange_service_id(self):
-#         eq = self.service_id.equipment_id
-#         self.eq_name = eq.name
-#         details = eq.get_details()
-#         self.eq_make = details['make']
-#         self.eq_model = details['model']
+#     @api.model
+#     def create(self, vals):
+#         if vals['origin_type'] == 'own_risk':
+#             journal = self.env['account.journal'].search([('code', '=', 'ORINV')], limit=1)
+#             vals['journal_id'] = journal.id
+#         
+#         result = super(AccountInvoice, self).create(vals)
+#         return result
     
     @api.one
     @api.depends
@@ -149,7 +147,9 @@ class AccountInvoice(models.Model):
         ('own_risk', 'Own Risk'),
         ('warehouse', 'Warehouse'),
         ('entertain', 'Entertain')], 'Origin Type', required=True, default='general')
-    service_id = fields.Many2one('service.order', string='Service', copy='False')
+    service_id = fields.Many2one(
+        'service.order', string='Service', copy='False', readonly=True,
+        states={'draft': [('readonly', False)]})
     eq_name = fields.Char('No. Plat', compute='_compute_equipment', store=True)
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
     sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
@@ -169,3 +169,4 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     product_category = fields.Char('Category')
+    deductible = fields.Boolean('Deductible', default=False)

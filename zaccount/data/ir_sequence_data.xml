@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="seq_service" model="ir.sequence">
+			<field name="name">Own Risk Invoices</field>
+			<field name="code">invoice.own_risk</field>
+			<field name="active">TRUE</field>
+			<field name="prefix">ORINV/%(range_year)s/</field>
+			<field name="padding">4</field>
+		</record>
+	</data>
+</odoo>

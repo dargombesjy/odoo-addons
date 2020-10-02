@@ -736,6 +736,7 @@ class ServiceOrder(models.Model):
                         else:
                             raise UserError(_('No account defined for product "%s".') % other.product_id.name)
                         
+                        price = other.price_unit
                         if other.deductible:
                             price = other.price_unit * (-1)
                         
@@ -755,7 +756,8 @@ class ServiceOrder(models.Model):
                             'product_id': other.product_id and other.product_id.id or False,
                             'product_category': other.product_id.categ_id.name,
                             'price_unit': price,  # other.price_unit,
-                            'price_subtotal': other.product_uom_qty * price  # other.price_unit
+                            'price_subtotal': other.product_uom_qty * price,  # other.price_unit
+                            'deductible': other.deductible
                         })
 
                 invoice.compute_taxes()
@@ -1187,7 +1189,7 @@ class ServiceOther(models.Model):
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
         if self.name == 'Own Risk':
-            self.deductible == True
+            self.deductible = True
         self.price_unit = self.product_id.list_price
         self.estimate_unit = self.product_id.list_price
         self.cost_unit = self.product_id.standard_price

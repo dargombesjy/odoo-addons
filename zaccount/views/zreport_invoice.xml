@@ -34,8 +34,7 @@
 							</div>
 						</div>
 						<h4>
-							<span
-								t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
+							<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
 							<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
 							<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
 							<span t-if="o.type == 'out_refund'">Credit Note</span>
@@ -190,6 +189,8 @@
 							</thead>
 							<tbody class="invoice_tbody">
 								<t t-set="current_subtotal" t-value="0" />
+								<t t-set="deductibles"
+									t-value="o.invoice_line_ids.search([('invoice_id', '=', o.id), ('deductible', '=', True)])"/>
 								<t t-foreach="o.invoice_line_ids" t-as="line">
 									<t t-set="current_subtotal"
 										t-value="current_subtotal + line.price_subtotal"
@@ -197,9 +198,8 @@
 									<t t-set="current_subtotal"
 										t-value="current_subtotal + line.price_total"
 										groups="account.group_show_line_subtotals_tax_included" />
-										
 									
-									<t t-if="line.name != 'Own Risk'">
+									<t t-if="not line.deductible">
 									<tr
 										t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
 										<t t-if="not line.display_type"
@@ -248,7 +248,8 @@
 										</t>
 									</tr>
 									</t>
-
+									
+									<!-- <t t-debug="pdb"/> -->
 									<t t-if="current_section and (line_last or o.invoice_line_ids[line_index+1].display_type == 'line_section')">
 										<tr class="is-subtotal text-right">
 											<td colspan="99">
@@ -345,15 +346,34 @@
 												</t>
 											</tr>
 										</t> -->
-										<t t-if="o.origin_type == 'service'">
-											<tr style="">
+										<t t-if="o.service_id.insurance_id">
+											<t t-foreach="deductibles" t-as="d">
+												<tr>
+													<td>
+														<span t-esc="d.name"/>
+													</td>
+													<td class="text-right o_price_total">
+														<span t-esc="d.price_subtotal"
+															t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+													</td>
+												</tr>
+											</t>
+											<!-- <tr style="">
 												<td>
 													<span>Own Risk</span>
 												</td>
 												<td class="text-right o_price_total">
-													<span t-field="o.own_risk" />
+													<span t-esc="o.own_risk" />
 												</td>
 											</tr>
+											<tr style="">
+												<td>
+													<span>Salvage</span>
+												</td>
+												<td class="text-right o_price_total">
+													<span t-field="o.salvage" />
+												</td>
+											</tr> -->
 										</t>
 										<tr class="border-black o_total">
 											<td>

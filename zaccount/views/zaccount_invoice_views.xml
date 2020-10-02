@@ -18,6 +18,9 @@
 				<xpath expr="//tree/field[@name='sequence']" position="after">
 					<field name="product_category" />
 				</xpath>
+				<xpath expr="//tree/field[@name='price_subtotal']" position="after">
+					<field name="deductible" string="Deduct?"/>
+				</xpath>
 				<xpath expr="//group[@class='oe_subtotal_footer oe_right']"
 					position="replace">
 					<group class="oe_subtotal_footer oe_right">

@@ -261,6 +261,7 @@
 										<field name="invoiced" invisible="1" />
 										<field name="price_subtotal" widget="monetary" />
 										<field name="approved" string="Acc?" />
+										<field name="deductible" string="Deductible?"/>
 									</tree>
 								</field>
 							</page>

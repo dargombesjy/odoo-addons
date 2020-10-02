@@ -9,9 +9,7 @@
     Custom Invoicing
     """,
     'data': [
-        # 'security/ir.model.access.csv',
-        # 'views/account_report_settings.xml',
-        # 'views/account_pdf_reports.xml',
+        'data/ir_sequence_data.xml',
         'views/partner_views.xml',
         'views/zaccount_invoice_views.xml',
         'views/zreport_invoice.xml',
