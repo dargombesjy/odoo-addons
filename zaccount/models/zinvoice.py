@@ -126,14 +126,14 @@ class AccountInvoice(models.Model):
         self.amount_total_signed = self.amount_total * sign
         self.amount_untaxed_signed = amount_untaxed_signed * sign
 
-#     @api.model
-#     def create(self, vals):
-#         if vals['origin_type'] == 'own_risk':
-#             journal = self.env['account.journal'].search([('code', '=', 'ORINV')], limit=1)
-#             vals['journal_id'] = journal.id
-#         
-#         result = super(AccountInvoice, self).create(vals)
-#         return result
+    @api.model
+    def create(self, vals):
+        if vals['origin_type'] == 'own_risk':
+            journal = self.env['account.journal'].search([('code', '=', 'ORINV')], limit=1)
+            vals['journal_id'] = journal.id
+         
+        result = super(AccountInvoice, self).create(vals)
+        return result
     
     @api.one
     @api.depends

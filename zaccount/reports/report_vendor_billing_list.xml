@@ -30,6 +30,8 @@
 		                	
 		                	<tbody>
 		                		<t t-set="i" t-value="1"/>
+		                		<t t-set="e" t-value="0"/>
+		                		<t t-set="curr" t-value="docs[0].currency_id"/>
 		                		<tr t-foreach="docs" t-as="doc">
 		                			<td><span t-esc="i"/></td>
 		                			<td><span t-field="doc.service_id.name"/></td>
@@ -38,7 +40,12 @@
 		                			<td><span t-field="doc.service_id.equipment_id.name"/></td>
 		                			<td><span t-field="doc.service_id.model"/></td>
 		                			<td><span t-field="doc.residual"/></td>
-		                			<t t-set="i" t-value="i+1"/>
+		                			<t t-set="i" t-value="i + 1"/>
+		                			<t t-set="e" t-value="e + doc.residual"/>
+		                		</tr>
+		                		<tr>
+		                			<td colspan="6">Total</td>
+		                			<td><span t-esc="e" t-options='{"widget": "monetary", "display_currency": curr}'/></td>
 		                		</tr>
 		                	</tbody>
 		                </table>
@@ -65,6 +72,21 @@
 	                			<span>Mengetahui</span>
 	                			<div style="height: 100px;"></div>
                     			<div><span class="bold">.............</span></div>
+	                		</div>
+	                	</div>
+	                </div>
+	                <div class="mt-8">
+	                	<div class="row">
+	                		<div class="col-4 text-center">
+	                		</div>
+	                		<div class="col-4 text-center">
+	                			<span/>
+	                			<br/>      
+	                			<span>Mengetahui</span>
+	                			<div style="height: 100px;"></div>
+	                			<div><span class="bold">.............</span></div>
+	                		</div>
+	                		<div class="col-4 text-center">
 	                		</div>
 	                	</div>
 	                </div>

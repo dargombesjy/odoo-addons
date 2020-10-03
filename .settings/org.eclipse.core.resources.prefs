@@ -43,6 +43,7 @@ encoding//zaccount/wizards/account_financial_report.py=utf-8
 encoding//zaccount/wizards/account_general_ledger.py=utf-8
 encoding//zaccount/wizards/account_report_common_account.py=utf-8
 encoding//zaccount/wizards/bill_vendor.py=utf-8
+encoding//zdg_admin/__manifest__.py=utf-8
 encoding//zdg_dashboard/__manifest__.py=utf-8
 encoding//zdg_product/__init__.py=utf-8
 encoding//zdg_product/__manifest__.py=utf-8
