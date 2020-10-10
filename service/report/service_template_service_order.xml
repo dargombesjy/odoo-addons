@@ -145,7 +145,7 @@
 								</tr>
 								<tr t-foreach="o.fees_lines" t-as="fees">
 									<t t-if="o.state == 'draft'">
-										<t t-if="fees.approved">
+										<!-- <t t-if="fees.approved"> -->
 											<td style="width:5%;">
 												<span t-esc="m" />
 											</td>
@@ -165,7 +165,7 @@
 											<td class="text-right o_price_total">
 												<span t-field="fees.price_subtotal" /> <!--t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
 											</td>
-										</t>
+										<!-- </t> -->
 									</t>
 									<t t-elif="fees.approved">
 										<td style="width:5%;">
@@ -211,7 +211,7 @@
 								</tr>
 								<tr t-foreach="o.operations" t-as="line">
 									<t t-if="o.state == 'draft'">
-										<t t-if="line.approved">
+										<!-- <t t-if="line.approved"> -->
 											<td style="width:5%;">
 												<span t-esc="i" />
 											</td>
@@ -236,7 +236,7 @@
 												<span t-field="line.price_subtotal" /><!-- t-options='{"widget":
 													"monetary", "display_currency": o.currency_id}'/ -->
 											</td>
-										</t>
+										<!-- </t> -->
 									</t>
 									<t t-elif="line.approved">
 										<td style="width:5%;">
