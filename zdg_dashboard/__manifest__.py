@@ -9,7 +9,9 @@
     Custom Dashboard
     """,
     'data': [
-        'views/zdg_dashboard_view.xml'
+        'reports/report_own_risk.xml',
+        'views/zdg_dashboard_view.xml',
+        'wizards/wizard_own_risk.xml'
     ],
     'installable': True,
     'auto_install': False,

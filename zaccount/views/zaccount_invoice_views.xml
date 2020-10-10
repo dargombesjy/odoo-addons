@@ -12,14 +12,18 @@
 						string="Print Invoice OR" type="object" />
 				</xpath>
 				<xpath expr="//sheet/group/group/field[@name='payment_term_id']" position="after">
-					<field name="service_id" />
-					<field name="eq_name" />
+					<field name="service_id"/>
+					<field name="eq_name"/>
+					<field name="origin_type" invisible="1"/>
 				</xpath>
 				<xpath expr="//tree/field[@name='sequence']" position="after">
 					<field name="product_category" />
 				</xpath>
 				<xpath expr="//tree/field[@name='price_subtotal']" position="after">
-					<field name="deductible" string="Deduct?"/>
+					<field name="deductible" string="Deduct?"
+						attrs="{
+							'column_invisible': [('parent.origin_type', '=', 'own_risk')],
+							'invisible': ['product_category', 'not in', 'Service Other']}"/>
 				</xpath>
 				<xpath expr="//group[@class='oe_subtotal_footer oe_right']"
 					position="replace">

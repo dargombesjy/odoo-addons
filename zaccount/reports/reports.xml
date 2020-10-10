@@ -2,11 +2,11 @@
 <odoo>
 	<data>
 
-		<report id="action_report_general_ledger"
-			model="account.report.general.ledger" string="Report General Ledger"
-			report_type="qweb-pdf" name="zaccount.report_generalledger"
-			file="zaccount.report_generalledger"
-			groups="account.group_account_invoice" />
+<!-- 		<report id="action_report_general_ledger" -->
+<!-- 			model="account.report.general.ledger" string="Report General Ledger" -->
+<!-- 			report_type="qweb-pdf" name="zaccount.report_generalledger" -->
+<!-- 			file="zaccount.report_generalledger" -->
+<!-- 			groups="account.group_account_invoice" /> -->
 
 		<report id="action_invoice_or" model="account.invoice"
 			string="Invoice OR" report_type="qweb-pdf"

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="wizard_own_risk"
+			model="ir.ui.view">
+			<field name="name">Report Own Risk</field>
+			<field name="model">zdg_dashboard.own.risk.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Report Own Risk">
+					<group>
+						<field name="date_from"/>
+						<field name="date_to"/>
+					</group>
+					<footer>
+						<button name="get_wizard_values" string="Print Report" type="object" class="oe_highlight"/>
+						<button string="Cancel" class="btn btn-secondary" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<record id="action_report_own_risk" model="ir.actions.act_window">
+			<field name="name">Report Own Risk</field>
+			<field name="res_model">zdg_dashboard.own.risk.wizard</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="wizard_own_risk"/>
+			<field name="target">new</field>
+		</record>
+
+<!-- 		<act_window id="action_report_own_risk" -->
+<!-- 			name="Report Own Risk" -->
+<!-- 			res_model="zdg_dashboard.own.risk.wizard" -->
+<!-- 			view_mode="form" -->
+<!-- 			target="new"/> -->
+		
+		<menuitem id="menu_dashboard_own_risk" name="Own Risk"
+    		parent="menu_main_zdg_dashboard"
+    		action="action_report_own_risk"/>
+	</data>
+</odoo>

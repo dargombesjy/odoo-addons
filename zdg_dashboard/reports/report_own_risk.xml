@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<report id="report_own_risk"
+			model="zdg_dashboard.own.risk.wizard"
+			string="Report Own Risk"
+			report_type="qweb-pdf"
+			name="zdg_dashboard.template_report_own_risk"
+			menu="False"/>
+			
+		<template id="template_report_own_risk">
+			<t t-call="web.html_container">
+				<t t-call="web.internal_layout">
+					
+					<div class="page">
+						<h2>
+							<span t-esc="res_company.name"/>
+							: Own Risk
+						</h2>
+						<div class="row mb16">
+							<div class="col-4">
+								<t t-if="data['date_from']">
+									<strong>Selesai dari Tgl.:</strong>
+									<span t-esc="data['date_from']"/>
+									<br/>
+								</t>
+								<t t-if="data['date_to']">
+									<strong>Selesai hingga Tgl.:</strong>
+									<span t-esc="data['date_to']"/>
+									<br/>
+								</t>
+							</div>
+						</div>
+						
+						<table class="table table-sm table-reports">
+							<thead>
+								<tr class="">
+									<th>OR Status</th>
+									<th>Invoice Status</th>
+									<th>Nilai</th>
+									<th>No SPK</th>
+									<th>No Pol.</th>
+									<th>No. Invoice</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr style="font-weight: bold;">
+									<td><span>Invoiced</span></td>
+									<td><span>Paid</span></td>
+									<td>
+										<span t-esc="results['totals']['invoiced']['paid']"
+											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+									</td>
+									<td colspan="3"/>
+								</tr>
+								<tr style="font-weight: bold;">
+									<td><span>Invoiced</span></td>
+									<td><span>Open</span></td>
+									<td>
+										<span t-esc="results['totals']['invoiced']['open']"
+											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+									</td>
+									<td colspan="3"/>
+								</tr>
+								<tr style="font-weight: bold;">
+									<td><span>Not Yet Invoiced</span></td>
+									<td>
+										<span t-esc="results['totals']['not_invoiced']"
+											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+									</td>
+									<td colspan="3"/>
+								</tr>
+								
+								<tr>
+									<td colspan="6"/>
+								</tr>
+							
+								<tr t-foreach="results['lines']" t-as="line">
+									<td>
+										<span t-if="line['invoice']">Invoiced</span>
+										<span t-else="">Belum Invoiced</span>
+									</td>
+									<td>
+										<span t-esc="line['inv_status']"/>
+									</td>
+									<td>
+										<span t-esc="line['total']"
+											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+									</td>
+									<td><span t-esc="line['no_spk']"/></td>
+									<td><span t-esc="line['no_plat']"/></td>
+									<td><span t-esc="line['invoice']"/></td>
+								</tr>
+							</tbody>
+						</table>
+						
+					</div>
+					
+				</t>
+			</t>
+		</template>
+	</data>
+</odoo>
