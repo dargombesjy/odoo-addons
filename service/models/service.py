@@ -417,15 +417,17 @@ class ServiceOrder(models.Model):
     def _amount_tax(self):
         val = 0.0
         for operation in self.operations:
-            if operation.tax_id:
-                tax_calculate = operation.tax_id.compute_all(operation.price_unit, self.currency_id, operation.product_uom_qty, operation.product_id, self.partner_id)
-                for c in tax_calculate['taxes']:
-                    val += c['amount']
+            if operation.approved:
+                if operation.tax_id:
+                    tax_calculate = operation.tax_id.compute_all(operation.price_unit, self.currency_id, operation.product_uom_qty, operation.product_id, self.partner_id)
+                    for c in tax_calculate['taxes']:
+                        val += c['amount']
         for fee in self.fees_lines:
-            if fee.tax_id:
-                tax_calculate = fee.tax_id.compute_all(fee.price_unit, self.currency_id, fee.product_uom_qty, fee.product_id, self.partner_id)
-                for c in tax_calculate['taxes']:
-                    val += c['amount']
+            if fee.approved:
+                if fee.tax_id:
+                    tax_calculate = fee.tax_id.compute_all(fee.price_unit, self.currency_id, fee.product_uom_qty, fee.product_id, self.partner_id)
+                    for c in tax_calculate['taxes']:
+                        val += c['amount']
         for other in self.others_lines:
             if other.product_id.name != 'Own Risk' and other.tax_id:
                 tax_calculate = other.tax_id.compute_all(other.price_unit, self.currency_id, other.product_uom_qty, other.product_id, self.partner_id)

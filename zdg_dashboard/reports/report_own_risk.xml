@@ -15,7 +15,7 @@
 					<div class="page">
 						<h2>
 							<span t-esc="res_company.name"/>
-							: Own Risk
+							: Monitoring Own Risk Status
 						</h2>
 						<div class="row mb16">
 							<div class="col-4">
@@ -37,52 +37,56 @@
 								<tr class="">
 									<th>OR Status</th>
 									<th>Invoice Status</th>
+									<th>Jumlah SPK</th>
 									<th>Nilai</th>
 									<th>No SPK</th>
 									<th>No Pol.</th>
 									<th>No. Invoice</th>
+									<th>SA</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr style="font-weight: bold;">
 									<td><span>Invoiced</span></td>
 									<td><span>Paid</span></td>
+									<td><span t-esc="results['totals']['invoiced']['paid']['count']"/></td>
 									<td>
-										<span t-esc="results['totals']['invoiced']['paid']"
+										<span t-esc="results['totals']['invoiced']['paid']['value']"
 											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
 									</td>
-									<td colspan="3"/>
 								</tr>
 								<tr style="font-weight: bold;">
 									<td><span>Invoiced</span></td>
 									<td><span>Open</span></td>
+									<td><span t-esc="results['totals']['invoiced']['open']['count']"/></td>
 									<td>
-										<span t-esc="results['totals']['invoiced']['open']"
+										<span t-esc="results['totals']['invoiced']['open']['value']"
 											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
 									</td>
-									<td colspan="3"/>
 								</tr>
-								<tr style="font-weight: bold;">
-									<td><span>Not Yet Invoiced</span></td>
+								<tr style="font-weight: bold;">R
+									<td><span>Belum Invoiced</span></td>
+									<td></td>
+									<td><span t-esc="results['totals']['not_invoiced']['count']"/></td>
 									<td>
-										<span t-esc="results['totals']['not_invoiced']"
+										<span t-esc="results['totals']['not_invoiced']['value']"
 											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
 									</td>
-									<td colspan="3"/>
 								</tr>
 								
 								<tr>
-									<td colspan="6"/>
+									<td></td>
 								</tr>
 							
 								<tr t-foreach="results['lines']" t-as="line">
 									<td>
-										<span t-if="line['invoice']">Invoiced</span>
+										<span t-if="line['inv_status']">Invoiced</span>
 										<span t-else="">Belum Invoiced</span>
 									</td>
 									<td>
 										<span t-esc="line['inv_status']"/>
 									</td>
+									<td></td>
 									<td>
 										<span t-esc="line['total']"
 											t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
@@ -90,6 +94,7 @@
 									<td><span t-esc="line['no_spk']"/></td>
 									<td><span t-esc="line['no_plat']"/></td>
 									<td><span t-esc="line['invoice']"/></td>
+									<td><span t-esc="line['service_advisor']"/></td>
 								</tr>
 							</tbody>
 						</table>
