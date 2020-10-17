@@ -151,7 +151,7 @@ class StockMove(models.Model):
         to_assign = {}
         for move in self:
             if move.service_id:
-                if move.product_category == 'Sparepart':
+                if move.product_category == 'Sparepart' or move.product_category == 'Bahan':
                     service_line = move.env['service.line'].search([('id', '=', move.service_line_id)], limit=1)
                 else:
                     service_line = move.env['service.consumable'].search([('id', '=', move.service_line_id)], limit=1)
@@ -353,7 +353,13 @@ class ServiceOrder(models.Model):
         copy=False, readonly=True, track_visibility="onchange")
     invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
     repaired = fields.Boolean('Repaired', copy=False, readonly=True)
+    amount_sparepart = fields.Float('Pend. Sparepart', compute='_amount_untaxed', store=True, digits=(12,0))
+    amount_jasa = fields.Float('Pend. Jasa', compute='_amount_untaxed', store=True, digits=(12,0))
+    amount_others = fields.Float('Pend. Others', compute='_amount_untaxed', store=True, digits=(12,0))
     amount_untaxed = fields.Float('Untaxed Amount', compute='_amount_untaxed', store=True, digits=(12,0))
+    amount_tax_sparepart = fields.Float('Sparepart Taxes', compute='_amount_tax', store=True, digits=(12,0))
+    amount_tax_jasa = fields.Float('Jasa Taxes', compute='_amount_tax', store=True, digits=(12,0))
+    amount_tax_others = fields.Float('Others Taxes', compute='_amount_tax', store=True, digits=(12,0))
     amount_tax = fields.Float('Taxes', compute='_amount_tax', store=True, digits=(12,0))
     amount_own_risk = fields.Float('Own Risk', compute='_amount_untaxed', store=True, digits=(12,0))
     amount_total = fields.Float('Total', compute='_amount_total', store=True, digits=(12,0))
@@ -399,15 +405,20 @@ class ServiceOrder(models.Model):
     @api.one
     @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal', 'others_lines.price_subtotal')
     def _amount_untaxed(self):
-        total = sum(operation.price_subtotal for operation in self.operations if operation.approved)
-        total += sum(fee.price_subtotal for fee in self.fees_lines if fee.approved)
+        sparepart_sum = sum(operation.price_subtotal for operation in self.operations if operation.approved)
+        fee_sum = sum(fee.price_subtotal for fee in self.fees_lines if fee.approved)
+        other_sum = 0
         for other in self.others_lines:
             if other.product_id.name == 'Own Risk':
                 self.amount_own_risk = other.price_subtotal
             else:
-                total += other.price_subtotal
-        # total += sum(other.price_subtotal for other in self.others_lines)
-        self.amount_untaxed = total
+#                 if other.approved:
+                other_sum = other.price_subtotal
+                    
+        self.amount_sparepart = sparepart_sum
+        self.amount_jasa = fee_sum
+        self.amount_others = other_sum
+        self.amount_untaxed = sparepart_sum + fee_sum + other_sum
 
     @api.one
     @api.depends('operations.price_unit', 'operations.product_uom_qty', 'operations.product_id',
@@ -416,23 +427,33 @@ class ServiceOrder(models.Model):
                  'currency_id', 'partner_id')
     def _amount_tax(self):
         val = 0.0
+        sparepart_tax = 0
+        fee_tax = 0
+        other_tax = 0
         for operation in self.operations:
             if operation.approved:
                 if operation.tax_id:
                     tax_calculate = operation.tax_id.compute_all(operation.price_unit, self.currency_id, operation.product_uom_qty, operation.product_id, self.partner_id)
                     for c in tax_calculate['taxes']:
+                        sparepart_tax += c['amount']
                         val += c['amount']
         for fee in self.fees_lines:
             if fee.approved:
                 if fee.tax_id:
                     tax_calculate = fee.tax_id.compute_all(fee.price_unit, self.currency_id, fee.product_uom_qty, fee.product_id, self.partner_id)
                     for c in tax_calculate['taxes']:
+                        fee_tax += c['amount']
                         val += c['amount']
         for other in self.others_lines:
             if other.product_id.name != 'Own Risk' and other.tax_id:
                 tax_calculate = other.tax_id.compute_all(other.price_unit, self.currency_id, other.product_uom_qty, other.product_id, self.partner_id)
                 for c in tax_calculate['taxes']:
+                    other_tax = c['amount']
                     val += c['amount']
+        
+        self.amount_tax_sparepart = sparepart_tax
+        self.amount_tax_jasa = fee_tax
+        self.amount_tax_others = other_tax
         self.amount_tax = val
 
     @api.one
@@ -1170,7 +1191,7 @@ class ServiceOther(models.Model):
     cost_unit = fields.Float('Unit Cost', required=True)
     cost_tax_id = fields.Many2many(
         'account.tax', 'service_others_cost_tax', 'service_others_line_id', 'cost_tax_id', 'Taxes')
-    cost_subtotal = fields.Float('Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
+    cost_subtotal = fields.Float('Cost Subtotal', compute='_compute_cost_subtotal', store=True, digits=0)
     purchased = fields.Boolean('Purchased', copy=False, required=True)
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)

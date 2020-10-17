@@ -15,6 +15,7 @@
         'views/zreport_invoice.xml',
         'reports/paperformat.xml',
         'reports/reports.xml',
+        'reports/report_invoice_customer.xml',
         'reports/report_invoice_or.xml',
         'reports/report_invoice_aab.xml',
         'reports/report_vendor_billing_list.xml',
