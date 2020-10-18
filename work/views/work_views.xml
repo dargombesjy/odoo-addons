@@ -260,8 +260,11 @@
 					<field name="bill_type" type="row" />
 					<field name="state" type="col" />
 					<field name="amount_total" type="measure" string="Pend. Total"/>
-					<field name="amount_untaxed" type="measure" string="Pend. Total sebelum Pajak"/>
-					<field name="amount_tax" type="measure" string="Pajak"/>
+					<field name="amount_untaxed" type="measure" string="Pend. Total sebelum PPN"/>
+					<field name="amount_tax" type="measure" string="PPN Total"/>
+					<field name="amount_tax_sparepart" type="measure" string="PPN Sparepart"/>
+					<field name="amount_tax_jasa" type="measure" string="PPN Jasa"/>
+					<field name="amount_tax_others" type="measure" string="PPN Other"/>
 					<field name="amount_own_risk" type="measure" string="Pend. Own Risk"/>
 				</pivot>
 			</field>

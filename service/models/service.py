@@ -405,9 +405,18 @@ class ServiceOrder(models.Model):
     @api.one
     @api.depends('operations.price_subtotal', 'invoice_method', 'fees_lines.price_subtotal', 'others_lines.price_subtotal')
     def _amount_untaxed(self):
-        sparepart_sum = sum(operation.price_subtotal for operation in self.operations if operation.approved)
-        fee_sum = sum(fee.price_subtotal for fee in self.fees_lines if fee.approved)
+        sparepart_sum = 0
+        fee_sum = 0
         other_sum = 0
+        for line in self.operations:
+            if line.supply_type == 'self' and line.approved:
+                sparepart_sum += line.price_subtotal
+#         sparepart_sum = sum(operation.price_subtotal for operation in self.operations if operation.approved)
+        for fee in self.fees_lines:
+            if fee.approved:
+                fee_sum += fee.price_subtotal
+#         fee_sum = sum(fee.price_subtotal for fee in self.fees_lines if fee.approved)
+        
         for other in self.others_lines:
             if other.product_id.name == 'Own Risk':
                 self.amount_own_risk = other.price_subtotal
@@ -431,7 +440,7 @@ class ServiceOrder(models.Model):
         fee_tax = 0
         other_tax = 0
         for operation in self.operations:
-            if operation.approved:
+            if operation.approved and operation.supply_type == 'self':
                 if operation.tax_id:
                     tax_calculate = operation.tax_id.compute_all(operation.price_unit, self.currency_id, operation.product_uom_qty, operation.product_id, self.partner_id)
                     for c in tax_calculate['taxes']:
