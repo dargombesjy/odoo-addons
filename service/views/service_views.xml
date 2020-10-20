@@ -21,8 +21,9 @@
 					<field name="state" />
 					<field name="planned_date" string="Pln. Finish" />
 					<field name="finish_date" string="Act. Finish" />
-					<field name="amount_untaxed" groups="service.group_service_manager"/>
 					<field name="amount_total" groups="service.group_service_manager"/>
+					<field name="amount_sparepart" groups="service.group_service_manager"/>
+					<field name="amount_tax_sparepart" groups="service.group_service_manager"/>
 				</tree>
 			</field>
 		</record>

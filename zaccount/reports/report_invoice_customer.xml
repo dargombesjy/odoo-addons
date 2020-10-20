@@ -23,10 +23,8 @@
 								vertical-align: top;
 								}
 							</style>
-							<!-- <div class="text-center"> <h4> <span>PT.KARYA MURNI SENTOSA</span> 
-								</h4> <div style="border-bottom: 1px solid;margin-bottom: 16px;"> <span>Jl. 
-								Siliwangi Km. 7 No. 50</span> </div> </div> -->
-							<h4 class="mt-16">
+							<div style="height: 16px;"></div>
+							<h4 class="mt-32">
 								<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
 								<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
 								<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
@@ -55,15 +53,15 @@
 								<t t-if="o.origin_type in ('service', 'own_risk')">
 									<div class="col-7 bm-2">
 										<table class="table table-sm">
+<!-- 											<tr> -->
+<!-- 												<td style="width:30%">Nama Asuransi</td> -->
+<!-- 												<td>:</td> -->
+<!-- 												<td> -->
+<!-- 													<span t-field="o.service_id.insurance_id.name" /> -->
+<!-- 												</td> -->
+<!-- 											</tr> -->
 											<tr>
-												<td style="width:30%">Nama Asuransi</td>
-												<td>:</td>
-												<td>
-													<span t-field="o.service_id.insurance_id.name" />
-												</td>
-											</tr>
-											<tr>
-												<td style="width:30%">Nama Pelapor</td>
+												<td style="width:30%">Customer</td>
 												<td>:</td>
 												<td>
 													<span t-field="o.service_id.partner_id.name" />
@@ -77,6 +75,35 @@
 													<span t-field="o.service_id.model" />
 												</td>
 											</tr>
+											<!-- <tr> <td style="width:30%">Tipe Kendaraan</td> <td>:</td> 
+												<td><span t-field="o.service_id.model"/></td> </tr> -->
+										</table>
+									</div>
+									<div class="col-5 bm-2">
+										<table class="table table-sm">
+<!-- 											<tr> -->
+<!-- 												<td style="width:30%">Claim Ref.No</td> -->
+<!-- 												<td>:</td> -->
+<!-- 												<td> -->
+<!-- 													<span t-field="o.service_id.claim_reference" /> -->
+<!-- 												</td> -->
+<!-- 											</tr> -->
+<!-- 											<tr> -->
+<!-- 												<td style="width:30%">Claim No</td> -->
+<!-- 												<td>:</td> -->
+<!-- 												<td> -->
+<!-- 													<span t-field="o.service_id.claim_id" /> -->
+<!-- 												</td> -->
+<!-- 											</tr> -->
+<!-- 											<tr> -->
+<!-- 												<td style="width:30%">No. Polis</td> -->
+<!-- 												<td>:</td> -->
+<!-- 												<td> -->
+<!-- 													<span t-field="o.service_id.policy_no" /> -->
+<!-- 												</td> -->
+<!-- 											</tr> -->
+											<!-- <tr> <td style="width:30%">Delivery Date</td> <td>:</td> 
+												<td><span t-field="o.service_id.finish_date"/></td> </tr> -->
 											<tr>
 												<td style="width:30%">No. Polisi</td>
 												<td>:</td>
@@ -84,35 +111,6 @@
 													<span t-field="o.service_id.equipment_id.name" />
 												</td>
 											</tr>
-											<!-- <tr> <td style="width:30%">Tipe Kendaraan</td> <td>:</td> 
-												<td><span t-field="o.service_id.model"/></td> </tr> -->
-										</table>
-									</div>
-									<div class="col-5 bm-2">
-										<table class="table table-sm">
-											<tr>
-												<td style="width:30%">Claim Ref.No</td>
-												<td>:</td>
-												<td>
-													<span t-field="o.service_id.claim_reference" />
-												</td>
-											</tr>
-											<tr>
-												<td style="width:30%">Claim No</td>
-												<td>:</td>
-												<td>
-													<span t-field="o.service_id.claim_id" />
-												</td>
-											</tr>
-											<tr>
-												<td style="width:30%">No. Polis</td>
-												<td>:</td>
-												<td>
-													<span t-field="o.service_id.policy_no" />
-												</td>
-											</tr>
-											<!-- <tr> <td style="width:30%">Delivery Date</td> <td>:</td> 
-												<td><span t-field="o.service_id.finish_date"/></td> </tr> -->
 											<tr>
 												<td style="width:30%">Invoice Date</td>
 												<td>:</td>
@@ -203,22 +201,13 @@
 													</t>
 												</tr>
 											</t>
-											<t t-if="o.origin_type == 'service'">
-												<tr style="">
-													<td>
-														<span>Own Risk</span>
-													</td>
-													<td class="text-right o_price_total">
-														<span t-field="o.own_risk" />
-													</td>
-												</tr>
-											</t>
+										
 											<tr class="border-black o_total">
 												<td>
 													<strong>Total</strong>
 												</td>
 												<td class="text-right">
-													<span t-field="o.amount_total" />
+													<span t-field="o.residual" />
 												</td>
 											</tr>
 										</table>
@@ -261,7 +250,7 @@
 								<div class="col-4 text-center">
 									<span
 										t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')" />
-									<div style="height:100px" />
+									<div style="height:90px" />
 									<span>REFDISON</span>
 <!-- 									<span t-esc="user.name" /> -->
 								</div>
