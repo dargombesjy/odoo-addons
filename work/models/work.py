@@ -19,6 +19,7 @@ class ServiceOrder(models.Model):
         ops_ng = fees_ng = consumables_ng = False
         if self.operations:
             ops_ng = self.operations.filtered(lambda ops: ops.requested and not ops.received)
+            ops_ng = self.operations.filtered(lambda ops: ops.approved and not ops.product_id)
         if self.fees_lines:
             fees_ng = self.fees_lines.filtered(lambda fees: fees.approved and not fees.purchased)
         # others_ok = self.others_lines.filtered(lambda others: others.purchased)
@@ -82,8 +83,10 @@ class ServiceOrder(models.Model):
                         'qty_received': v.product_uom_qty  # all services were received
                     })
                     v.write({'purchased': True, 'purchase_line_id': purchase_line.id})
+                    service.write({'purchase_ids': [(4, purchase.id)]})
                 po_ids.append(purchase)
-            service.write({'purchased': True, 'purchase_ids': [(6, 0, [x.id for x in po_ids])]})
+            # service.write({'purchased': True, 'purchase_ids': [(6, 0, [x.id for x in po_ids])]})
+            service.write({'purchased': True})
 
     @api.multi
     def action_create_sparepart_transfer(self):

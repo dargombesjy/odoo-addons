@@ -127,7 +127,12 @@
 											attrs="{'readonly': 1}" />
 										<field name="requested" string="Req" />
 										<field name="received" string="Rcv"
-											attrs="{'readonly': 1}" />
+											attrs="{'readonly': 0}" />
+										<field name="is_robbing"/>
+										<field name="eq_robbed"
+											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
+										<field name="is_robbing_done"
+											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
 									</tree>
 								</field>
 								<div class="oe_clear" />

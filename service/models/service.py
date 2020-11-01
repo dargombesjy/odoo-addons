@@ -648,22 +648,24 @@ class ServiceOrder(models.Model):
         invoices_group = {}
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
-#         own_risk = self.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
         for service in self.filtered(lambda service: service.state not in ('draft', 'cancel') and not service.invoice_id):
+            inv_partner = service.partner_invoice_id
             if not service.partner_id.id and not service.partner_invoice_id.id:
                 raise UserError(_('You have to select an invoice address in the service form.'))
+            if not service.partner_invoice_id.id:
+                inv_partner = service.partner_id
             comment = service.quotation_notes
-#             own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.invoice_method != 'none':
                 if group and service.partner_invoice_id.id in invoices_group:
-                    invoice = invoices_group[servistatece.partner_invoice_id.id]
+                    invoice = invoices_group[service.partner_invoice_id.id]
                     invoice.write({
                         'name': invoice.name + ', ' + service.name,
                         'origin': invoice.origin + ', ' + service.name,
                         'comment': (comment and (invoice.comment and invoice.comment + "\n" + comment or comment)) or (invoice.comment and invoice.comment or ''),
                     })
                 else:
-                    if not service.partner_invoice_id.property_account_receivable_id:
+                    # if not service.partner_invoice_id.property_account_receivable_id:
+                    if not inv_partner.property_account_receivable_id:
                         raise UserError(_('No account defined for partner "%s"' % service.partner_invoice_id.name))
                     invoice = Invoice.create({
                         # 'name': service.name,
@@ -674,7 +676,7 @@ class ServiceOrder(models.Model):
                         'type': 'out_invoice',
                         'account_id': service.partner_invoice_id.property_account_receivable_id.id,
                         # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
-                        'partner_id': service.partner_invoice_id.id,
+                        'partner_id': inv_partner.id,
                         'currency_id': service.currency_id.id,
                         # 'comment': service.quotation_notes,
                         'fiscal_position_id': service.partner_invoice_id.property_account_position_id
@@ -1047,6 +1049,9 @@ class ServiceLine(models.Model):
     # purchase_line_id = fields.Many2one(
     #     'purchase.order.line', 'Purchase Line', copy=False)
     # vendor_id = fields.Many2one('res.partner', 'Vendor', copy=False)
+    is_robbing = fields.Boolean('Robbing?', copy=False)
+    eq_robbed = fields.Char('Nopol Robbed')
+    is_robbing_done = fields.Boolean('Robbing Done?', copy=False)
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id', 'tax_id') #, 'service_id.invoice_method')

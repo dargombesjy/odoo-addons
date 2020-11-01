@@ -273,6 +273,8 @@
 					</table>
 
 					<t t-if="o.state == 'draft'">
+						<t t-set="tot" t-value="n+j"/>
+						<t t-set="val_total" t-value="'{:,}'.format(int(tot))"/>
 						<div id="total" class="row justify-content-end mb32">
 							<div class="col-4">
 								<table class="table table-sm">
@@ -289,7 +291,8 @@
 												</td>
 											</t>
 											<td class="text-right">
-												<span class="bold" t-field="o.amount_untaxed" /> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+												<!-- <span class="bold" t-field="o.amount_untaxed" /> --> <!-- t-options='{"widget": "monetary", "display_currency": o.currency_id}'/ -->
+												<span class="bold" t-esc="val_total"/>
 											</td>
 										</tr>
 										<t t-if="o.print_tax">
