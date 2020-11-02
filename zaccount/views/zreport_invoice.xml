@@ -25,14 +25,14 @@
 							vertical-align: top;
 							}
 						</style>
-						<div class="text-center">
+						<!-- <div class="text-center">
 							<h4>
 								<span>PT.KARYA MURNI SENTOSA</span>
 							</h4>
 							<div style="border-bottom: 1px solid;margin-bottom: 16px;">
 								<span>Jl. Siliwangi Km. 7 No. 50</span>
 							</div>
-						</div>
+						</div> -->
 						<h4>
 							<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
 							<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
