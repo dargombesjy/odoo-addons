@@ -135,9 +135,9 @@
 							</tr>
 						</thead>
 						<tbody>
+							<t t-set="n" t-value="0"/>
 							<t t-if="o.fees_lines">
 								<t t-set="m" t-value="1"/>
-								<t t-set="n" t-value="0"/>
 								<tr class="bg-200 o_line_section">
 									<td colspan="6">
 										<strong>Repairs</strong>
@@ -201,9 +201,9 @@
 							</tr>
 
 							<!-- Sparepart lines -->
+							<t t-set="j" t-value="0"/>
 							<t t-if="o.operations">
 								<t t-set="i" t-value="1"/>
-								<t t-set="j" t-value="0"/>
 								<tr class="bg-200 o_line_section">
 									<td colspan="6">
 										<strong>Spareparts</strong>
