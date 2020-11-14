@@ -133,7 +133,7 @@
 									<field name="received_date"
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<button name="action_set_draft" type="object" icon="fa-cubes"
-										attrs="{'invisible': [('state', '=', 'draft')]"
+										attrs="{'invisible': [('state', '=', 'draft')]}"
 										groups="service.group_admin_superadmin" />
 									<button name="action_show_details"
 										string="Register lots, packs, location" type="object"
