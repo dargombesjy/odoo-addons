@@ -43,3 +43,4 @@ class AccountMove(models.Model):
                 move.company_id.account_bank_reconciliation_start = move.date
 
         return self.write({'state': 'posted'})
+    

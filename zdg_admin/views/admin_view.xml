@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 	<data>
-		<record id="view_admin_tree_01" model="ir.ui.view">
+		<record id="view_superadmin_invoice" model="ir.ui.view">
+			<field name="name">zdg_admin.invoice_form</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//header/button[@name='preview_invoice']"
+					position="after">
+						<button name="action_set_draft"
+							string="Set to draft" type="object"
+							groups="zdg_admin.group_admin_superadmin" />
+				</xpath>
+			</field>
+		</record>
+		
+		<!-- <record id="view_admin_tree_01" model="ir.ui.view">
 			<field name="name">service.other</field>
 			<field name="model">service.other</field>
 			<field name="arch" type="xml">
@@ -84,6 +98,6 @@
 	    	
 	    <menuitem id="menu_admin_03" name="Temporary Tree 3"
 	    	parent="menu_admin_main"
-	    	action="action_admin_data_03"/>
+	    	action="action_admin_data_03"/> -->
 	</data>
 </odoo>

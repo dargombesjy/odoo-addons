@@ -4,7 +4,7 @@ import base64
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from num2words import num2words
-from html5lib._ihatexml import digit
+# from html5lib._ihatexml import digit
 
 SUPPLY_TYPES = [
         ('self', 'Self Supply'),
@@ -892,7 +892,7 @@ class ServiceOrder(models.Model):
             'border': 1
         })
 
-        worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
+        # worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
         worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
         worksheet.write(1, 2, self.name, border_format)
         worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)

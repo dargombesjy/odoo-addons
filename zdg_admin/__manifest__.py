@@ -9,6 +9,7 @@
     Custom Invoicing
     """,
     'data': [
+        'security/admin_security.xml',
         'views/admin_view.xml',
     ],
     'installable': True,

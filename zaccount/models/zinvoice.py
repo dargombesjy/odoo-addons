@@ -15,10 +15,9 @@ class AccountInvoice(models.Model):
     def action_invoice_aab(self):
         return self.env.ref('zaccount.action_invoice_aab').report_action(self)
     
-#     @api.multi
-#     def action_vendor_bill_request(self):
-#         self.write({'bill_printed': True})     
-#         return self.env.ref('zaccount.action_vendor_bill_request').report_action(self)
+    @api.multi
+    def action_set_draft(self):
+        return self.write({'state': 'draft'})
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',

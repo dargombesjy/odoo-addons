@@ -37,7 +37,7 @@ class ServiceOrder(models.Model):
     def create_po_dict(self):
         po_vendor = {}
         for fee in self.fees_lines:
-            if not fee.approved:
+            if not fee.approved or fee.cost_unit == 0:
                 continue
             if not fee.purchased:
                 for vendor in fee.vendor_ids:
@@ -98,7 +98,7 @@ class ServiceOrder(models.Model):
             if not service.operations:
                 raise UserError(_('No Sparepart items to transfer'))
 
-            outs_all = service.operations.filtered(lambda line: line.approved == True and line.requested == False)
+            outs_all = service.operations.filtered(lambda line: line.approved == True and line.requested == False and line.is_robbing == False)
             outs_bhn = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
 
             outs = [item for item in outs_all if item not in outs_bhn]
