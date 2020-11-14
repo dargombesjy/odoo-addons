@@ -10,6 +10,8 @@
 					position="after">
 					<button name="action_print_invoice_or"
 						string="Print Invoice OR" type="object" />
+					<button name="action_set_draft"
+						string="Set to Draft" type="object" />
 				</xpath>
 				<xpath expr="//sheet/group/group/field[@name='payment_term_id']" position="after">
 					<field name="service_id"/>

@@ -113,6 +113,9 @@ class StockMove(models.Model):
     vendor_received = fields.Float('Recv')
     receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
+    
+    def action_set_draft(self):
+        return self.write({'state': 'draft'})
 
     @api.constrains('product_uom')
     def _check_uom(self):
