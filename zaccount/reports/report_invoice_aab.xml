@@ -140,10 +140,12 @@
                 <div class="row">
                   <div class="col-3"><span>KWITANSI KLAIM NO</span></div>
                   <div class="col-4">
-                    <div>: <span t-field="o.service_id.claim_id"/></div>
+                    <div>: <span t-field="o.service_id.name"/></div>
                   </div>
                   <div class="col-3"><span>BERKAS KLAIM NO</span></div>
-                  <div class="col-3"><span>:</span></div>
+                  <div class="col-3">
+                    <div>: <span t-field="o.service_id.claim_id"/></div>
+                  </div>
                 </div>
               </div>
               <div>
@@ -247,7 +249,7 @@
                   </div>
                   <div class="col-4 text-center">
                     <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
-                    <div style="height: 100px;"></div>
+                    <div style="height: 130px;"></div>
                     <div><span class="bold">( REFDISON )</span></div>
                   </div>
                 </div>

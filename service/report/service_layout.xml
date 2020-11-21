@@ -7,7 +7,13 @@
 		<template id="service_layout"
 			inherit_id="web.external_layout_standard">
 			<xpath expr="//div[@class='header']" position="replace">
-				<div class="header">
+				<div>
+				</div>
+			</xpath>
+
+			<xpath expr="//div[@class='article o_report_layout_standard']" position="replace">
+				<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+					<t t-raw="0"/>
 				</div>
 			</xpath>
 
