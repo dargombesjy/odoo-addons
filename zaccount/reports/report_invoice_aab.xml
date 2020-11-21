@@ -140,7 +140,7 @@
                 <div class="row">
                   <div class="col-3"><span>KWITANSI KLAIM NO</span></div>
                   <div class="col-4">
-                    <div>: <span t-field="o.service_id.name"/></div>
+                    <div>: <span t-field="o.number"/></div>
                   </div>
                   <div class="col-3"><span>BERKAS KLAIM NO</span></div>
                   <div class="col-3">

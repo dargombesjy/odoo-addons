@@ -13,7 +13,8 @@
     'demo': [],
     'data': [
         'security/security.xml',
-        'views/report_menu.xml'
+        'views/report_menu_parent.xml',
+        'views/report_menu_views.xml'
     ],
     'installable': True,
     'application': False,
