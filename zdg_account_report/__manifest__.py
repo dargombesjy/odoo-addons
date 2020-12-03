@@ -12,9 +12,16 @@
     'depends': ['account'],
     'demo': [],
     'data': [
+        'security/ir.model.access.csv',
         'security/security.xml',
         'views/report_menu_parent.xml',
-        'views/report_menu_views.xml'
+        'views/report_settings.xml',
+        'wizards/general_ledger.xml',
+        'wizards/balance_sheet.xml',
+        'wizards/profit_and_loss.xml',
+        'reports/reports.xml',
+        'reports/report_general_ledger.xml',
+        'reports/report_financial.xml'
     ],
     'installable': True,
     'application': False,

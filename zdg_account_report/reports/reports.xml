@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <report id="action_report_general_ledger"
+            model="account.report.general.ledger"
+            string="General Ledger"
+            name="zdg_account_report.report_generalledger"
+            file="zdg_account_report.report_generalledger"/>
+    </data>
+
+    <report id="action_report_financial"
+			model="account.financial.report" string="Financial report"
+			menu="False" report_type="qweb-pdf"
+			name="zdg_account_report.report_financial"
+			file="zdg_account_report.report_financial" />
+</odoo>

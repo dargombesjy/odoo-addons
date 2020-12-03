@@ -37,7 +37,7 @@ class ServiceOrder(models.Model):
     def create_po_dict(self):
         po_vendor = {}
         for fee in self.fees_lines:
-            if not fee.approved or fee.cost_unit == 0:
+            if not fee.approved  # or fee.cost_unit == 0:
                 continue
             if not fee.purchased:
                 for vendor in fee.vendor_ids:
