@@ -110,7 +110,8 @@
                     <div><span>No. Rekening Bank</span></div>
                   </div>
                   <div class="col-9">
-                    <div>: <span><strong>158-0000-331167</strong></span></div>
+                    <!-- <div>: <span><strong>156-0000-331167</strong></span></div> -->
+                    <div>: <strong><span t-field="o.company_id.partner_id.bank_ids[0].acc_number"></span></strong></div>
                   </div>
                 </div>
                 <div class="row">
