@@ -228,9 +228,9 @@
                     		<strong>Jumlah: </strong>
                     	</span>
                     	<span>
-                    		<strong t-esc="total_tagihan"
-                    				t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-<!--                     		<strong t-field="o.residual"/> -->
+                    		<!-- <strong t-esc="total_tagihan"
+                    				t-options='{"widget": "monetary", "display_currency": o.currency_id}'/> -->
+                    		<strong t-field="o.residual"/>
                     	</span>
                     </div>
                   </div>
