@@ -1,0 +1,98 @@
+<odoo>
+  <template id="portal_my_orders" name="Monitoring Orders">
+    <t t-call="website.layout">
+      <style>
+      .table-xl {
+        font-size: 1.5rem;
+        width: 100%;
+      }
+      .centered {
+        max-width: 95%;
+        min-width: 90%;
+        margin: auto;
+      }
+      .table-xl thead tr {
+        border-top: 2px solid grey;
+        border-bottom: 2px solid grey;
+      }
+      </style>
+      <t t-set="title">Order Monitoring</t>
+      <div class="oe_structure"> <!--onload="timer = setTimeout('auto_reload()', 30000)" -->
+        <div class="oe_container centered">
+          <h1>Order Monitoring</h1>
+          <h3 class="text-center">
+            <t t-foreach="rekap" t-as="r">
+              <span t-esc="r"/>: <span t-esc="rekap[r]"/><span> ,  </span>
+            </t>
+            <span>Hal: </span>
+            <span id="pager_current" t-esc="pager['page']['num']"/>
+            <span>/ </span>
+            <span id="pager_count" t-esc="pager['page_count']"/>
+          </h3>
+          <table class="table-xl">
+            <thead>
+              <tr>
+                <th>No. Plat</th>
+                <th>Status</th>
+                <th>Stage</th>
+                <th>Tgl. Masuk</th>
+                <th>Tgl. Est. Selesai</th>
+                <!-- <th>Overdue</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="orders" t-as="order">
+                <tr t-if="order['overdue'] == 'Overdue'" style="color: red;">
+                  <td><span t-esc="order['no_plat']"/></td>
+                  <td><span t-esc="order['state']"/></td>
+                  <td><span t-esc="order['work_stage']"/></td>
+                  <td><span t-esc="order['register_date']"/></td>
+                  <td><span t-esc="order['planned_date']"/></td>
+                  <!-- <td><span t-esc="order['overdue']"/></td> -->
+                </tr>
+                <tr t-else="">
+                  <td><span t-esc="order['no_plat']"/></td>
+                  <td><span t-esc="order['state']"/></td>
+                  <td><span t-esc="order['work_stage']"/></td>
+                  <td><span t-esc="order['register_date']"/></td>
+                  <td><span t-esc="order['planned_date']"/></td>
+                  <!-- <td><span t-esc="order['overdue']"/></td> -->
+                </tr>
+              </t>
+            </tbody>
+          </table>
+          <div class="products_pager form-inline justify-content-center mt-3">
+            <t t-call="website.pager">
+            <t t-set="_classes">mt-2 ml-md-2</t>
+            </t>
+          </div>
+        </div>
+      </div>
+      <div style="display:none;">
+        <!-- <span id="pager_current" t-esc="pager['page']['num']"/>
+        <span id="pager_count" t-esc="pager['page_count']"/> -->
+        <span id="pager_next_num" t-esc="pager['page_next']['num']"/>
+        <span id="pager_next_url" t-esc="pager['page_next']['url']"/>
+      </div>
+    </t>
+    <script>
+      (function() {
+        var timer = null;
+        var host = window.location.origin;
+        var route = '/my/dashboard/orders/page/';
+        var current_page = document.getElementById('pager_current').innerHTML;
+        var total_page = document.getElementById('pager_count').innerHTML;
+        var next_page = document.getElementById('pager_next_num').innerHTML;
+        var page = '1';
+        var query = '?date_begin=2021-01-01';
+        if (parseInt(current_page) &lt; parseInt(total_page)) {
+          page = next_page;
+        }
+        var url = host + route + page + query;
+        setTimeout(function() {
+          window.location = url
+        }, 20000);
+      })()
+    </script>
+  </template>
+</odoo>

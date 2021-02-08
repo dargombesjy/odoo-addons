@@ -1,0 +1,10 @@
+<odoo>
+  <data>
+    <template id="assets_backend" name="service assets" inherit_id="web.assets_backend">
+      <xpath expr="//script[last()]" position="after">
+        <link rel="stylesheet" href="/service/static/src/css/main.css"/>
+        <!-- <script type="text/javascript" src="/service/static/src/js/main.js"></script> -->
+      </xpath>
+    </template>
+  </data>
+</odoo>

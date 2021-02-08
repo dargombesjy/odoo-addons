@@ -29,7 +29,7 @@
 							font-weight: bold;
 						}
 					</style>
-					<div class="oe_structure" style="height:45px" />
+					<div class="oe_structure" style="height:65px" />
 					<h4 class="text-center">
 						<span t-if="o.state == 'draft'">ESTIMASI PERBAIKAN KENDARAAN</span>
 						<span t-if="o.state != 'draft'">SURAT PERINTAH KERJA BENGKEL</span>

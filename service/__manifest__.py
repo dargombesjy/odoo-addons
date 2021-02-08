@@ -9,6 +9,7 @@
     'data': [
         'security/service_security.xml',
         'security/ir.model.access.csv',
+        # 'views/resources.xml',
         'views/service_views.xml',
         'views/equipment_views.xml',
         # 'views/partner_views.xml',

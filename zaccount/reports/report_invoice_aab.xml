@@ -41,7 +41,7 @@
                     <div><span>Jenis</span></div>
                   </div>
                   <div class="col-9">
-                    <div>: <span t-field="o.service_id.make"/><span t-field="o.service_id.model"/></div>
+                    <div>: <span t-field="o.service_id.make"/><span> </span><span t-field="o.service_id.model"/></div>
                   </div>
                 </div>
                 <div class="row">

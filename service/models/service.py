@@ -1115,6 +1115,15 @@ class ServiceLine(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
+    # @api.model
+    # def unlink(self):
+    #     for material in self:
+    #         if material.received:
+    #             raise UserError(_('Material sudah diambil, harap dikembalikan terlebih dahulu'))
+    #         elif material.requested:
+    #             raise UserWarning(_('Harap batalkan request Material terlebih dahulu'))
+    #     return models.Model.unlink(self)
+
 class ServiceFee(models.Model):
     _name = 'service.fee'
     _description = 'Service Fees'

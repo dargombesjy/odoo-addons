@@ -1,0 +1,10 @@
+<odoo>
+  <data>
+    <template id="assets_backend" name="zdg_dashboard assets" inherit_id="website.assets_backend">
+      <xpath expr="." position="inside">
+        <link rel="stylesheet" href="/zdg_dashboard/static/src/css/main.css"/>
+        <!-- <script type="text/javascript" src="/zdg_dashboard/static/src/js/main.js"></script> -->
+      </xpath>
+    </template>
+  </data>
+</odoo>

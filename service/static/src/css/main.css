@@ -1,0 +1,13 @@
+.table-xl {
+  font-size: 1.5rem;
+  width: 100%;
+}
+.centered {
+  max-width: 95%;
+  min-width: 90%;
+  margin: auto;
+}
+.table-xl thead tr {
+  border-top: 2px solid grey;
+  border-bottom: 2px solid grey;
+}
