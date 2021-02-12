@@ -129,7 +129,7 @@
 												<group>
 													<group>
 														<field name="product_id" string="Part Number"
-															domain="[('type', '=', 'product'), ('categ_id', '=', 4)]" />
+															domain="[('type', '=', 'product'), ('categ_id', '=', 4)]" context="{'custom_search': True}"/>
 														<field name="name" invisible="0" />
 														<label for="product_uom_qty" />
 														<div class="o_row">
@@ -333,6 +333,7 @@
 			<field name="name">Master Data</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">product.template</field>
+			<field name="context">{'custom_search': True}</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">kanban,tree</field>
 		</record>

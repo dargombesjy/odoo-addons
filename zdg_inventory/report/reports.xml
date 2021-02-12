@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <data>
+    <report id="report_move_xlsx"
+      model="stock.move"
+      string="Print to XLSX"
+      report_type="xlsx"
+      name="zdg_inventory.report_move_xlsx"
+      file="stock_move"
+      attachment_use="False" />
+    </data>
+</odoo>

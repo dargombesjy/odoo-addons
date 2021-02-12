@@ -6,9 +6,10 @@
     'author': 'Dargombes Djaja',
     'category': 'Uncategorized',
     'description': """
-    Custom Dashboard
+    Custom Inventory
     """,
     'data': [
+        'report/reports.xml',
         'views/zdg_product_template_view.xml'
     ],
     'installable': True,

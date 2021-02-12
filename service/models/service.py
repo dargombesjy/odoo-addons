@@ -1110,19 +1110,20 @@ class ServiceLine(models.Model):
         # if not self.product_id or not self.product_uom_qty:
         # return
         if self.product_id:
-            self.name = self.product_id.name
+            self.part_number = self.product_id.name
+            # self.name = self.product_id.default_code
             self.product_uom = self.product_id.uom_id.id
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
-    # @api.model
-    # def unlink(self):
-    #     for material in self:
-    #         if material.received:
-    #             raise UserError(_('Material sudah diambil, harap dikembalikan terlebih dahulu'))
-    #         elif material.requested:
-    #             raise UserWarning(_('Harap batalkan request Material terlebih dahulu'))
-    #     return models.Model.unlink(self)
+    @api.model
+    def unlink(self):
+        for material in self:
+            if material.received:
+                raise UserError(_('Material sudah diambil, harap dikembalikan terlebih dahulu'))
+            elif material.requested:
+                raise UserWarning(_('Harap batalkan request Material terlebih dahulu'))
+        return models.Model.unlink(self)
 
 class ServiceFee(models.Model):
     _name = 'service.fee'
