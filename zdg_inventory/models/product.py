@@ -171,7 +171,7 @@ class ProductProduct(models.Model):
             code = self._context.get('display_default_code', True) and d.get('default_code', False) or False
             generic_name = d.get('generic_name', '')
             if code:
-                name = '[%s] %s %s' % (name, code, generic_name)
+                name = '[%s] %s [%s]' % (name, code, generic_name)
             return (d['id'], name)
 
         partner_id = self._context.get('partner_id')
