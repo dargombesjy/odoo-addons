@@ -24,11 +24,34 @@ class ReportMoveXlsx(models.AbstractModel):
         row += 1
         col = 0
         for obj in stock_moves:
-            for field in fields:
-                if field == 'skip':
-                    continue
-                name_ = getattr(obj, field)
-                sheet.write(row, col, name_.name)
-                col += 1
+            sheet.write(row, col, obj.product_id.name)
+            col += 1
+            sheet.write(row, col, obj.product_id.default_code)
+            col += 1
+            sheet.write(row, col, obj.product_id.list_price)
+            col += 1
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, obj.picking_id.eq_name)
+            col += 1
+            sheet.write(row, col, vendor_date)
+            col += 1
+            sheet.write(row, col, picking_id.eq_make)
+            col += 1
+            sheet.write(row, col, picking_id.eq_model)
+            col += 1
+            sheet.write(row, col, supply_type)
+            # for field in fields:
+            #     if field == 'skip':
+            #         continue
+            #     name_ = getattr(obj, field)
+            #     sheet.write(row, col, name_.name)
+            #     col += 1
             row += 1
             col = 0
