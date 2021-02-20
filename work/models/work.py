@@ -113,6 +113,7 @@ class ServiceOrder(models.Model):
                     'service_id': service.id,
                     'origin': "Part-%s" % service.name,
                     'eq_name': service.equipment_id.name,
+                    'eq_make': service.make,
                     'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,

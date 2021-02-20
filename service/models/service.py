@@ -17,6 +17,7 @@ class StockPicking(models.Model):
 
     service_id = fields.Many2one('service.order')
     eq_name = fields.Char('License Plate')
+    eq_make = fields.Char('Make')
     eq_model = fields.Char('Model')
     receiver = fields.Char('Receiver')
     received_date = fields.Date('Received Date')
@@ -1116,13 +1117,13 @@ class ServiceLine(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
-    @api.model
+    @api.multi
     def unlink(self):
         for material in self:
             if material.received:
-                raise UserError(_('Material sudah diambil, harap dikembalikan terlebih dahulu'))
+                raise UserError(_('Material sudah diambil, harap dikembalikan ke Warehouse terlebih dahulu'))
             elif material.requested:
-                raise UserWarning(_('Harap batalkan request Material terlebih dahulu'))
+                raise UserError(_('Material sudah direquest, harap batalkan request Material ke Warehouse terlebih dahulu'))
         return models.Model.unlink(self)
 
 class ServiceFee(models.Model):
