@@ -18,7 +18,7 @@
 						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
 					<field name="received_date"
 						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
-					<field name="is_sparepart" invisible="1" />>
+					<field name="is_sparepart" invisible="1" />
 				</xpath>
 				
 				<xpath expr="//notebook" position="replace">
@@ -112,10 +112,10 @@
 									<field name="product_id" required="1"
 										attrs="{'readonly': ['|', '&amp;', ('additional', '=', False), ('has_move_lines', '=', True)]}" />
 									<field name="name" invisible="0" />
-									<field name="vendor_id"
-										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="part_number"
 										attrs="{'column_invisible': [('parent.is_sparepart', '=', False)]}" />
+									<field name="vendor_id"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="vendor_qty" invisible="0" />
 									<field name="vendor_date" invisible="0" />
 									<field name="vendor_received" invisible="1" />
@@ -176,6 +176,7 @@
 						</page>
 					</notebook>
 				</xpath>
+				
 			</field>
 		</record>
 
