@@ -5,9 +5,31 @@ class ReportMoveXlsx(models.AbstractModel):
     _name = 'report.zdg_inventory.report_move_xlsx'
     _inherit = 'report.report_xlsx.abstract'
 
+    def _get_objs_for_report(self, docids, data):
+        """
+        Returns objects for xlx report.  From WebUI these
+        are either as docids taken from context.active_ids or
+        in the case of wizard are in data.  Manual calls may rely
+        on regular context, setting docids, or setting data.
+
+        :param docids: list of integers, typically provided by
+            qwebactionmanager for regular Models.
+        :param data: dictionary of data, if present typically provided
+            by qwebactionmanager for TransientModels.
+        :param ids: list of integers, provided by overrides.
+        :return: recordset of active model for ids.
+        """
+        if docids:
+            ids = docids
+        elif data and 'context' in data:
+            ids = data["context"].get('active_ids', [])
+        else:
+            ids = self.env.context.get('active_ids', [])
+        return self.env[self.env.context.get('active_model')].browse(ids)
+
     def generate_xlsx_report(self, workbook, data, stock_moves):
         sheet = workbook.add_worksheet('Report')
-        company = self.env.company.id
+        # company = self.env.company.id
         header = ['NAMA BARANG', 'PART NUMBER', 'HARGA PRICELIST', 'DISC',
             'HARGA BELI', 'PPN', 'TOTAL', 'NOPOL', 'TGL. TERIMA', 'TGL. AMBIL',
             'PIC', 'AGING', 'LOKASI PART', 'SUPPLIER', 'MEREK', 'TIPE', 'STATUS',

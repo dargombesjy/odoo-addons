@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="stock_move_wizard" model="ir.ui.view">
+      <field name="name">stock.move.report</field>
+      <field name="model">zdg_inventory.stock.move.wizard</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+        <form string="Stock Move Report">
+          <group>
+            <group>
+              <field name="start_date" />
+            </group>
+            <group>
+              <field name="end_date" />
+            </group>
+          </group>
+          <footer>
+            <button name="get_report" string="Download to Excel" type="object" class="oe_highlight" />
+            <button string="Cancel" special="cancel" />
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="action_stock_move_wizard" model="ir.actions.act_window">
+      <field name="name">Stock Move Report</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">zdg_inventory.stock.move.wizard</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+      <!-- <field name="view_id" ref="stock_move_wizard" /> -->
+      <field name="target">new</field>
+      <!-- <field name="binding_model_id" ref="stock.move" /> -->
+      <!-- <field name="binding_type">report</field> -->
+    </record>
+
+    <menuitem id="menu_stock_move_report"
+      name="Report Monitoring Stock"
+      action="action_stock_move_wizard"
+      parent="stock.menu_warehouse_report"
+      sequence="200" />
+
+  </data>
+</odoo>

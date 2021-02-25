@@ -10,7 +10,8 @@
     """,
     'data': [
         'report/reports.xml',
-        'views/zdg_product_template_view.xml'
+        'views/zdg_product_template_view.xml',
+        'wizards/stock_move_wizard.xml'
     ],
     'installable': True,
     'auto_install': False,
