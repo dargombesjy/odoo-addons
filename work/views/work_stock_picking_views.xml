@@ -18,6 +18,7 @@
 						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
 					<field name="received_date"
 						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
+					<field name="is_sparepart" invisible="1" />>
 				</xpath>
 				
 				<xpath expr="//notebook" position="replace">
@@ -91,7 +92,7 @@
 									string="Stock Moves" editable="bottom">
 									<field name="service_id" invisible="1"/>
 									<field name="service_line_id" invisible="1" />
-									<field name="product_category" invisible="0" />
+									<field name="product_category" invisible="0" groups='service.group_service_manager' />
 									<field name="date_expected" invisible="1" />
 									<field name="state" invisible="1" readonly="0" />
 									<field name="picking_type_id" invisible="1" />
@@ -107,12 +108,14 @@
 									<field name="has_move_lines" invisible="1" />
 									<field name="is_locked" invisible="1" />
 									<field name="supply_type"
-										attrs="{'column_invisible': ['|', ('parent.picking_type_code', '=', 'incoming'), ('parent.origin', 'like', '%Bahan%')]}"/>
+										attrs="{'column_invisible': ['|', ('parent.picking_type_code', '=', 'incoming'), ('parent.is_sparepart', '=', False)]}"/>
 									<field name="product_id" required="1"
 										attrs="{'readonly': ['|', '&amp;', ('additional', '=', False), ('has_move_lines', '=', True)]}" />
 									<field name="name" invisible="0" />
 									<field name="vendor_id"
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
+									<field name="part_number"
+										attrs="{'column_invisible': [('parent.is_sparepart', '=', False)]}" />
 									<field name="vendor_qty" invisible="0" />
 									<field name="vendor_date" invisible="0" />
 									<field name="vendor_received" invisible="1" />

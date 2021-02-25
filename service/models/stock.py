@@ -15,6 +15,12 @@ class StockPicking(models.Model):
     vendor_id = fields.Many2one(
         'res.partner', 'Vendor', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
+    is_sparepart = fields.Boolean('Is Sparepart', compute='_compute_ispart')
+
+    @api.one
+    @api.depends('origin')
+    def _compute_ispart(self):
+        self.is_sparepart = 'Part-' in self.origin
 
     @api.multi
     def action_confirm(self):
@@ -99,12 +105,19 @@ class StockMove(models.Model):
         domain=[('type', 'in', ['product', 'consu'])], index=True, required=False)
     product_category = fields.Char('Product Category')
     supply_type = fields.Selection(SUPPLY_TYPES, 'Supply Type')
+    part_number = fields.Char('Kode Part Admin', compute='_compute_part_admin')
     vendor_id = fields.Many2one('res.partner', 'Vendor', index=True)
     vendor_qty = fields.Float('Qty. Terima')
     vendor_date = fields.Date('Tgl. Terima')
     vendor_received = fields.Float('Recv')
     receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
+
+    @api.one
+    @api.depends('service_line_id')
+    def _compute_part_admin(self):
+        service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
+        self.part_number = service_line.part_number
     
     def action_set_draft(self):
         return self.write({'state': 'draft'})

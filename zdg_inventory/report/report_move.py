@@ -7,6 +7,7 @@ class ReportMoveXlsx(models.AbstractModel):
 
     def generate_xlsx_report(self, workbook, data, stock_moves):
         sheet = workbook.add_worksheet('Report')
+        company = self.env.company.id
         header = ['NAMA BARANG', 'PART NUMBER', 'HARGA PRICELIST', 'DISC',
             'HARGA BELI', 'PPN', 'TOTAL', 'NOPOL', 'TGL. TERIMA', 'TGL. AMBIL',
             'PIC', 'AGING', 'LOKASI PART', 'SUPPLIER', 'MEREK', 'TIPE', 'STATUS',
@@ -24,11 +25,11 @@ class ReportMoveXlsx(models.AbstractModel):
         row += 1
         col = 0
         for obj in stock_moves:
-            sheet.write(row, col, obj.product_id.name)
-            col += 1
             sheet.write(row, col, obj.product_id.default_code)
             col += 1
-            sheet.write(row, col, obj.product_id.list_price)
+            sheet.write(row, col, obj.product_id.name)
+            col += 1
+            sheet.write(row, col, obj.product_id.list_price or '')
             col += 1
             sheet.write(row, col, '')
             col += 1
@@ -38,15 +39,25 @@ class ReportMoveXlsx(models.AbstractModel):
             col += 1
             sheet.write(row, col, '')
             col += 1
-            sheet.write(row, col, obj.picking_id.eq_name)
+            sheet.write(row, col, obj.picking_id.eq_name or '')
             col += 1
-            sheet.write(row, col, vendor_date)
+            sheet.write(row, col, obj.vendor_date or '')
             col += 1
-            sheet.write(row, col, picking_id.eq_make)
+            sheet.write(row, col, obj.received_date or '')
             col += 1
-            sheet.write(row, col, picking_id.eq_model)
+            sheet.write(row, col, obj.receiver or '')
             col += 1
-            sheet.write(row, col, supply_type)
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, '')
+            col += 1
+            sheet.write(row, col, obj.vendor_id.name or '')
+            col += 1
+            sheet.write(row, col, obj.picking_id.eq_make or '')
+            col += 1
+            sheet.write(row, col, obj.picking_id.eq_model)
+            col += 1
+            sheet.write(row, col, obj.supply_type or '')
             # for field in fields:
             #     if field == 'skip':
             #         continue
