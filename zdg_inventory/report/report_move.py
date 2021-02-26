@@ -1,5 +1,7 @@
 import inspect
+from datetime import datetime, timedelta
 from odoo import models
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 
 class ReportMoveXlsx(models.AbstractModel):
     _name = 'report.zdg_inventory.report_move_xlsx'
@@ -19,13 +21,29 @@ class ReportMoveXlsx(models.AbstractModel):
         :param ids: list of integers, provided by overrides.
         :return: recordset of active model for ids.
         """
+        move = self.env['stock.move']
+        objs = []
         if docids:
-            ids = docids
-        elif data and 'context' in data:
-            ids = data["context"].get('active_ids', [])
+            objs = move.browse(docids)
+            # ids = docids
         else:
-            ids = self.env.context.get('active_ids', [])
-        return self.env[self.env.context.get('active_model')].browse(ids)
+            start = datetime.strptime(data['start_date'], DATE_FORMAT)
+            end = datetime.strptime(data['end_date'], DATE_FORMAT)
+            delta = timedelta(days=1)
+            # delta = (end - start).days + 1
+            while start <= end:
+                date = start
+                start += delta
+                ids = move.search([
+                    ('vendor_date', '>=', date.strftime(DATETIME_FORMAT)),
+                    ('vendor_date', '<', start.strftime(DATETIME_FORMAT)),])
+                objs.extend(ids)
+        return objs
+        # elif data and 'context' in data:
+        #     ids = data["context"].get('active_ids', [])
+        # else:
+        #     ids = self.env.context.get('active_ids', [])
+        # return self.env[self.env.context.get('active_model')].browse(ids)
 
     def generate_xlsx_report(self, workbook, data, stock_moves):
         sheet = workbook.add_worksheet('Report')

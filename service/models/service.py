@@ -29,7 +29,10 @@ class StockPicking(models.Model):
     @api.one
     @api.depends('origin')
     def _compute_ispart(self):
-        self.is_sparepart = 'Part-' in self.origin
+        self.is_sparepart = False
+        if 'Part-' in self.origin:
+            self.is_sparepart = True
+        # self.is_sparepart = 'Part-' in self.origin
 
     @api.multi
     def action_confirm(self):

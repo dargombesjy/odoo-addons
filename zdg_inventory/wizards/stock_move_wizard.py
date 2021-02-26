@@ -14,7 +14,7 @@ class StockMoveWizard(models.TransientModel):
         # data = {}
         # data['form'] = rec.read(['model', 'start_date', 'end_date'])
         # return self.env['report'].get_action(rec, 'zdg_inventory.report_move_xlsx.xlsx',data=data)
-        
+        data = {}
         data = {
             'start_date': self.start_date,
             'end_date': self.end_date
