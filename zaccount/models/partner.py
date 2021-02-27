@@ -14,7 +14,9 @@ class ResPartner(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals['wht_proportion'] > 1.0:
-            raise UserError(_('WHT Proportion dalam desimal harus kurang dari atau sama dengan 1'))
+        # if vals['wht_proportion']:
+        if 'wht_proportion' in vals:
+            if vals['wht_proportion'] > 1.0:
+                raise UserError(_('WHT Proportion dalam desimal harus kurang dari atau sama dengan 1'))
         res = super(ResPartner, self).write(vals)
         return res
