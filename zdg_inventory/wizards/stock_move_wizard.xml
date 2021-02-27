@@ -10,9 +10,11 @@
           <group>
             <group>
               <field name="start_date" />
+              <field name="end_date" />
             </group>
             <group>
-              <field name="end_date" />
+              <field name="picking_type" />
+              <field name="apply_filter" />
             </group>
           </group>
           <footer>
@@ -29,14 +31,14 @@
       <field name="res_model">zdg_inventory.stock.move.wizard</field>
       <field name="view_type">form</field>
       <field name="view_mode">form</field>
-      <!-- <field name="view_id" ref="stock_move_wizard" /> -->
+      <field name="view_id" ref="stock_move_wizard" />
       <field name="target">new</field>
       <!-- <field name="binding_model_id" ref="stock.move" /> -->
-      <!-- <field name="binding_type">report</field> -->
+      <field name="binding_type">report</field>
     </record>
 
     <menuitem id="menu_stock_move_report"
-      name="Report Monitoring Stock"
+      name="Monitoring Stock"
       action="action_stock_move_wizard"
       parent="stock.menu_warehouse_report"
       sequence="200" />
