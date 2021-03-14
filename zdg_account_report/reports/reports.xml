@@ -4,13 +4,17 @@
         <report id="action_report_general_ledger"
             model="account.report.general.ledger"
             string="General Ledger"
-            name="zdg_account_report.report_generalledger"
-            file="zdg_account_report.report_generalledger"/>
+            report_type="xlsx"
+            name="zdg_account_report.report_generalledger_xlsx"
+            file="General Ledger"
+            attachment_use="False"/>
     </data>
 
     <report id="action_report_financial"
-			model="account.financial.report" string="Financial report"
-			menu="False" report_type="qweb-pdf"
-			name="zdg_account_report.report_financial"
+			model="account.financial.report"
+			string="Financial report"
+			report_type="xlsx"
+			menu="False"
+			name="zdg_account_report.report_financial_xlsx"
 			file="zdg_account_report.report_financial" />
 </odoo>

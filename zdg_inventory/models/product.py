@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 import re
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.osv import expression
 
 # class ProductTemplate(models.Model):

@@ -3,7 +3,7 @@
 	<data>
 
 		<menuitem id="menu_finance_legal_statement"
-			name="PDF Reports" parent="account.menu_finance_reports" />
+			name="Accounting Excel Reports" parent="account.menu_finance_reports" />
 
 	</data>
 </odoo>

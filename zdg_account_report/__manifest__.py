@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Odoo 12 Accounting PDF Reports',
+    'name': 'DGBZ Accounting Reports',
     'version': '12.0.1.0.0',
     'category': 'Invoicing Management',
     'summary': 'Accounting Reports For Odoo 12',

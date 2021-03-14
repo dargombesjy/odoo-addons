@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import inspect
 from datetime import datetime, timedelta
 from odoo import models
