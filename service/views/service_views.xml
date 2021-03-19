@@ -37,6 +37,7 @@
 					<header>
 						<!-- <button name="action_send_mail" states="draft" string="Send Quotation" 
 							type="object"/> -->
+						<button name="action_request_material" type="object" string="SPB Sparepart"/>
 						<button name="action_print_service_order" states="draft"
 							string="Print Quotation" type="object" />
 						<button name="action_export_xls" states="draft"
@@ -59,8 +60,6 @@
 							attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
 							attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
-						<!-- <button name="action_service_cancel" states="draft" type="object" 
-							string="Cancel Repair"/> -->
 						<field name="state" widget="statusbar"
 							statusbar_visible="draft,confirmed,under_repair,2binvoiced,ready,done" />
 					</header>

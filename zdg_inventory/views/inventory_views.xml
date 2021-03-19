@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="view_inventory_tree" model="ir.ui.view">
+			<field name="name">zdg_inventory.tree</field>
+			<field name="model">inventory.move</field>
+			<field name="arch" type="xml">
+				<tree string="Inventory Move">
+					<field name="name"/>
+					<field name="service_id"/>
+					<field name="eq_name"/>
+				</tree>
+			</field>
+		</record>
+		
+		<record id="view_inventory_form" model="ir.ui.view">
+			<field name="name">zdg_inventory.form</field>
+			<field name="model">inventory.move</field>
+			<field name="priority" eval="1"/>
+			<field name="arch" type="xml">
+				<form string="SPB">
+					<header></header>
+					<sheet></sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" />
+						<field name="activity_ids" widget="mail_activity" />
+						<field name="message_ids" widget="mail_thread" />
+					</div>
+				</form>
+			</field>
+		</record>
+	</data>
+</odoo>

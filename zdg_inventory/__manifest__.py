@@ -10,6 +10,7 @@
     """,
     'data': [
         'report/reports.xml',
+        'views/inventory_views.xml',
         'views/zdg_product_template_view.xml',
         'wizards/stock_move_wizard.xml'
     ],

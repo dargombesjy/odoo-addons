@@ -20,7 +20,10 @@ class StockPicking(models.Model):
     @api.one
     @api.depends('origin')
     def _compute_ispart(self):
-        self.is_sparepart = 'Part-' in self.origin
+        self.is_sparepart = True
+        if self.origin:
+            self.is_sparepart = 'Part-' in self.origin
+        # self.is_sparepart = 'Part-' in self.origin
 
     @api.multi
     def action_confirm(self):
@@ -112,7 +115,7 @@ class StockMove(models.Model):
     vendor_received = fields.Float('Recv')
     receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
-
+    
     @api.one
     @api.depends('service_line_id')
     def _compute_part_admin(self):
@@ -226,3 +229,4 @@ class StockMoveLine(models.Model):
 
     # service_line_id = fields.Many2one('service.line')
     product_alias = fields.Char('Product Alias')
+    
