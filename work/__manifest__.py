@@ -14,6 +14,7 @@
         'report/work_reports.xml',
         'report/work_template_consumable_form.xml',
         'report/work_template_sparepart_form.xml',
+        'report/work_template_spb.xml',
         ],
     'images': [],
     'license': 'AGPL-3',

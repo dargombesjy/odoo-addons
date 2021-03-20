@@ -850,34 +850,96 @@ class ServiceOrder(models.Model):
         return self.write({'state': 'draft'})
     
     @api.multi
-    def action_request_material(self):
-        spb_model = self.env['inventory.move']
-        spb_line_model = self.env['inventory.move.line']
-        
+    def action_create_sparepart_transfer(self):
+        # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')
+        Picking = self.env['stock.picking']
+        Move_Line = self.env['stock.move']
+        partner = self.partner_id
         for service in self:
-            part_line = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
-            spb = spb_model.create({
-                'service_id': service.id,
-                'eq_name': service.equipment_id.name,
-                'state': 'draft'})
-            if part_line:
-                for part in part_line:
-                    if part.product_id:
-                        uom_id = part.product_uom.id
+            if not service.operations:
+                raise UserError(_('No Sparepart items to transfer'))
+
+            outs_all = service.operations.filtered(lambda line: line.approved == True and line.requested == False and line.is_robbing == False)
+            outs_bhn = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
+
+            outs = [item for item in outs_all if item not in outs_bhn]
+#             outs = outs_all
+            if not outs:
+                raise UserError(_('No Requested item(s) left to transfer'))
+
+            if not service.sparepart_picking_id:
+                # raise UserError('Sparepart request already created')
+                picking = Picking.create({
+                    # 'name': '',
+                    'service_id': service.id,
+                    'origin': "Part-%s" % service.name,
+                    'eq_name': service.equipment_id.name,
+                    'eq_make': service.make,
+                    'eq_model': service.model,
+                    'move_type': 'one',
+                    'partner_id': partner.id,
+                    'picking_type_id': 2,
+                    'location_id': service.location_id.id,  # 12,
+                    'location_dest_id': 9,
+                    'state': 'draft',
+                })
+                service.write({'sparepart_picking_id': picking.id})
+            else:
+                picking = service.sparepart_picking_id
+
+            if outs:
+                for operation in outs:
+                    if operation.product_id:
+                        uom_id = operation.product_uom.id
                     else:
                         uom_id = 1
-                    spb_line = spb_line_model.create({
-                        'name': part.name,
-                        'move_id': spb.id,
+                    moving = Move_Line.create({
                         'service_id': service.id,
                         'service_line_id': operation.id,
+                        'name': operation.name,
                         'product_category': 'Sparepart',
-                        'supply_type': part.supply_type,
-                        'product_id': part.product_id.id,
-                        'part_number': part.part_number,
-                        'product_uom_qty': part.product_uom_qty,
-                        'product_uom': uom_id, 
-                        'state': 'draft'})
+                        'supply_type': operation.supply_type,
+                        'picking_id': picking.id,
+                        'picking_type_id': 2,
+                        'product_id': operation.product_id.id,
+                        'product_uom_qty': operation.product_uom_qty,
+                        'product_uom': uom_id, # operation.product_uom.id,
+                        'package_id': False,
+                        'package_level_id': False,
+                        'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
+                        'location_dest_id': 9,
+                        'state': 'draft'
+                    })
+                    operation.write({'move_id': moving.id, 'requested': True})
+    # @api.multi
+    # def action_request_material(self):           
+        # spb_model = self.env['inventory.move']
+        # spb_line_model = self.env['inventory.move.line']
+        #
+        # for service in self:
+            # part_line = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
+            # spb = spb_model.create({
+                # 'service_id': service.id,
+                # 'eq_name': service.equipment_id.name,
+                # 'state': 'draft'})
+            # if part_line:
+                # for part in part_line:
+                    # if part.product_id:
+                        # uom_id = part.product_uom.id
+                    # else:
+                        # uom_id = 1
+                    # spb_line = spb_line_model.create({
+                        # 'name': part.name,
+                        # 'move_id': spb.id,
+                        # 'service_id': service.id,
+                        # 'service_line_id': operation.id,
+                        # 'product_category': 'Sparepart',
+                        # 'supply_type': part.supply_type,
+                        # 'product_id': part.product_id.id,
+                        # 'part_number': part.part_number,
+                        # 'product_uom_qty': part.product_uom_qty,
+                        # 'product_uom': uom_id, 
+                        # 'state': 'draft'})
 
     @api.multi
     def action_export_xls(self):

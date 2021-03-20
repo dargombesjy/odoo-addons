@@ -37,11 +37,12 @@
 					<header>
 						<!-- <button name="action_send_mail" states="draft" string="Send Quotation" 
 							type="object"/> -->
-						<button name="action_request_material" type="object" string="SPB Sparepart"/>
+						<button name="action_create_sparepart_transfer"
+							string="Req. Sparepart" type="object" states="draft"/>
 						<button name="action_print_service_order" states="draft"
 							string="Print Quotation" type="object" />
-						<button name="action_export_xls" states="draft"
-							string="Export to Excel" type="object" />
+						<!-- <button name="action_export_xls" states="draft"
+							string="Export to Excel" type="object" /> -->
 						<button name="action_service_confirm" states="draft"
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"

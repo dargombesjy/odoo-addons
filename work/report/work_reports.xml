@@ -4,13 +4,19 @@
 		<report string="Sparepart Request"
 			id="action_work_sparepart_request" model="service.order"
 			name="work.sparepart_request" file="work.sparepart_request"
-			report_type="qweb-pdf"
-			groups="work.group_work_user"/>
+			report_type="qweb-pdf"/>
+<!-- 			groups="work.group_work_user"/> -->
 
 		<report string="Consumable Request"
 			id="action_work_consumable_request" model="service.order"
 			name="work.consumable_request" file="work.consumable_request"
 			report_type="qweb-pdf"
 			groups="work.group_work_user"/>
+
+		<report string="Surat Permintaan Barang"
+			id="action_work_spb" model="service.order"
+			name="work.spb" file="SPB"
+			report_type="qweb-pdf"
+			paperformat="service.paperformat_spb"/>
 	</data>
 </odoo>

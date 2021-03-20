@@ -42,12 +42,8 @@
 						<!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', 
 							('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready')]}" type="object" 
 							string="Start Repair" class="oe_highlight"/> -->
-						<!-- <button name="action_print_sparepart_request" states="under_repair" 
-							string="Req. Sparepart" type="object"/> -->
-						<!-- <button name="action_print_consumable_request" states="under_repair" 
-							string="Req. Consumables" type="object"/> -->
 						<button name="action_create_sparepart_transfer"
-							states="under_repair" string="Req. Sparepart" type="object" />
+							string="Req. Sparepart" type="object" states="under_repair" />
 						<button name="action_create_consumable_transfer"
 							states="under_repair" string="Req. Bahan" type="object" />
 						<button name="action_create_purchase_fee"

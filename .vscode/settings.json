@@ -1,4 +1,7 @@
 {
-  "python.pythonPath": "/home/warno006089/workspace/python/env/bin/python3",
-  "python.analysis.extraPaths": ["odoo12\\odoo", "odoo12\\addons"]
+  "python.pythonPath": "/home/suwarno/workspace/python/odoo-env/bin/python",
+  "python.analysis.extraPaths": [
+    "/home/suwarno/workspace/python/odoo12/odoo",
+    "/home/suwarno/workspace/python/odoo12/addons"
+  ]
 }

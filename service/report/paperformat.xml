@@ -16,5 +16,21 @@
 			<field name="header_spacing">10</field>
 			<field name="dpi">90</field>
 		</record>
+
+		<record id="paperformat_spb" model="report.paperformat">
+			<field name="name">spb</field>
+			<field name="default" eval="False" />
+			<field name="format">custom</field>
+			<field name="page_height">138</field>
+			<field name="page_width">210</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">5</field>
+			<field name="margin_bottom">5</field>
+			<field name="margin_left">8</field>
+			<field name="margin_right">8</field>
+			<field name="header_line" eval="False" />
+			<field name="header_spacing">10</field>
+			<field name="dpi">90</field>
+		</record>
 	</data>
 </odoo>
