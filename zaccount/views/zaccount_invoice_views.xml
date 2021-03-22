@@ -62,6 +62,9 @@
 					<field name="service_id" readonly="1"/>
 					<field name="eq_name"/>
 				</xpath>
+				<xpath expr="//field[@name='discount']" position="replace">
+					<field name="discount"/>
+				</xpath>
 			</field>
 		</record>
 		

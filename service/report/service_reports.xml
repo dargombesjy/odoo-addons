@@ -18,7 +18,8 @@
       string="Quotation in Excel"
       report_type="xlsx"
       name="service.report_quotation_xlsx"
-      file="'Quotation - %s' % (object.name)"/>
+      file="service.report_quotation_xlsx"
+			print_report_name="'Quotation %s' % (object.name)"/>
 
 	</data>
 </odoo>
