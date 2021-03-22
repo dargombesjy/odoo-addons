@@ -4,6 +4,7 @@ from odoo.addons import decimal_precision as dp
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
+    _description = 'Purchase Order Customization'
 
     po_type = fields.Selection([
         ('general', 'PO General'),

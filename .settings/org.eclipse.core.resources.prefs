@@ -70,5 +70,6 @@ encoding//zdg_inventory/wizards/stock_move_wizard.py=utf-8
 encoding//zpurchase/__init__.py=utf-8
 encoding//zpurchase/__manifest__.py=utf-8
 encoding//zpurchase/models/__init__.py=utf-8
+encoding//zpurchase/models/zaccount_invoice.py=utf-8
 encoding//zpurchase/models/zpurchase.py=utf-8
 encoding//zpurchase/wizards/__init__.py=utf-8
