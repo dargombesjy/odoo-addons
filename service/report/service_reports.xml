@@ -14,11 +14,11 @@
 			paperformat="paperformat_pass_keluar" menu="False" />
 
 		<report id="report_quotation_xlsx"
-      model="service.order"
-      string="Quotation in Excel"
-      report_type="xlsx"
-      name="service.report_quotation_xlsx"
-      file="service.report_quotation_xlsx"
+      		model="service.order"
+      		string="Quotation in Excel"
+      		report_type="xlsx"
+      		name="service.report_quotation_xlsx"
+      		file="service.report_quotation_xlsx"
 			print_report_name="'Quotation %s' % (object.name)"/>
 
 	</data>

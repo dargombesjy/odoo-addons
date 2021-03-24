@@ -160,10 +160,11 @@
                   <span><strong>Merk / Type : </strong></span><span><strong t-field="o.service_id.make"/></span>
                   <span> - <strong t-field="o.service_id.model"/></span>
                 </div>
-                <div style="height:20px;"></div>
+                <div style="height:10px;"></div>
                 <div class="row">
                   <div class="col-4">
-                    <div><span>Total Tagihan Jasa</span></div>
+<!--                     <div><span>Total Tagihan Jasa</span></div> -->
+                    <div><span>Jasa</span></div>
                   </div>
                   <div class="col-3">
                     <div>: <span t-field="o.wht_base" /></div>
@@ -171,23 +172,24 @@
                 </div>
                 <div class="row">
                   <div class="col-4">
-                    <div><span>Total Tagihan Spareparts</span></div>
+<!--                     <div><span>Total Tagihan Spareparts</span></div> -->
+					<div><span>Part</span></div>
                   </div>
                   <div class="col-3">
-                    <div>: <span t-field="o.sub_spareparts" /></div>
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_spareparts" /></div>
                   </div>
                 </div>
+<!--                 <div class="row"> -->
+<!--                   <div class="col-4"> -->
+<!--                     <div><span>Lain-Lain</span></div> -->
+<!--                   </div> -->
+<!--                   <div class="col-3"> -->
+<!--                     <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div> -->
+<!--                   </div> -->
+<!--                 </div> -->
                 <div class="row">
                   <div class="col-4">
-                    <div><span>Lain-Lain</span></div>
-                  </div>
-                  <div class="col-3">
-                    <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4">
-                    <div><span></span></div>
+                    <div><span>Jumlah</span></div>
                   </div>
                   <div class="col-3">
                     <div>: <span t-field="o.amount_untaxed" /></div>
@@ -195,24 +197,41 @@
                 </div>
                 <div class="row">
                   <div class="col-4">
-                    <div><span>PPN 10%</span></div>
+                    <div><span>PPN</span></div>
                   </div>
                   <div class="col-3">
                     <div style="border-bottom:1px solid grey;">: <span t-field="o.amount_tax" /></div>
                   </div>
                 </div>
+                <t t-set="subtotal" t-value="o.amount_untaxed + o.amount_tax"/>
                 <div class="row">
                   <div class="col-4">
-                    <div><span>Resiko Sendiri</span></div>
+                    <div><span>Total</span></div>
                   </div>
                   <div class="col-3">
-                    <div style="border-bottom:1px solid grey;">: <span t-field="o.own_risk" /></div>
+                    <div>: <span t-esc="subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>OR</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div>: <span t-field="o.own_risk" /></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>PPH 23</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.amount_wht" /></div>
                   </div>
                 </div>
                 <!-- <t t-set="total_tagihan" t-value="o.residual - o.amount_wht"/> -->
                 <div class="row mb8">
                   <div class="col-4">
-                    <div><span>Total Tagihan Bersih</span></div>
+                    <div><span>Grand Total</span></div>
                   </div>
                   <div class="col-3">
                   	<!-- <div>: <span id="residual" t-esc="total_tagihan"
