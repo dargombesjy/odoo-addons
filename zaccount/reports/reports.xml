@@ -23,7 +23,6 @@
 		<report id="action_invoice_aab" model="account.invoice"
 			string="Invoice AAB" report_type="qweb-pdf"
 			name="zaccount.report_invoice_aab" file="zaccount.report_invoice_aab"
-			print_report_name="'Invoice %s' % (object.name)"
 			groups="account.group_account_invoice" />
 			
 		<report string="Vendor Bill"
