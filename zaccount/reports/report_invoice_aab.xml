@@ -187,12 +187,14 @@
 <!--                     <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div> -->
 <!--                   </div> -->
 <!--                 </div> -->
+				<t t-set="gross" t-value="o.amount_untaxed + o.own_risk"/>
                 <div class="row">
                   <div class="col-4">
                     <div><span>Jumlah</span></div>
                   </div>
                   <div class="col-3">
-                    <div>: <span t-field="o.amount_untaxed" /></div>
+<!--                     <div>: <span t-field="o.amount_untaxed" /></div> -->
+					<div>: <span t-esc="gross" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></div>
                   </div>
                 </div>
                 <div class="row">
@@ -203,7 +205,7 @@
                     <div style="border-bottom:1px solid grey;">: <span t-field="o.amount_tax" /></div>
                   </div>
                 </div>
-                <t t-set="subtotal" t-value="o.amount_untaxed + o.amount_tax"/>
+                <t t-set="subtotal" t-value="o.amount_untaxed + o.amount_tax + o.own_risk"/>
                 <div class="row">
                   <div class="col-4">
                     <div><span>Total</span></div>
