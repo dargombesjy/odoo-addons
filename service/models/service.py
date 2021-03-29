@@ -855,6 +855,8 @@ class ServiceOrder(models.Model):
         Picking = self.env['stock.picking']
         Move_Line = self.env['stock.move']
         partner = self.partner_id
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.company_id.id)], limit=1)
+        pick = self.env['stock.picking.type'].search([('name', '=', 'Delivery Orders'), ('warehouse_id', '=', warehouse.id)], limit=1)
         for service in self:
             if not service.operations:
                 raise UserError(_('No Sparepart items to transfer'))
@@ -878,7 +880,8 @@ class ServiceOrder(models.Model):
                     'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,
-                    'picking_type_id': 2,
+                    # 'picking_type_id': 2,
+                    'picking_type_id': pick.id,
                     'location_id': service.location_id.id,  # 12,
                     'location_dest_id': 9,
                     'state': 'draft',
@@ -900,7 +903,8 @@ class ServiceOrder(models.Model):
                         'product_category': 'Sparepart',
                         'supply_type': operation.supply_type,
                         'picking_id': picking.id,
-                        'picking_type_id': 2,
+                        # 'picking_type_id': 2,
+                        'picking_type_id': pick.id,
                         'product_id': operation.product_id.id,
                         'product_uom_qty': operation.product_uom_qty,
                         'product_uom': uom_id, # operation.product_uom.id,
@@ -941,165 +945,165 @@ class ServiceOrder(models.Model):
                         # 'product_uom': uom_id, 
                         # 'state': 'draft'})
 
-    @api.multi
-    def action_export_xls(self):
-        file_name = '/home/kmsadmin/temp/service_order.xlsx'
-        workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
-        worksheet = workbook.add_worksheet('SPK')
-
-        number_format = workbook.add_format({
-            'num_format': '#,##0',
-            'border': 1
-        })
-        border_format = workbook.add_format({
-            'border': 1
-        })
-        header_format_main = workbook.add_format({
-            'font_size': 14,
-            'bold': True,
-            'align': 'center',
-            'valign': 'center',
-            'border': 1
-        })
-        header_format = workbook.add_format({
-            'bold': True,
-            'align': 'center',
-            'valign': 'center',
-            'border': 1
-        })
-        header_format_wrap = workbook.add_format({
-            'bold': True,
-            'align': 'center',
-            'valign': 'center',
-            'text_wrap': True,
-            'border': 1
-        })
-        section_format = workbook.add_format({
-            'border': 1,
-            'bold': True
-        })
-        center_format = workbook.add_format({
-            'align': 'center',
-            'valign': 'center',
-            'border': 1
-        })
-        merged_format_top = workbook.add_format({
-            'align': 'left',
-            'valign': 'top',
-            'border': 1
-        })
-        merged_format_bottom = workbook.add_format({
-            'align': 'center',
-            'valign': 'bottom',
-            'border': 1
-        })
-        wrap_format = workbook.add_format({
-            'text_wrap': True,
-            'border': 1
-        })
-        wrap_format_top = workbook.add_format({
-            'text_wrap': True,
-            'valign': 'top',
-            'border': 1
-        })
-
-        # worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
-        worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
-        worksheet.write(1, 2, self.name, border_format)
-        worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)
-        worksheet.write(2, 2, self.insurance_id.name or '', border_format)
-        worksheet.merge_range(3, 0, 3, 1, 'Merek Mobil', border_format)
-        worksheet.write(3, 2, '%s %s' % (self.make, self.model), border_format)
-        worksheet.merge_range(4, 0, 4, 1, 'No. Polisi / Chassis', wrap_format)
-        worksheet.write(4, 2, '%s / %s' % (self.equipment_id.name, self.chassis_no), wrap_format)
-        worksheet.merge_range(5, 0, 5, 1, 'Warna', border_format)
-        worksheet.write(5, 2, self.base_colour or '', border_format)
-
-        worksheet.merge_range(1, 3, 1, 4, 'Nama Pelanggan', border_format)
-        worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, wrap_format)
-        worksheet.merge_range(2, 3, 2, 4, 'Alamat', border_format)
-        worksheet.merge_range(2, 5, 2, 6, self.partner_id.street or '', border_format)
-        worksheet.merge_range(3, 3, 3, 4, 'Telepon', border_format)
-        worksheet.merge_range(3, 5, 3, 6, self.partner_id.phone or '', border_format)
-        worksheet.merge_range(4, 3, 4, 4, 'No. Polis Asuransi', wrap_format)
-        worksheet.merge_range(4, 5, 4, 6, self.policy_no or '', wrap_format)
-        worksheet.merge_range(5, 3, 5, 4, 'No. Berkas', border_format)
-        worksheet.merge_range(5, 5, 5, 6, self.claim_id or '', border_format)
-        # details
-        worksheet.write(7, 0, 'No.', header_format)
-        worksheet.merge_range(7, 1, 7, 3, 'KETERANGAN', header_format)
-        worksheet.write(7, 4, 'QTY', header_format)
-        worksheet.write(7, 5, 'HARGA SATUAN \n(Rp.)', header_format_wrap)
-        worksheet.write(7, 6, 'TOTAL HARGA \n(Rp.)', header_format_wrap)
-
-        worksheet.merge_range(8, 0, 8, 6, 'PERBAIKAN DAN PENGECATAN', section_format)
-        row = 9
-        idx = 1
-        total_jasa = 0
-        for o in self.fees_lines:
-            worksheet.write(row, 0, idx, border_format)
-            worksheet.write(row, 1, '', border_format)
-            worksheet.merge_range(row, 2, row, 3, o.name, border_format)
-            worksheet.write(row, 4, o.product_uom_qty, border_format)
-            worksheet.write(row, 5, o.price_unit, number_format)
-            worksheet.write(row, 6, o.price_subtotal, number_format)
-            total_jasa += o.price_subtotal
-            row += 1
-            idx += 1
-        worksheet.merge_range(row, 0, row, 5, 'Total Jasa', section_format)
-        worksheet.write(row, 6, total_jasa, number_format)
-        row += 1
-
-        worksheet.merge_range(row, 0, row, 6, 'PENGGANTIAN SPAREPART', section_format)
-        row += 1
-        idx = 1
-        total_spareparts = 0
-        for r in self.operations:
-            worksheet.write(row, 0, idx, border_format)
-            worksheet.write(row, 1, r.part_number, border_format)
-            worksheet.merge_range(row, 2, row, 3, r.name, border_format)
-            worksheet.write(row, 4, r.product_uom_qty, border_format)
-            worksheet.write(row, 5, r.price_unit, number_format)
-            worksheet.write(row, 6, r.price_subtotal, number_format)
-            total_spareparts += r.price_subtotal
-            row += 1
-            idx += 1
-        worksheet.merge_range(row, 0, row, 5, 'Total Sparepart', section_format)
-        worksheet.write(row, 6, total_spareparts, number_format)
-
-        row += 1
-        worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
-        worksheet.write(row, 6, self.amount_untaxed, number_format)
-
-        row += 1
-        total = total_spareparts + total_jasa
-        worksheet.merge_range(row, 0, row, 1, 'Terbilang:', border_format)
-        worksheet.merge_range(row, 2, row, 4, num2words(total, lang='id'), wrap_format)
-        worksheet.merge_range(row, 5, row, 6, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
-
-        row += 1
-        worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
-        worksheet.merge_range(row, 2, row + 2, 4, self.quotation_notes or '', wrap_format_top)
-        worksheet.merge_range(row, 5, row + 2, 6, self.service_advisor or '', merged_format_bottom)
-        # Save workbook
-        workbook.close()
-        # read and save as binary
-        with open(file_name, "rb") as file:
-            file_base64 = base64.b64encode(file.read())
-
-        record_id = self.env['service.order.excel.wizard'].create(
-            {'excel_file': file_base64, 'excel_file_name': 'testing.xls'})
-
-        return {
-            'name': _('Excel file created'),
-            'view_mode': 'form',
-            'res_id': record_id.id,
-            'res_model': 'service.order.excel.wizard',
-            'view_type': 'form',
-            'type': 'ir.actions.act_window',
-            # 'context': context
-            'target': 'new',
-        }
+    # @api.multi
+    # def action_export_xls(self):
+        # file_name = '/home/kmsadmin/temp/service_order.xlsx'
+        # workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
+        # worksheet = workbook.add_worksheet('SPK')
+        #
+        # number_format = workbook.add_format({
+            # 'num_format': '#,##0',
+            # 'border': 1
+        # })
+        # border_format = workbook.add_format({
+            # 'border': 1
+        # })
+        # header_format_main = workbook.add_format({
+            # 'font_size': 14,
+            # 'bold': True,
+            # 'align': 'center',
+            # 'valign': 'center',
+            # 'border': 1
+        # })
+        # header_format = workbook.add_format({
+            # 'bold': True,
+            # 'align': 'center',
+            # 'valign': 'center',
+            # 'border': 1
+        # })
+        # header_format_wrap = workbook.add_format({
+            # 'bold': True,
+            # 'align': 'center',
+            # 'valign': 'center',
+            # 'text_wrap': True,
+            # 'border': 1
+        # })
+        # section_format = workbook.add_format({
+            # 'border': 1,
+            # 'bold': True
+        # })
+        # center_format = workbook.add_format({
+            # 'align': 'center',
+            # 'valign': 'center',
+            # 'border': 1
+        # })
+        # merged_format_top = workbook.add_format({
+            # 'align': 'left',
+            # 'valign': 'top',
+            # 'border': 1
+        # })
+        # merged_format_bottom = workbook.add_format({
+            # 'align': 'center',
+            # 'valign': 'bottom',
+            # 'border': 1
+        # })
+        # wrap_format = workbook.add_format({
+            # 'text_wrap': True,
+            # 'border': 1
+        # })
+        # wrap_format_top = workbook.add_format({
+            # 'text_wrap': True,
+            # 'valign': 'top',
+            # 'border': 1
+        # })
+        #
+        # # worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
+        # worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
+        # worksheet.write(1, 2, self.name, border_format)
+        # worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)
+        # worksheet.write(2, 2, self.insurance_id.name or '', border_format)
+        # worksheet.merge_range(3, 0, 3, 1, 'Merek Mobil', border_format)
+        # worksheet.write(3, 2, '%s %s' % (self.make, self.model), border_format)
+        # worksheet.merge_range(4, 0, 4, 1, 'No. Polisi / Chassis', wrap_format)
+        # worksheet.write(4, 2, '%s / %s' % (self.equipment_id.name, self.chassis_no), wrap_format)
+        # worksheet.merge_range(5, 0, 5, 1, 'Warna', border_format)
+        # worksheet.write(5, 2, self.base_colour or '', border_format)
+        #
+        # worksheet.merge_range(1, 3, 1, 4, 'Nama Pelanggan', border_format)
+        # worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, wrap_format)
+        # worksheet.merge_range(2, 3, 2, 4, 'Alamat', border_format)
+        # worksheet.merge_range(2, 5, 2, 6, self.partner_id.street or '', border_format)
+        # worksheet.merge_range(3, 3, 3, 4, 'Telepon', border_format)
+        # worksheet.merge_range(3, 5, 3, 6, self.partner_id.phone or '', border_format)
+        # worksheet.merge_range(4, 3, 4, 4, 'No. Polis Asuransi', wrap_format)
+        # worksheet.merge_range(4, 5, 4, 6, self.policy_no or '', wrap_format)
+        # worksheet.merge_range(5, 3, 5, 4, 'No. Berkas', border_format)
+        # worksheet.merge_range(5, 5, 5, 6, self.claim_id or '', border_format)
+        # # details
+        # worksheet.write(7, 0, 'No.', header_format)
+        # worksheet.merge_range(7, 1, 7, 3, 'KETERANGAN', header_format)
+        # worksheet.write(7, 4, 'QTY', header_format)
+        # worksheet.write(7, 5, 'HARGA SATUAN \n(Rp.)', header_format_wrap)
+        # worksheet.write(7, 6, 'TOTAL HARGA \n(Rp.)', header_format_wrap)
+        #
+        # worksheet.merge_range(8, 0, 8, 6, 'PERBAIKAN DAN PENGECATAN', section_format)
+        # row = 9
+        # idx = 1
+        # total_jasa = 0
+        # for o in self.fees_lines:
+            # worksheet.write(row, 0, idx, border_format)
+            # worksheet.write(row, 1, '', border_format)
+            # worksheet.merge_range(row, 2, row, 3, o.name, border_format)
+            # worksheet.write(row, 4, o.product_uom_qty, border_format)
+            # worksheet.write(row, 5, o.price_unit, number_format)
+            # worksheet.write(row, 6, o.price_subtotal, number_format)
+            # total_jasa += o.price_subtotal
+            # row += 1
+            # idx += 1
+        # worksheet.merge_range(row, 0, row, 5, 'Total Jasa', section_format)
+        # worksheet.write(row, 6, total_jasa, number_format)
+        # row += 1
+        #
+        # worksheet.merge_range(row, 0, row, 6, 'PENGGANTIAN SPAREPART', section_format)
+        # row += 1
+        # idx = 1
+        # total_spareparts = 0
+        # for r in self.operations:
+            # worksheet.write(row, 0, idx, border_format)
+            # worksheet.write(row, 1, r.part_number, border_format)
+            # worksheet.merge_range(row, 2, row, 3, r.name, border_format)
+            # worksheet.write(row, 4, r.product_uom_qty, border_format)
+            # worksheet.write(row, 5, r.price_unit, number_format)
+            # worksheet.write(row, 6, r.price_subtotal, number_format)
+            # total_spareparts += r.price_subtotal
+            # row += 1
+            # idx += 1
+        # worksheet.merge_range(row, 0, row, 5, 'Total Sparepart', section_format)
+        # worksheet.write(row, 6, total_spareparts, number_format)
+        #
+        # row += 1
+        # worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
+        # worksheet.write(row, 6, self.amount_untaxed, number_format)
+        #
+        # row += 1
+        # total = total_spareparts + total_jasa
+        # worksheet.merge_range(row, 0, row, 1, 'Terbilang:', border_format)
+        # worksheet.merge_range(row, 2, row, 4, num2words(total, lang='id'), wrap_format)
+        # worksheet.merge_range(row, 5, row, 6, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
+        #
+        # row += 1
+        # worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
+        # worksheet.merge_range(row, 2, row + 2, 4, self.quotation_notes or '', wrap_format_top)
+        # worksheet.merge_range(row, 5, row + 2, 6, self.service_advisor or '', merged_format_bottom)
+        # # Save workbook
+        # workbook.close()
+        # # read and save as binary
+        # with open(file_name, "rb") as file:
+            # file_base64 = base64.b64encode(file.read())
+            #
+        # record_id = self.env['service.order.excel.wizard'].create(
+            # {'excel_file': file_base64, 'excel_file_name': 'testing.xls'})
+            #
+        # return {
+            # 'name': _('Excel file created'),
+            # 'view_mode': 'form',
+            # 'res_id': record_id.id,
+            # 'res_model': 'service.order.excel.wizard',
+            # 'view_type': 'form',
+            # 'type': 'ir.actions.act_window',
+            # # 'context': context
+            # 'target': 'new',
+        # }
 
 class ServiceOrderExcelWizard(models.TransientModel):
     _name = 'service.order.excel.wizard'

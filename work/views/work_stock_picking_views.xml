@@ -6,14 +6,22 @@
 			<field name="model">stock.picking</field>
 			<field name="inherit_id" ref="stock.view_picking_form" />
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='has_packages']" position="after">
+					<button name="action_create_purchase" type="object" string="Create PO" invisible="1"/>
+<!-- 						attrs="{'invisible': [('state', 'not in', ('waiting', 'confirmed'))]}"/> -->
+<!-- 					<button name="action_create_supply_receipt" type="object" string='Todo' groups="service.group_service_manager"/> -->
+				</xpath>
 				<xpath expr="//field[@name='backorder_id']" position="after">
 					<field name="picking_type_code" invisible="1" />
-					<field name="service_id" />
+<!-- 					<field name="service_id" /> -->
 					<field name="eq_name" />
 					<field name="eq_model" />
 				</xpath>
 				
 				<xpath expr="//field[@name='origin']" position="after">
+					<field name="po_created" invisible="1"/>
+					<field name="purchase_ids" widget="many2many_tags"
+						attrs="{'invisible': [('po_created', '!=', True)]}"/>
 					<field name="receiver"
 						attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" />
 					<field name="received_date"

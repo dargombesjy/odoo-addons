@@ -15,8 +15,7 @@ class PurchaseOrder(models.Model):
     service_id = fields.Many2one('service.order', 'Service', copy=False)
     eq_name = fields.Char('No. Plat')
     eq_model = fields.Char('Model')
-    # eq_name = fields.Char('License Plate', compute="_compute_equipment", store=True)
-    # eq_model = fields.Char('Model', compute="_compute_equipment")
+    picking_id = fields.Many2one('stock.picking', 'Picking', copy=False)
     receiver = fields.Char('Receiver')
 
     @api.one
@@ -41,19 +40,31 @@ class PurchaseOrder(models.Model):
         res['context']['default_eq_name'] = self.service_id.equipment_id.name
         res['context']['default_origin_type'] = self.po_type
         return res
+    
+    def _prepare_po_line_from_move_line(self, line):
+        data = {}
         
-#     @api.one
-#     @api.depends('service_id')
-#     def _compute_equipment(self):
-#         eq = self.service_id.equipment_id
-#         self.eq_name = eq.name
-#         details = eq.get_details()
-# #         self.eq_make = details['make']
-#         self.eq_model = details['model']
+        return data
+    
+    @api.onchange('picking_id')
+    def picking_change(self):
+        if not self.picking_id:
+            return {}
+        new_lines = self.env['purchase.order.line']
+        for line in self.picking_id.move_line - self.order_line.mapped('move_id'):
+            data = self._prepare_po_line_from_move_line(line)
+            new_line = new_lines.new(data)
+            new_lines += new_line
+
+        self.order_line += new_lines
+        # self.env.context = dict(self.env.context, from_purchase_order_change=True)
+        self.picking_id = False
+        return {}
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
-
+    
+    move_id = fields.Many2one('stock.move', 'Stock Move', copy=False)
     discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
 
     def _prepare_compute_all_values(self):

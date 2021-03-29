@@ -65,6 +65,7 @@ encoding//zdg_inventory/__manifest__.py=utf-8
 encoding//zdg_inventory/models/__init__.py=utf-8
 encoding//zdg_inventory/models/inventory_move.py=utf-8
 encoding//zdg_inventory/models/product.py=utf-8
+encoding//zdg_inventory/models/stock.py=utf-8
 encoding//zdg_inventory/report/report_move.py=utf-8
 encoding//zdg_inventory/wizards/stock_move_wizard.py=utf-8
 encoding//zpurchase/__init__.py=utf-8

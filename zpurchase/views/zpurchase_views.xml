@@ -10,8 +10,8 @@
 					<field name="po_type" />
 				</xpath>
 				<xpath expr="//field[@name='company_id']" position="after">
-					<field name="service_id"
-						attrs="{'invisible': [('po_type', '=', 'general')]}" />
+<!-- 					<field name="service_id" -->
+<!-- 						attrs="{'invisible': [('po_type', '=', 'general')]}" /> -->
 					<field name="eq_name"
 						attrs="{'invisible': [('po_type', '=', 'general')]}" />
 					<field name="eq_model"

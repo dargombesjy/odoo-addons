@@ -3,6 +3,7 @@ from datetime import datetime
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
+from passlib.tests.utils import limit
 
 class ServiceOrder(models.Model):
     _inherit = 'service.order'
@@ -80,7 +81,7 @@ class ServiceOrder(models.Model):
                         'product_qty': v.product_uom_qty,
                         'product_uom': v.product_uom.id,
                         'price_unit': v.cost_unit,
-                        'qty_received': v.product_uom_qty  # all services were received
+                        # 'qty_received': v.product_uom_qty  # all services were received
                     })
                     v.write({'purchased': True, 'purchase_line_id': purchase_line.id})
                     service.write({'purchase_ids': [(4, purchase.id)]})
@@ -165,6 +166,8 @@ class ServiceOrder(models.Model):
         Picking = self.env['stock.picking']
         Move_Line = self.env['stock.move']
         partner = self.partner_id
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.company_id.id)], limit=1)
+        pick = self.env['stock.picking.type'].search([('name', '=', 'Delivery Orders'), ('warehouse_id', '=', warehouse.id)], limit=1)
         for service in self:
             outs_sp = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
             outs = service.consumable_lines.filtered(lambda line: line.requested == False)
@@ -183,7 +186,8 @@ class ServiceOrder(models.Model):
                     'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,
-                    'picking_type_id': 2,
+                    # 'picking_type_id': 2,
+                    'picking_type_id': pick.id,
                     'location_id': service.location_id.id, # 12,
                     'location_dest_id': 9,
                     'state': 'draft',
@@ -200,7 +204,8 @@ class ServiceOrder(models.Model):
                         'name': bahan_sp.name,
                         'product_category': 'Bahan',
                         'picking_id': picking.id,
-                        'picking_type_id': 2,
+                        # 'picking_type_id': 2,
+                        'picking_type_id': pick.id,
                         'product_id': bahan_sp.product_id.id,
                         'product_uom_qty': bahan_sp.product_uom_qty,
                         'product_uom': bahan_sp.product_uom.id,
@@ -220,7 +225,8 @@ class ServiceOrder(models.Model):
                         'name': bahan.name,
                         'product_category': 'Consumable',
                         'picking_id': picking.id,
-                        'picking_type_id': 2,
+                        # 'picking_type_id': 2,
+                        'picking_type_id': pick.id,
                         'product_id': bahan.product_id.id,
                         'product_uom_qty': bahan.product_uom_qty,
                         'product_uom': bahan.product_uom.id,
