@@ -2,8 +2,6 @@
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from .service import SUPPLY_TYPES
-from passlib.tests.utils import limit
-from orca.scripts import self_voicing
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
