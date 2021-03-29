@@ -7,8 +7,8 @@
 			<field name="inherit_id" ref="stock.view_picking_form" />
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='has_packages']" position="after">
-					<button name="action_create_purchase" type="object" string="Create PO" invisible="1"/>
-<!-- 						attrs="{'invisible': [('state', 'not in', ('waiting', 'confirmed'))]}"/> -->
+					<button name="action_create_purchase" type="object" string="Create PO"
+						attrs="{'invisible': [('state', 'not in', ('waiting', 'confirmed'))]}"/>
 <!-- 					<button name="action_create_supply_receipt" type="object" string='Todo' groups="service.group_service_manager"/> -->
 				</xpath>
 				<xpath expr="//field[@name='backorder_id']" position="after">

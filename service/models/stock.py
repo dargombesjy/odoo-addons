@@ -167,6 +167,8 @@ class StockPicking(models.Model):
     def action_create_purchase(self):
         Purchase = self.env['purchase.order']
         Purchase_Line = self.env['purchase.order.line']
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.service_id.company_id.id)], limit=1)
+        pick_type = self.env['stock.picking.type'].search([('name', '=', 'Receipts'), ('warehouse_id', '=', warehouse.id)], limit=1)
 
         for pick in self:
             if pick.purchase_ids:
@@ -180,7 +182,9 @@ class StockPicking(models.Model):
                     'origin': 'Part-%s.' % (pick.service_id.name),
                     'service_id': pick.service_id.id,
                     'eq_name': pick.eq_name,
+                    'eq_model': pick.eq_model,
                     'partner_id': item[0].id,
+                    'picking_type_id': pick_type.id,
                     'state': 'draft',
                 })
                 for v in item[1]:
