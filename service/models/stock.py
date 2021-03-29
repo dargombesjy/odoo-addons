@@ -55,11 +55,12 @@ class StockPicking(models.Model):
         also impact the state of the picking as it is computed based on move's states.
         @return: True
         """
-        not_valid = self.mapped('move_lines').filtered(lambda move: move.picking_type_id.name == 'Pick' and (move.vendor_qty == 0 or not move.vendor_date))
-        if not_valid:
-            raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
         
         if self.picking_type_id.name == 'Pick':
+            not_valid = self.mapped('move_lines').filtered(lambda move: move.vendor_qty == 0 or not move.vendor_date)
+            if not_valid:
+                raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
+            
             to_receive = self.mapped('move_lines')\
                 .filtered(lambda move:move.supply_type == 'vendor' and move.product_category == 'Sparepart'\
                 and move.vendor_id and move.vendor_qty > 0 and move.vendor_date and not move.auto_receipt_id)

@@ -240,3 +240,8 @@ class ProductProduct(models.Model):
                           }
                 result.append(_name_get(mydict))
         return result
+    
+    # @api.model
+    # def create(self, vals):
+        # res = super(ProductProduct, self).create(vals)
+        # return res
