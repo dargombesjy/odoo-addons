@@ -21,6 +21,11 @@ class StockPicking(models.Model):
         'picking_id', 'purchase_order_id', 'Purchase Orders')
 
     @api.one
+    @api.depends('picking_type_id')
+    def _compute_vendor_detail(self):  
+        pass
+    
+    @api.one
     @api.depends('origin')
     def _compute_ispart(self):
         self.is_sparepart = True
@@ -50,7 +55,7 @@ class StockPicking(models.Model):
         also impact the state of the picking as it is computed based on move's states.
         @return: True
         """
-        not_valid = self.mapped('move_lines').filtered(lambda move:move.vendor_qty == 0 or not move.vendor_date)
+        not_valid = self.mapped('move_lines').filtered(lambda move: move.picking_type_id.name == 'Pick' and (move.vendor_qty == 0 or not move.vendor_date))
         if not_valid:
             raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
         

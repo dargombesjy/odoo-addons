@@ -124,8 +124,10 @@
 										attrs="{'column_invisible': [('parent.is_sparepart', '=', False)]}" />
 									<field name="vendor_id"
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
-									<field name="vendor_qty" invisible="0" />
-									<field name="vendor_date" invisible="0" />
+									<field name="vendor_qty"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
+									<field name="vendor_date"
+										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="vendor_received" invisible="1" />
 									<field name="is_initial_demand_editable" invisible="1" />
 									<field name="is_quantity_done_editable" invisible="1" />
