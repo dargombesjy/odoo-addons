@@ -57,7 +57,7 @@ class StockPicking(models.Model):
         """
         
         if self.picking_type_id.name == 'Pick':
-            not_valid = self.mapped('move_lines').filtered(lambda move: move.vendor_qty == 0 or not move.vendor_date)
+            not_valid = self.mapped('move_lines').filtered(lambda move: move.product_category == 'Sparepart' and (move.vendor_qty == 0 or not move.vendor_date))
             if not_valid:
                 raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
             
