@@ -138,9 +138,36 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
     def generate_xlsx_report(self, workbook, data, objs):
         sheet = workbook.add_worksheet('general_ledger')
         journals = objs['print_journal']
-        sheet.write(1, 1, ', '.join([lt or '' for lt in journals]))
-    
+        Accounts = objs['Accounts']
 
+        row = 2
+        sheet.write(row, 1, '%s: %s' % (res_company.name, 'General Ledger'))
+        row += 1
+        pj = ', '.join([lt or '' for lt in journals])
+        sheet.write(row, 1, 'Journals: %s' % (pj))
+        row += 2
+        sheet.write(row, 1, 'Date')
+        sheet.write(row, 2, 'Journal')
+        sheet.write(row, 3, 'Partner')
+        sheet.write(row, 4, 'Ref')
+        sheet.write(row, 5, 'Move')
+        sheet.write(row, 6, 'Entry Label')
+        sheet.write(row, 7, 'Debit')
+        sheet.write(row, 8, 'Credit')
+        sheet.write(row, 9, 'Balance')
+        sheet.write(row, 10, 'Currency')
+        row += 1
+        for account in Accounts:
+            sheet.write(row, 1, account['code'])
+            sheet.write(row, 2, account['name'])
+            sheet.write(row, 3, account['debit'])
+            sheet.write(row, 4, account['credit'])
+            sheet.write(row, 5, account['balance'])
+            row += 1
+            for line in account['move_lines']:
+                pass
+    
+# this is the pdf version
 class ReportGeneralLedger(models.AbstractModel):
     _name = 'report.zdg_account_report.report_generalledger'
 
