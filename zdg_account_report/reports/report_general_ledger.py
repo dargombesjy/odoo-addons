@@ -137,9 +137,67 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
     
     def generate_xlsx_report(self, workbook, data, objs):
         sheet = workbook.add_worksheet('general_ledger')
+        number_format = workbook.add_format({
+            'num_format': '#,##0',
+            # 'border': 1
+        })
+        date_format = workbook.add_format({
+            'num_format': 'dd/mm/yyyy',
+            # 'border': 1
+        })
+        header_format = workbook.add_format({
+            'bold': True,
+            # 'align': 'center',
+            'valign': 'center',
+            # 'border': 1
+        })
+
         journals = objs['print_journal']
-        sheet.write(1, 1, ', '.join([lt or '' for lt in journals]))
-    
+
+        sheet.write(1, 1, 'General Ledger')
+        sheet.write(2, 1, 'Journals')
+        sheet.write(2, 2, ', '.join([lt or '' for lt in journals]))
+        sheet.write(3, 1, 'Date From')
+        sheet.write(3, 2, objs['data']['date_from'])
+        sheet.write(3, 3, 'Date To')
+        sheet.write(3, 4, objs['data']['date_to'])
+
+        row = 4
+        for account in objs['Accounts']:
+            row += 1
+            sheet.write(row, 1, account['code'])
+            sheet.write(row, 2, account['name'])
+            sheet.write(row, 7, account['debit'], number_format)
+            sheet.write(row, 8, account['credit'], number_format)
+            sheet.write(row, 9, account['balance'], number_format)
+            # sheet.write(row, 10, res_company.currency_id)
+            row += 1
+            sheet.write(row, 1, 'Date')
+            sheet.write(row, 2, 'Journal')
+            sheet.write(row, 3, 'Partner')
+            sheet.write(row, 4, 'Ref')
+            sheet.write(row, 5, 'Move')
+            sheet.write(row, 6, 'Entry Label')
+            sheet.write(row, 7, 'Debit')
+            sheet.write(row, 8, 'Credit')
+            sheet.write(row, 9, 'Balance')
+            # sheet.write(row, 10, 'Currency')
+            
+            for line in account['move_lines']:
+                row += 1
+                sheet.write(row, 1, line['ldate'], date_format)
+                sheet.write(row, 2, line['lcode'])
+                sheet.write(row, 3, line['partner_name'])
+                if line['lref']:
+                    sheet.write(row, 4, line['lref'])
+                sheet.write(row, 5, line['move_name'])
+                sheet.write(row, 6, line['lname'])
+                sheet.write(row, 7, line['debit'], number_format)
+                sheet.write(row, 8, line['credit'], number_format)
+                sheet.write(row, 9, line['balance'], number_format)
+                # sheet.write(row, 10, line['amount_currency'])
+            row += 1
+
 
 class ReportGeneralLedger(models.AbstractModel):
     _name = 'report.zdg_account_report.report_generalledger'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 from odoo import api, fields, models
 
 
@@ -16,6 +16,8 @@ class AccountingReport(models.TransientModel):
             reports = self.env['account.financial.report'].search([('name', 'ilike', menu)])
         return reports and reports[0] or False
 
+    date_from = fields.Date(string='Start Date',default=fields.Date.today)
+    date_to = fields.Date(string='End Date', default=fields.Date.today)
     enable_filter = fields.Boolean(string='Enable Comparison')
     account_report_id = fields.Many2one('account.financial.report', string='Account Reports', required=True, default=_get_account_report)
     label_filter = fields.Char(string='Column Label', help="This label will be displayed on report to show the balance computed for the given comparison filter.")

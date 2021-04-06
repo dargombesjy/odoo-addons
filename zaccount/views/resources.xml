@@ -1,0 +1,12 @@
+<odoo>
+  <data>
+    <template id="assets_backend" name="zaccount assets" inherit_id="web.assets_backend">
+      <xpath expr="//link[last()]" position="after">
+        <link rel="stylesheet" href="/zaccount/static/src/css/main.css"/>
+      </xpath>
+      <!-- <xpath expr="//script[1]" position="before">
+        <script type="text/javascript" src="/zaccount/static/src/js/main.js"></script>
+      </xpath> -->
+    </template>
+  </data>
+</odoo>

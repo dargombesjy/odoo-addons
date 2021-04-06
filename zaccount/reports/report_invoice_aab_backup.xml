@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <template id="report_invoice_aab">
+      <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+      <!-- <t t-foreach="docs" t-as="o"> -->
+        <!-- <t t-call="web.html_container"> -->
+          <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <!-- goes below are the contents   -->
+            <div class="page" style="font-size:0.95rem">
+              <style type="text/css">
+                .bold {
+                  font-weight: bold;
+                }
+                .table tr {
+                  border: none;
+                }
+              </style>
+              <!-- to  -->
+              <div class="mb8">
+                <div class="row">
+                  <div class="col-8">
+                  </div>
+                  <div class="col-4">
+                    <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                    <div><span>Kepada Yth:</span></div>
+                    <div><span style="font-weight:bold;">PT.Asuransi Astra Buana</span></div>
+                    <div><span>Graha Asuransi Astra 5th</span></div>
+                    <div><span>Jl. TB Simatupang Kav.15</span></div>
+                    <div><span>Cilandak Barat, Jakarta</span></div>
+                  </div>
+                </div>
+              </div>
+              <div><span>Dengan Hormat,</span></div>
+              <div class="mb8">
+                <span>Dengan telah diselesaikannya perbaikan kendaraan kami:</span>
+              </div>
+              <div class="mb8">
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Jenis</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span t-field="o.service_id.make"/><span> </span><span t-field="o.service_id.model"/></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>No.Polisi</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span t-field="o.service_id.equipment_id.name" /></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>No.Polis Asuransi</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span t-field="o.service_id.policy_no" /></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb8">
+                <span>Dalam keadaan baik, maka biaya perbaikan kendaraan kami dapat bayarkan kepada:</span>
+              </div>
+              <div class="mb8">
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Bengkel</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span><strong>PT. KARYA MURNI SENTOSA</strong></span></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Alamat</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span>Jl. Siliwangi Km.7 No. 50 Caringin</span></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span>Bojong Menteng - Rawa Lumbu, Bekasi</span></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Nama Bank</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span>Bank Mandiri</span></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Atas Nama</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span><strong>KARYA MURNI SENTOSA</strong></span></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>No. Rekening Bank</span></div>
+                  </div>
+                  <div class="col-9">
+                    <!-- <div>: <span><strong>156-0000-331167</strong></span></div> -->
+                    <div>: <strong><span t-field="o.company_id.partner_id.bank_ids[0].acc_number"></span></strong></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div><span>Alamat Bank</span></div>
+                  </div>
+                  <div class="col-9">
+                    <div>: <span><strong>Cab. Kemang Pratama Bekasi</strong></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb8">
+                <span>
+                  Yang bertanda tangan dibawah ini meng-subrogasikan kepada PT. Asuransi Astra Buana
+                  segala hak yang mungkin dipunyai terhadap pihak ketiga sebagai akibat daripada kerugian
+                  tersebut. Dalam hal barang-barang yang hilang diperoleh kembali seluruhnya atau sebagian,
+                  maka penandatanganan dibawah ini akan membayarkan kembali sebagian atau seluruh jumlah
+                  kerugian kepada PT. Asuransi Astra Buana. Demikian pemberitahuan dari kami dan Terima Kasih.
+                </span>
+              </div>
+              <div><span>Hormat kami</span></div>
+              <div style="height:75px"/>
+              <div>
+                <span><strong>PT. SERASI AUTORAYA</strong></span>
+              </div>
+              <div class="mt8 mb8" style="border-bottom:1px solid grey;">
+                <div class="row">
+                  <div class="col-3"><span>KWITANSI KLAIM NO</span></div>
+                  <div class="col-4">
+                    <div>: <span t-field="o.number"/></div>
+                  </div>
+                  <div class="col-3"><span>BERKAS KLAIM NO</span></div>
+                  <div class="col-3">
+                    <div>: <span t-field="o.service_id.claim_id"/></div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <span>TERIMA DARI</span>
+                  <span><strong>PT. Asuransi Astra Buana.</strong></span>
+                  <span>Uang sebesar tersebut dibawah ini sebagai penyelesaian klaim asuransi atas kerugian akibat
+                    kerusakan / kehilangan
+                  </span>
+                  <span><strong>NO. POL : </strong></span><span><strong t-field="o.service_id.equipment_id.name"/></span>
+                  <span><strong>Merk / Type : </strong></span><span><strong t-field="o.service_id.make"/></span>
+                  <span> - <strong t-field="o.service_id.model"/></span>
+                </div>
+                <div style="height:10px;"></div>
+                <div class="row">
+                  <div class="col-4">
+<!--                     <div><span>Total Tagihan Jasa</span></div> -->
+                    <div><span>Jasa</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div>: <span t-field="o.wht_base" /></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+<!--                     <div><span>Total Tagihan Spareparts</span></div> -->
+                <div><span>Part</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_spareparts" /></div>
+                  </div>
+                </div>
+<!--                 <div class="row"> -->
+<!--                   <div class="col-4"> -->
+<!--                     <div><span>Lain-Lain</span></div> -->
+<!--                   </div> -->
+<!--                   <div class="col-3"> -->
+<!--                     <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div> -->
+<!--                   </div> -->
+<!--                 </div> -->
+				<t t-set="gross" t-value="o.amount_untaxed + o.own_risk"/>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>Jumlah</span></div>
+                  </div>
+                  <div class="col-3">
+<!--                     <div>: <span t-field="o.amount_untaxed" /></div> -->
+					<div>: <span t-esc="gross" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>PPN</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.amount_tax" /></div>
+                  </div>
+                </div>
+                <t t-set="subtotal" t-value="o.amount_untaxed + o.amount_tax + o.own_risk"/>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>Total</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div>: <span t-esc="subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>OR</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div>: <span t-field="o.own_risk" /></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>PPH 23</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.amount_wht" /></div>
+                  </div>
+                </div>
+                <!-- <t t-set="total_tagihan" t-value="o.residual - o.amount_wht"/> -->
+                <div class="row mb8">
+                  <div class="col-4">
+                    <div><span>Grand Total</span></div>
+                  </div>
+                  <div class="col-3">
+                  	<!-- <div>: <span id="residual" t-esc="total_tagihan"
+                  				 t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                  	</div> -->
+                    <div>: <span id="residual" t-field="o.residual" /></div>
+                  </div>
+                </div>
+                <div class="row mb8">
+                  <div class="col-4">
+                    <div>
+                    	<span>
+                    		<strong>Jumlah: </strong>
+                    	</span>
+                    	<span>
+                    		<!-- <strong t-esc="total_tagihan"
+                    				t-options='{"widget": "monetary", "display_currency": o.currency_id}'/> -->
+                    		<strong t-field="o.residual"/>
+                    	</span>
+                    </div>
+                  </div>
+                  <div class="col-8">
+                    <div><span id="terbilang" class="bold"></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb8">
+                <span>Dengan menandatangani Kwitansi ini sebagai tanda lunas sepenuhnya, maka kami mengakui / menyatakan
+                  tidak mempunyai tagihan apapun lagi terhadap <strong>PT. Asuransi Astra Buana</strong> Mengenai Klaim ini.
+                </span>
+              </div>
+              <div>
+                <div class="row">
+                  <div class="col-8">
+                  </div>
+                  <div class="col-4 text-center">
+                    <span t-esc="'Bekasi, ' + context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                    <div style="height: 130px;"></div>
+                    <div><span class="bold">( REFDISON )</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </t>
+        </t>
+        <script type="text/javascript" src="/zaccount/static/src/js/main.js"></script>
+        <script>
+          (function() {
+            //var converter = new NumToWordsIdn
+            var angka = document.getElementById('residual').innerText;
+            angka = angka.replace('Rp', '');
+            angka = angka.replace(/\s/g, '');
+            //angka = angka.replace('/\./g', '');
+            angka = angka.replace(/\,/g, '');
+            document.getElementById('terbilang').innerHTML = toWordsconver(parseFloat(angka));
+          })();
+        </script>
+      </t>
+    </template>
+  </data>
+</odoo>

@@ -10,6 +10,7 @@
     """,
     'data': [
         'data/ir_sequence_data.xml',
+        'views/resources.xml',
         'views/partner_views.xml',
         'views/zaccount_invoice_views.xml',
         'views/zreport_invoice.xml',
