@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 import re
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 from odoo.osv import expression
 
-# class ProductTemplate(models.Model):
-#     _inherit = 'product.template'
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
 
-#     make_id = fields.Many2one('service.equipment.make', 'Manufacturer')
-#     model_id = fields.Many2one('service.equipment.variant', 'Model')
-#     generic_name = fields.Char('Nama umum')
-#     note = fields.Char('Keterangan')
+    @api.model
+    def create(self, vals):
+        if vals['type'] == 'product' and vals['categ_id'] == 4:
+            if not vals['make_id'] or not vals['model_id']:
+                raise UserError(_('Untuk Sparepart, field Manufacturer dan Model tolong diisi'))
+        res = super(ProductTemplate, self).create(vals)
+        return res
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -240,8 +244,3 @@ class ProductProduct(models.Model):
                           }
                 result.append(_name_get(mydict))
         return result
-    
-    # @api.model
-    # def create(self, vals):
-        # res = super(ProductProduct, self).create(vals)
-        # return res
