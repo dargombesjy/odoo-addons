@@ -153,7 +153,6 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
         })
 
         journals = objs['print_journal']
-<<<<<<< HEAD
 
         sheet.write(1, 1, 'General Ledger')
         sheet.write(2, 1, 'Journals')
@@ -198,37 +197,6 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
                 sheet.write(row, 9, line['balance'], number_format)
                 # sheet.write(row, 10, line['amount_currency'])
             row += 1
-
-=======
-        Accounts = objs['Accounts']
->>>>>>> 7b610d8cc6a0bdf2813a1baf8a380a8a96fb5e48
-
-        row = 2
-        sheet.write(row, 1, '%s: %s' % (res_company.name, 'General Ledger'))
-        row += 1
-        pj = ', '.join([lt or '' for lt in journals])
-        sheet.write(row, 1, 'Journals: %s' % (pj))
-        row += 2
-        sheet.write(row, 1, 'Date')
-        sheet.write(row, 2, 'Journal')
-        sheet.write(row, 3, 'Partner')
-        sheet.write(row, 4, 'Ref')
-        sheet.write(row, 5, 'Move')
-        sheet.write(row, 6, 'Entry Label')
-        sheet.write(row, 7, 'Debit')
-        sheet.write(row, 8, 'Credit')
-        sheet.write(row, 9, 'Balance')
-        sheet.write(row, 10, 'Currency')
-        row += 1
-        for account in Accounts:
-            sheet.write(row, 1, account['code'])
-            sheet.write(row, 2, account['name'])
-            sheet.write(row, 3, account['debit'])
-            sheet.write(row, 4, account['credit'])
-            sheet.write(row, 5, account['balance'])
-            row += 1
-            for line in account['move_lines']:
-                pass
     
 # this is the pdf version
 class ReportGeneralLedger(models.AbstractModel):
