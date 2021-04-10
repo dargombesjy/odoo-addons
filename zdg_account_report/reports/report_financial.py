@@ -163,8 +163,70 @@ class ReportFinancialXlsx(models.AbstractModel):
         }
     
     def generate_xlsx_report(self, workbook, data, objs):
-        sheet = workbook.add_worksheet('financial_report')
+        sheet = workbook.add_worksheet(objs['data']['account_report_id'][1])
+        number_normal = workbook.add_format({
+            'num_format': '#,##0',
+            # 'border': 1
+        })
+        number_bold = workbook.add_format({
+            'num_format': '#,##0',
+            'bold': True,
+            # 'border': 1
+        })
+        date_format = workbook.add_format({
+            'num_format': 'dd/mm/yyyy',
+            # 'border': 1
+        })
+        bold_right = workbook.add_format({
+            'bold': True,
+            'align': 'right',
+            # 'valign': 'center',
+            # 'border': 1
+        })
+        bold = workbook.add_format({
+            'bold': True,
+            # 'align': 'right',
+            # 'valign': 'center',
+            # 'border': 1
+        })
+        
+        sheet.write(1, 1, objs['data']['account_report_id'][1])
+        sheet.write(2, 1, 'Date From')
+        sheet.write(2, 2, objs['data']['date_from'])
+        sheet.write(2, 3, 'Date To')
+        sheet.write(2, 4, objs['data']['date_to'])
 
+        row = 4
+        col = 1
+        sheet.write(row, col, 'Name', bold)
+        if objs['data']['debit_credit'] == 1:
+            col += 1
+            sheet.write(row, col, 'Debit', bold_right)
+            col += 1
+            sheet.write(row, col, 'Credit', bold_right)
+        col += 1
+        sheet.write(row, col, 'Balance', bold_right)
+        if objs['data']['enable_filter'] == 1 and not objs['data']['debit_credit']:
+            col += 1
+            sheet.write(row, col, objs['data']['label_filter'], bold_right)
+
+        for a in objs['get_account_lines']:
+            row += 1
+            if not a['level'] > 3:
+                format = number_bold
+            else:
+                format = number_normal
+            text_left = '..' * a.get('level', 0)
+            text_right = a.get('name')
+            sheet.write(row, 1, '%s %s' % (text_left, text_right), format)
+            col = 2
+            if objs['data']['debit_credit'] == 1:
+                sheet.write(row, 2, a.get('debit'), format)
+                sheet.write(row, 3, a.get('credit'), format)
+                col = 4
+            sheet.write(row, col, a.get('balance'), format)
+        
+# this is the PDF version
 class ReportFinancial(models.AbstractModel):
     _name = 'report.zdg_account_report.report_financial'
 

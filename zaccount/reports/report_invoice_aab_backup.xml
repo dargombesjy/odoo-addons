@@ -290,7 +290,7 @@
             angka = angka.replace(/\s/g, '');
             //angka = angka.replace('/\./g', '');
             angka = angka.replace(/\,/g, '');
-            document.getElementById('terbilang').innerHTML = toWordsconver(parseFloat(angka));
+            document.getElementById('terbilang').innerHTML = NumToWordsIdn.toWordsconver(parseFloat(angka));
           })();
         </script>
       </t>

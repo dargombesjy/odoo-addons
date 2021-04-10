@@ -9,6 +9,8 @@ class AccountReportGeneralLedger(models.TransientModel):
     _name = "account.report.general.ledger"
     _description = "General Ledger Report"
 
+    date_from = fields.Date(string='Start Date',default=fields.Date.today)
+    date_to = fields.Date(string='End Date', default=fields.Date.today)
     initial_balance = fields.Boolean(string='Include Initial Balances',
                                     help='If you selected date, this field allow you to add a row to display the amount of debit/credit/balance that precedes the filter you\'ve set.')
     sortby = fields.Selection([('sort_date', 'Date'), ('sort_journal_partner', 'Journal & Partner')], string='Sort by', required=True, default='sort_date')

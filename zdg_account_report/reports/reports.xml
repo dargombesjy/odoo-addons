@@ -16,5 +16,5 @@
 			report_type="xlsx"
 			menu="False"
 			name="zdg_account_report.report_financial_xlsx"
-			file="zdg_account_report.report_financial" />
+			file="Financial Report" />
 </odoo>
