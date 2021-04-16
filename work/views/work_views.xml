@@ -258,15 +258,23 @@
 			<field name="arch" type="xml">
 				<pivot string="Service Order" display_quantity="True">
 					<field name="company_id" type="row" />
-					<field name="bill_type" type="row" />
+					<!-- <field name="bill_type" type="row" /> -->
 					<field name="state" type="col" />
-					<field name="amount_total" type="measure" string="Pend. Total"/>
-					<field name="amount_untaxed" type="measure" string="Pend. Total sebelum PPN"/>
-					<field name="amount_tax" type="measure" string="PPN Total"/>
-					<field name="amount_tax_sparepart" type="measure" string="PPN Sparepart"/>
-					<field name="amount_tax_jasa" type="measure" string="PPN Jasa"/>
-					<field name="amount_tax_others" type="measure" string="PPN Other"/>
-					<field name="amount_own_risk" type="measure" string="Pend. Own Risk"/>
+					<!-- <field name="cost_total" type="measure" groups="work.group_work_user"/> -->
+					<!-- <field name="cost_operations" type="measure" groups="work.group_work_user"/>
+					<field name="cost_fees" type="measure" groups="work.group_work_user"/>
+					<field name="cost_others" type="measure" groups="work.group_work_user"/>
+					<field name="cost_bahan" type="measure" groups="work.group_work_user"/> -->
+					<field name="amount_sparepart" invisible="1"/>
+					<field name="amount_jasa" invisible="1"/>
+					<field name="amount_others" invisible="1"/>
+					<field name="amount_total" invisible="1"/>
+					<field name="amount_untaxed" invisible="1"/>
+					<field name="amount_tax" invisible="1"/>
+					<field name="amount_tax_sparepart" invisible="1"/>
+					<field name="amount_tax_jasa" invisible="1"/>
+					<field name="amount_tax_others" invisible="1"/>
+					<field name="amount_own_risk" invisible="1"/>
 				</pivot>
 			</field>
 		</record>
@@ -277,7 +285,7 @@
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">service.order</field>
 			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">pivot,tree,form</field>
 		</record>
 
 		<record id="action_work_order_tree"
@@ -293,6 +301,14 @@
 			<field name="sequence" eval="2" />
 			<field name="view_mode">form</field>
 			<field name="view_id" ref="view_work_order_form" />
+			<field name="act_window_id" ref="action_work_order_list" />
+		</record>
+
+		<record id="action_work_order_pivot"
+			model="ir.actions.act_window.view">
+			<field name="sequence" eval="3" />
+			<field name="view_mode">pivot</field>
+			<field name="view_id" ref="view_work_order_pivot" />
 			<field name="act_window_id" ref="action_work_order_list" />
 		</record>
 

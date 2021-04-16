@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <record id="action_dashboard_production"
+    <!-- <record id="action_dashboard_production"
       	model="ir.actions.act_window">
       	<field name="name">Dashboard Production</field>
       	<field name="type">ir.actions.act_window</field>
       	<field name="res_model">service.order</field>
       	<field name="view_type">form</field>
       	<field name="view_mode">pivot,tree</field>      
-    </record>
+    </record> -->
     
     <menuitem id="menu_main_zdg_dashboard" name="Dashboard"
       	sequence="40" groups="service.group_service_manager"/>
       
-    <menuitem id="menu_dashboard_production" name="Production"
+    <!-- <menuitem id="menu_dashboard_production" name="Production"
       	parent="menu_main_zdg_dashboard"
-      	action="action_dashboard_production"/>
+      	action="action_dashboard_production"/> -->
       
   </data>
 </odoo>
