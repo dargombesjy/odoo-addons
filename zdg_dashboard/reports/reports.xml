@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <report id="report_service_order"
+			model="zdg_dashboard.service.order.wizard"
+			string="Report Service Order"
+			report_type="xlsx"
+			menu="False"
+			name="zdg_dashboard.report_service_order_xlsx"
+			file="Report Service Order"/>
+
+        <report id="report_own_risk"
+			model="zdg_dashboard.own.risk.wizard"
+			string="Report Own Risk"
+			report_type="qweb-pdf"
+			name="zdg_dashboard.template_report_own_risk"
+			menu="False"/>
+
+    </data>
+</odoo>

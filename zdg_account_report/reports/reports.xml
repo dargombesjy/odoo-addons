@@ -8,13 +8,14 @@
             name="zdg_account_report.report_generalledger_xlsx"
             file="General Ledger"
             attachment_use="False"/>
-    </data>
 
-    <report id="action_report_financial"
-			model="account.financial.report"
-			string="Financial report"
-			report_type="xlsx"
-			menu="False"
-			name="zdg_account_report.report_financial_xlsx"
-			file="Financial Report" />
+	    <report id="action_report_financial"
+				model="account.financial.report"
+				string="Financial report"
+				report_type="xlsx"
+				menu="False"
+				name="zdg_account_report.report_financial_xlsx"
+				file="Financial Report"/>
+
+    </data>
 </odoo>
