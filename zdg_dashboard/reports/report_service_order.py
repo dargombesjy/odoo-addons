@@ -128,32 +128,21 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         sheet.write(2, 4, objs['data']['date_to'])
 
         row = 4
-        col = 2
+        col = 1
         if objs['data']['with_details']:
             col += 1
-        sheet.write(row, col, 'Pendapatan Sblm. Pajak', bold_right)
-        col += 1
-        sheet.write(row, col, 'Cost Total', bold_right)
-        col += 1
-        sheet.write(row, col, 'Margin', bold_right)
-        col += 2
-        sheet.write(row, col, 'Pend. Sparepart', bold_right)
-        col += 1
-        sheet.write(row, col, 'Cost Sparepart', bold_right)
-        col += 1
-        sheet.write(row, col, 'Pend. Jasa', bold_right)
-        col += 1
-        sheet.write(row, col, 'Biaya Borongan', bold_right)
-        col += 1
-        sheet.write(row, col, 'Biaya Bahan', bold_right)
-        col += 1
-        sheet.write(row, col, 'Pend. Lain2', bold_right)
-        col += 1
-        sheet.write(row, col, 'Biaya Lain2', bold_right)
-        col += 2
-        sheet.write(row, col, 'PPN', bold_right)
-        col += 1
-        sheet.write(row, col, 'Pend. Own Risk', bold_right)
+        sheet.write(row, col + 1, 'Pendapatan Sblm. Pajak', bold_right)
+        sheet.write(row, col + 2, 'Cost Total', bold_right)
+        sheet.write(row, col + 3, 'Margin', bold_right)
+        sheet.write(row, col + 5, 'Pend. Sparepart', bold_right)
+        sheet.write(row, col + 6, 'Cost Sparepart', bold_right)
+        sheet.write(row, col + 7, 'Pend. Jasa', bold_right)
+        sheet.write(row, col + 8, 'Biaya Borongan', bold_right)
+        sheet.write(row, col + 9, 'Biaya Bahan', bold_right)
+        sheet.write(row, col + 10, 'Pend. Lain2', bold_right)
+        sheet.write(row, col + 11, 'Biaya Lain2', bold_right)
+        sheet.write(row, col + 13, 'PPN', bold_right)
+        sheet.write(row, col + 14, 'Pend. Own Risk', bold_right)
         
         # claim
         row += 1
@@ -191,30 +180,18 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         if order['name'] == 'claim':
                             col += 1
                             sheet.write(row, col, o['partner_name'])
-                        col += 1
-                        sheet.write(row, col, o['amount_untaxed'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['cost_total'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['amount_untaxed'] - o['cost_total'], number_normal)
-                        col += 2
-                        sheet.write(row, col, o['amount_sparepart'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['cost_operations'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['amount_jasa'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['cost_fees'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['cost_bahan'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['amount_others'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['cost_others'], number_normal)
-                        col += 2
-                        sheet.write(row, col, o['amount_tax'], number_normal)
-                        col += 1
-                        sheet.write(row, col, o['amount_own_risk'], number_normal)
+                        sheet.write(row, col + 1, o['amount_untaxed'], number_normal)
+                        sheet.write(row, col + 2, o['cost_total'], number_normal)
+                        sheet.write(row, col + 3, o['amount_untaxed'] - o['cost_total'], number_normal)
+                        sheet.write(row, col + 5, o['amount_sparepart'], number_normal)
+                        sheet.write(row, col + 6, o['cost_operations'], number_normal)
+                        sheet.write(row, col + 7, o['amount_jasa'], number_normal)
+                        sheet.write(row, col + 8, o['cost_fees'], number_normal)
+                        sheet.write(row, col + 9, o['cost_bahan'], number_normal)
+                        sheet.write(row, col + 10, o['amount_others'], number_normal)
+                        sheet.write(row, col + 11, o['cost_others'], number_normal)
+                        sheet.write(row, col + 13, o['amount_tax'], number_normal)
+                        sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
                         row += 1
                 row += 1
             row += 1
