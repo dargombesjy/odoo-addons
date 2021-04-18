@@ -153,8 +153,8 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             if order[1]['name'] == 'claim': 
                 sheet.write(row, col, 'Insurance', bold_h4)
             col += 1
-            for agg_c in order[1]['aggregates'].items():
-                sheet.write(row, col, agg_c[1], bold_h4)
+            for agg in order[1]['aggregates'].items():
+                sheet.write(row, col, '%s %s' % (agg[0], agg[1]), bold_h4)
                 col += 1
                 # if agg_c[0] == 'margin' or agg_c[0] == 'cost_others':
                 #     col += 1
@@ -193,6 +193,6 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         #                 sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
         #                 row += 1
         #         row += 1
-        #     row += 1
+            row += 1
 
         
