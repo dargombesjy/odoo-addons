@@ -11,9 +11,10 @@
 					<group>
 						<field name="date_from"/>
 						<field name="date_to"/>
+						<field name="with_details"/>
 					</group>
 					<footer>
-						<button name="get_wizard_values" string="Print Report" type="object" class="oe_highlight"/>
+						<button name="get_wizard_values" string="Get Report" type="object" class="oe_highlight"/>
 						<button string="Cancel" class="btn btn-secondary" special="cancel"/>
 					</footer>
 				</form>

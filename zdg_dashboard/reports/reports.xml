@@ -12,9 +12,10 @@
         <report id="report_own_risk"
 			model="zdg_dashboard.own.risk.wizard"
 			string="Report Own Risk"
-			report_type="qweb-pdf"
-			name="zdg_dashboard.template_report_own_risk"
-			menu="False"/>
+			report_type="xlsx"
+			menu="False"
+			name="zdg_dashboard.report_own_risk_xlsx"
+			file="Report Own Risk"/>
 
     </data>
 </odoo>
