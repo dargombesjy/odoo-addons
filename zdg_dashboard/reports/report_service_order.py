@@ -129,70 +129,94 @@ class ReportServiceOrderXlsx(models.AbstractModel):
 
         row = 4
         col = 1
-        # if objs['data']['with_details']:
-        #     col += 1
+        if objs['data']['with_details']:
+            col += 1
         sheet.write(row, col + 1, 'Pendapatan Sblm. Pajak', bold_right)
         sheet.write(row, col + 2, 'Cost Total', bold_right)
         sheet.write(row, col + 3, 'Margin', bold_right)
-        sheet.write(row, col + 4, 'Pend. Sparepart', bold_right)
-        sheet.write(row, col + 5, 'Cost Sparepart', bold_right)
-        sheet.write(row, col + 6, 'Pend. Jasa', bold_right)
-        sheet.write(row, col + 7, 'Biaya Borongan', bold_right)
-        sheet.write(row, col + 8, 'Biaya Bahan', bold_right)
-        sheet.write(row, col + 9, 'Pend. Lain2', bold_right)
-        sheet.write(row, col + 10, 'Biaya Lain2', bold_right)
-        sheet.write(row, col + 11, 'PPN', bold_right)
-        sheet.write(row, col + 12, 'Pend. Own Risk', bold_right)
+        sheet.write(row, col + 5, 'Pend. Sparepart', bold_right)
+        sheet.write(row, col + 6, 'Cost Sparepart', bold_right)
+        sheet.write(row, col + 7, 'Pend. Jasa', bold_right)
+        sheet.write(row, col + 8, 'Biaya Borongan', bold_right)
+        sheet.write(row, col + 9, 'Biaya Bahan', bold_right)
+        sheet.write(row, col + 10, 'Pend. Lain2', bold_right)
+        sheet.write(row, col + 11, 'Biaya Lain2', bold_right)
+        sheet.write(row, col + 13, 'PPN', bold_right)
+        sheet.write(row, col + 14, 'Pend. Own Risk', bold_right)
         
         row += 1
         for order in orders.items():
             col = 1
             sheet.write(row, col, order[1]['description'], bold_h4)
-            # if objs['data']['with_details']:
-            #     col += 1
-            if order[1]['name'] == 'claim': 
-                sheet.write(row, col, 'Insurance', bold_h4)
-            col += 1
-            for agg in order[1]['aggregates'].items():
-                sheet.write(row, col, '%s %s' % (agg[0], agg[1]), bold_h4)
+            if objs['data']['with_details']:
                 col += 1
-                # if agg_c[0] == 'margin' or agg_c[0] == 'cost_others':
-                #     col += 1
+                if order[1]['name'] == 'claim': 
+                    sheet.write(row, col, 'Insurance', bold_h4)
+            # for agg in order[1]['aggregates'].items():
+                # sheet.write(row, col, '%s %s' % (agg[0], agg[1]), bold_h4)
+                # col += 1
+            agg = order[1]['aggregates']
+            sheet.write(row, col + 1, agg['amount_untaxed'], bold_h4)
+            sheet.write(row, col + 2, agg['cost_total'], bold_h4)
+            sheet.write(row, col + 3, agg['amount_untaxed'] - agg['cost_total'], bold_h4)
+            sheet.write(row, col + 5, agg['amount_sparepart'], bold_h4)
+            sheet.write(row, col + 6, agg['cost_operations'], bold_h4)
+            sheet.write(row, col + 7, agg['amount_jasa'], bold_h4)
+            sheet.write(row, col + 8, agg['cost_fees'], bold_h4)
+            sheet.write(row, col + 9, agg['cost_bahan'], bold_h4)
+            sheet.write(row, col + 10, agg['amount_others'], bold_h4)
+            sheet.write(row, col + 11, agg['cost_others'], bold_h4)
+            sheet.write(row, col + 13, agg['amount_tax'], bold_h4)
+            sheet.write(row, col + 14, agg['amount_own_risk'], bold_h4)
             
-        #     row += 1
-        #     for line_c in order['orders'].items():
-        #         col = 1
-        #         sheet.write(row, col, '%s %s' % ('..', line_c[1]['state_name']), bold)
-        #         if order['name'] == 'claim' and objs['data']['with_details']:
-        #             col += 1
-        #         col += 1
-        #         for s in line_c[1]['aggregates'].items():
-        #             sheet.write(row, col, s[1], number_bold)
-        #             col += 1
-        #             if s[0] == 'margin' or s[0] == 'cost_others':
-        #                 col += 1
-        #         if objs['data']['with_details']:
-        #             row += 1
-        #             for o in line_c[1]['order_lines']:
-        #                 col = 1
-        #                 sheet.write(row, col, '%s %s' % ('....', o['name']))
-        #                 if order['name'] == 'claim':
-        #                     col += 1
-        #                     sheet.write(row, col, o['partner_name'])
-        #                 sheet.write(row, col + 1, o['amount_untaxed'], number_normal)
-        #                 sheet.write(row, col + 2, o['cost_total'], number_normal)
-        #                 sheet.write(row, col + 3, o['amount_untaxed'] - o['cost_total'], number_normal)
-        #                 sheet.write(row, col + 5, o['amount_sparepart'], number_normal)
-        #                 sheet.write(row, col + 6, o['cost_operations'], number_normal)
-        #                 sheet.write(row, col + 7, o['amount_jasa'], number_normal)
-        #                 sheet.write(row, col + 8, o['cost_fees'], number_normal)
-        #                 sheet.write(row, col + 9, o['cost_bahan'], number_normal)
-        #                 sheet.write(row, col + 10, o['amount_others'], number_normal)
-        #                 sheet.write(row, col + 11, o['cost_others'], number_normal)
-        #                 sheet.write(row, col + 13, o['amount_tax'], number_normal)
-        #                 sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
-        #                 row += 1
-        #         row += 1
+            row += 1
+            for line_c in order[1]['orders'].items():
+                col = 1
+                sheet.write(row, col, '%s %s' % ('..', line_c[1]['state_name']), bold)
+                if order[1]['name'] == 'claim' and objs['data']['with_details']:
+                    col += 1
+                # col += 1
+                # for s in line_c[1]['aggregates'].items():
+                #     sheet.write(row, col, s[1], number_bold)
+                #     col += 1
+                #     if s[0] == 'margin' or s[0] == 'cost_others':
+                #         col += 1
+                s = line_c[1]['aggregates']
+                sheet.write(row, col + 1, s['amount_untaxed'], number_bold)
+                sheet.write(row, col + 2, s['cost_total'], number_bold)
+                sheet.write(row, col + 3, s['amount_untaxed'] - s['cost_total'], number_bold)
+                sheet.write(row, col + 5, s['amount_sparepart'], number_bold)
+                sheet.write(row, col + 6, s['cost_operations'], number_bold)
+                sheet.write(row, col + 7, s['amount_jasa'], number_bold)
+                sheet.write(row, col + 8, s['cost_fees'], number_bold)
+                sheet.write(row, col + 9, s['cost_bahan'], number_bold)
+                sheet.write(row, col + 10, s['amount_others'], number_bold)
+                sheet.write(row, col + 11, s['cost_others'], number_bold)
+                sheet.write(row, col + 13, s['amount_tax'], number_bold)
+                sheet.write(row, col + 14, s['amount_own_risk'], number_bold)
+
+                if objs['data']['with_details']:
+                    row += 1
+                    for o in line_c[1]['order_lines']:
+                        col = 1
+                        sheet.write(row, col, '%s %s' % ('....', o['name']))
+                        if order[1]['name'] == 'claim':
+                            col += 1
+                            sheet.write(row, col, o['partner_name'])
+                        sheet.write(row, col + 1, o['amount_untaxed'], number_normal)
+                        sheet.write(row, col + 2, o['cost_total'], number_normal)
+                        sheet.write(row, col + 3, o['amount_untaxed'] - o['cost_total'], number_normal)
+                        sheet.write(row, col + 5, o['amount_sparepart'], number_normal)
+                        sheet.write(row, col + 6, o['cost_operations'], number_normal)
+                        sheet.write(row, col + 7, o['amount_jasa'], number_normal)
+                        sheet.write(row, col + 8, o['cost_fees'], number_normal)
+                        sheet.write(row, col + 9, o['cost_bahan'], number_normal)
+                        sheet.write(row, col + 10, o['amount_others'], number_normal)
+                        sheet.write(row, col + 11, o['cost_others'], number_normal)
+                        sheet.write(row, col + 13, o['amount_tax'], number_normal)
+                        sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
+                        row += 1
+                row += 1
             row += 1
 
         
