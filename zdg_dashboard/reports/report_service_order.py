@@ -20,7 +20,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         states = [('draft', 'Quotation'), ('confirmed', 'Confirmed'), ('under_repair', 'Under Repair'),
             ('ready', 'Repair Done'), ('2binvoiced', 'To Be Invoiced'), ('done', 'Closed'),]
         # states = data['form']['state']
-        bill_types = []
+        bill_types = {}
         for (k, v) in [('claim', 'Bill to Insurance'), ('self', 'Bill to Customer'),]:
             ty = {
                 'name': k,
@@ -38,38 +38,38 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         'cost_bahan', 'amount_others', 'cost_others', 'amount_tax', 'amount_own_risk' ]),
                     'order_lines': [],
                 }
-            bill_types.append(ty)
+            bill_types[k] = ty
 
         for row in cr.dictfetchall():
             state = row.pop('state')
             bill = row.pop('bill_type')
-            for item in bill_types:
-                if item['name'] == bill:
-                    item['aggregates']['amount_untaxed'] += row['amount_untaxed']
-                    item['aggregates']['cost_total'] += row['cost_total']
-                    item['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']
-                    item['aggregates']['amount_sparepart'] += row['amount_sparepart']
-                    item['aggregates']['cost_operations'] += row['cost_operations']
-                    item['aggregates']['amount_jasa'] += row['amount_jasa']
-                    item['aggregates']['cost_fees'] += row['cost_fees']
-                    item['aggregates']['cost_bahan'] += row['cost_bahan']
-                    item['aggregates']['amount_others'] += row['amount_others']
-                    item['aggregates']['cost_others'] += row['cost_others']
-                    item['aggregates']['amount_tax'] += row['amount_tax']
-                    item['aggregates']['amount_own_risk'] += row['amount_own_risk']
-                    item['orders'][state]['aggregates']['amount_untaxed'] += row['amount_untaxed']
-                    item['orders'][state]['aggregates']['cost_total'] += row['cost_total']
-                    item['orders'][state]['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']
-                    item['orders'][state]['aggregates']['amount_sparepart'] += row['amount_sparepart']
-                    item['orders'][state]['aggregates']['cost_operations'] += row['cost_operations']
-                    item['orders'][state]['aggregates']['amount_jasa'] += row['amount_jasa']
-                    item['orders'][state]['aggregates']['cost_fees'] += row['cost_fees']
-                    item['orders'][state]['aggregates']['cost_bahan'] += row['cost_bahan']
-                    item['orders'][state]['aggregates']['amount_others'] += row['amount_others']
-                    item['orders'][state]['aggregates']['cost_others'] += row['cost_others']
-                    item['orders'][state]['aggregates']['amount_tax'] += row['amount_tax']
-                    item['orders'][state]['aggregates']['amount_own_risk'] += row['amount_own_risk']
-                    item['orders'][state]['order_lines'].append(row)
+            # for item in bill_types:
+            #     if item['name'] == bill:
+            bill_types[bill]['aggregates']['amount_untaxed'] += row['amount_untaxed']
+            bill_types[bill]['aggregates']['cost_total'] += row['cost_total']
+            bill_types[bill]['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']
+            bill_types[bill]['aggregates']['amount_sparepart'] += row['amount_sparepart']
+            bill_types[bill]['aggregates']['cost_operations'] += row['cost_operations']
+            bill_types[bill]['aggregates']['amount_jasa'] += row['amount_jasa']
+            bill_types[bill]['aggregates']['cost_fees'] += row['cost_fees']
+            bill_types[bill]['aggregates']['cost_bahan'] += row['cost_bahan']
+            bill_types[bill]['aggregates']['amount_others'] += row['amount_others']
+            bill_types[bill]['aggregates']['cost_others'] += row['cost_others']
+            bill_types[bill]['aggregates']['amount_tax'] += row['amount_tax']
+            bill_types[bill]['aggregates']['amount_own_risk'] += row['amount_own_risk']
+            bill_types[bill]['orders'][state]['aggregates']['amount_untaxed'] += row['amount_untaxed']
+            bill_types[bill]['orders'][state]['aggregates']['cost_total'] += row['cost_total']
+            bill_types[bill]['orders'][state]['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']
+            bill_types[bill]['orders'][state]['aggregates']['amount_sparepart'] += row['amount_sparepart']
+            bill_types[bill]['orders'][state]['aggregates']['cost_operations'] += row['cost_operations']
+            bill_types[bill]['orders'][state]['aggregates']['amount_jasa'] += row['amount_jasa']
+            bill_types[bill]['orders'][state]['aggregates']['cost_fees'] += row['cost_fees']
+            bill_types[bill]['orders'][state]['aggregates']['cost_bahan'] += row['cost_bahan']
+            bill_types[bill]['orders'][state]['aggregates']['amount_others'] += row['amount_others']
+            bill_types[bill]['orders'][state]['aggregates']['cost_others'] += row['cost_others']
+            bill_types[bill]['orders'][state]['aggregates']['amount_tax'] += row['amount_tax']
+            bill_types[bill]['orders'][state]['aggregates']['amount_own_risk'] += row['amount_own_risk']
+            bill_types[bill]['orders'][state]['order_lines'].append(row)
         return bill_types
 
     @api.model
@@ -134,30 +134,30 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         sheet.write(row, col + 1, 'Pendapatan Sblm. Pajak', bold_right)
         sheet.write(row, col + 2, 'Cost Total', bold_right)
         sheet.write(row, col + 3, 'Margin', bold_right)
-        sheet.write(row, col + 5, 'Pend. Sparepart', bold_right)
-        sheet.write(row, col + 6, 'Cost Sparepart', bold_right)
-        sheet.write(row, col + 7, 'Pend. Jasa', bold_right)
-        sheet.write(row, col + 8, 'Biaya Borongan', bold_right)
-        sheet.write(row, col + 9, 'Biaya Bahan', bold_right)
-        sheet.write(row, col + 10, 'Pend. Lain2', bold_right)
-        sheet.write(row, col + 11, 'Biaya Lain2', bold_right)
-        sheet.write(row, col + 13, 'PPN', bold_right)
-        sheet.write(row, col + 14, 'Pend. Own Risk', bold_right)
+        sheet.write(row, col + 4, 'Pend. Sparepart', bold_right)
+        sheet.write(row, col + 5, 'Cost Sparepart', bold_right)
+        sheet.write(row, col + 6, 'Pend. Jasa', bold_right)
+        sheet.write(row, col + 7, 'Biaya Borongan', bold_right)
+        sheet.write(row, col + 8, 'Biaya Bahan', bold_right)
+        sheet.write(row, col + 9, 'Pend. Lain2', bold_right)
+        sheet.write(row, col + 10, 'Biaya Lain2', bold_right)
+        sheet.write(row, col + 11, 'PPN', bold_right)
+        sheet.write(row, col + 12, 'Pend. Own Risk', bold_right)
         
         row += 1
-        for order in orders:
+        for order in orders.items():
             col = 1
-            sheet.write(row, col, order['description'], bold_h4)
+            sheet.write(row, col, order[1]['description'], bold_h4)
             # if objs['data']['with_details']:
             #     col += 1
-            if order['name'] == 'claim': 
+            if order[1]['name'] == 'claim': 
                 sheet.write(row, col, 'Insurance', bold_h4)
             col += 1
-            for agg_c in order['aggregates'].items():
+            for agg_c in order[1]['aggregates'].items():
                 sheet.write(row, col, agg_c[1], bold_h4)
                 col += 1
-                if agg_c[0] == 'margin' or agg_c[0] == 'cost_others':
-                    col += 1
+                # if agg_c[0] == 'margin' or agg_c[0] == 'cost_others':
+                #     col += 1
             
         #     row += 1
         #     for line_c in order['orders'].items():
