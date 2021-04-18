@@ -200,8 +200,8 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                     for o in line_c[1]['order_lines']:
                         col = 1
                         sheet.write(row, col, '%s %s' % ('....', o['name']))
+                        col += 1
                         if order[1]['name'] == 'claim':
-                            col += 1
                             sheet.write(row, col, o['partner_name'])
                         sheet.write(row, col + 1, o['amount_untaxed'], number_normal)
                         sheet.write(row, col + 2, o['cost_total'], number_normal)
