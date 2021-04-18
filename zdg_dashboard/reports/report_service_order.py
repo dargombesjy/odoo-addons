@@ -173,7 +173,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             for line_c in order[1]['orders'].items():
                 col = 1
                 sheet.write(row, col, '%s %s' % ('..', line_c[1]['state_name']), bold)
-                if order[1]['name'] == 'claim' and objs['data']['with_details']:
+                if objs['data']['with_details']:
                     col += 1
                 # col += 1
                 # for s in line_c[1]['aggregates'].items():
