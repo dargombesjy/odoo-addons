@@ -360,10 +360,10 @@ class StockMove(models.Model):
     @api.multi
     def write(self, values):
         lines = super(StockMove, self).write(values)
-        # for line in self:
-        #     if line.product_id and line.supply_type == 'self':
-        #         if line.product_id.standard_price == 0:
-        #             raise UserError(_('Product "%s" belum memiliki harga standar') % line.product_id.name)
+        for line in self:
+            if line.product_id and line.supply_type == 'self':
+                if line.product_id.standard_price == 0:
+                    raise UserError(_('Product "%s" belum memiliki harga standar') % line.product_id.name)
         return lines
     
     # def _generate_receipt(self):

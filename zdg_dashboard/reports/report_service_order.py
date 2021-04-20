@@ -10,6 +10,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
 
         sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name as partner_name,\
             s.amount_untaxed, s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,\
+            s.register_date, s.received_date, s.planned_date, s.finish_date,\
             s.amount_jasa, s.cost_fees, s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax\
             FROM service_order s\
             LEFT JOIN res_partner p ON (s.insurance_id=p.id)\
@@ -94,7 +95,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             'bold': True,
             # 'border': 1
         })
-        date_format = workbook.add_format({
+        date_normal = workbook.add_format({
             'num_format': 'dd/mm/yyyy',
             # 'border': 1
         })
@@ -131,18 +132,22 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         col = 1
         if objs['data']['with_details']:
             col += 1
-        sheet.write(row, col + 1, 'Pendapatan Sblm. Pajak', bold_right)
-        sheet.write(row, col + 2, 'Cost Total', bold_right)
-        sheet.write(row, col + 3, 'Margin', bold_right)
-        sheet.write(row, col + 5, 'Pend. Sparepart', bold_right)
-        sheet.write(row, col + 6, 'Cost Sparepart', bold_right)
-        sheet.write(row, col + 7, 'Pend. Jasa', bold_right)
+        sheet.write(row, col + 1, 'Nilai SPK', bold_right)
+        sheet.write(row, col + 2, 'Biaya SPK Total', bold_right)
+        sheet.write(row, col + 3, 'Gain / Loss', bold_right)
+        sheet.write(row, col + 5, 'Nilai Sparepart', bold_right)
+        sheet.write(row, col + 6, 'Biaya Sparepart', bold_right)
+        sheet.write(row, col + 7, 'Nilai Jasa', bold_right)
         sheet.write(row, col + 8, 'Biaya Borongan', bold_right)
         sheet.write(row, col + 9, 'Biaya Bahan', bold_right)
         sheet.write(row, col + 10, 'Pend. Lain2', bold_right)
         sheet.write(row, col + 11, 'Biaya Lain2', bold_right)
         sheet.write(row, col + 13, 'PPN', bold_right)
         sheet.write(row, col + 14, 'Pend. Own Risk', bold_right)
+        if objs['data']['with_details']:
+            sheet.write(row, col + 16, 'Tgl. Masuk')
+            sheet.write(row, col + 17, 'Tgl. Masuk Produksi')
+            sheet.write(row, col + 18, 'Tgl. Selesai')
         
         row += 1
         for order in orders.items():
@@ -215,6 +220,9 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         sheet.write(row, col + 11, o['cost_others'], number_normal)
                         sheet.write(row, col + 13, o['amount_tax'], number_normal)
                         sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
+                        sheet.write(row, col + 16, o['register_date'], date_normal)
+                        sheet.write(row, col + 17, o['received_date'], date_normal)
+                        sheet.write(row, col + 18, o['finish_date'], date_normal)
                         row += 1
                 row += 1
             row += 1
