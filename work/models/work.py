@@ -81,7 +81,7 @@ class ServiceOrder(models.Model):
                         'product_qty': v.product_uom_qty,
                         'product_uom': v.product_uom.id,
                         'price_unit': v.cost_unit,
-                        # 'qty_received': v.product_uom_qty  # all services were received
+                        'qty_received': v.product_uom_qty  # all services were received
                     })
                     v.write({'purchased': True, 'purchase_line_id': purchase_line.id})
                     service.write({'purchase_ids': [(4, purchase.id)]})

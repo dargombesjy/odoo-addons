@@ -8,14 +8,22 @@ class ReportServiceOrderXlsx(models.AbstractModel):
     def _get_orders(self, data):
         cr = self.env.cr
 
-        sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name as partner_name,\
+        sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name AS partner_name,\
             s.amount_untaxed, s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,\
+            s.amount_jasa, s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax,\
             s.register_date, s.received_date, s.planned_date, s.finish_date,\
-            s.amount_jasa, s.cost_fees, s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax\
+            SUM(COALESCE(po.amount_untaxed,0)) AS jasa_untaxed, SUM(COALESCE(po.amount_total,0)) AS jasa_total\
             FROM service_order s\
             LEFT JOIN res_partner p ON (s.insurance_id=p.id)\
-            WHERE s.register_date >= %s AND s.register_date <= %s ORDER BY s.id''')
+            LEFT JOIN purchase_order po ON (s.id=po.service_id)\
+            WHERE s.register_date >= %s AND s.register_date <= %s\
+            GROUP BY s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name, s.amount_untaxed,\
+            s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,s.amount_jasa,\
+            s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax, s.register_date, s.received_date,\
+            s.planned_date, s.finish_date\
+            ORDER BY s.state, s.name''')
         params = (data['form']['date_from'], data['form']['date_to'])
+        # params = ('KMS01/0470/03/2021',)
         cr.execute(sql, params)
 
         states = [('draft', 'Quotation'), ('confirmed', 'Confirmed'), ('under_repair', 'Under Repair'),
@@ -52,7 +60,8 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             bill_types[bill]['aggregates']['amount_sparepart'] += row['amount_sparepart']
             bill_types[bill]['aggregates']['cost_operations'] += row['cost_operations']
             bill_types[bill]['aggregates']['amount_jasa'] += row['amount_jasa']
-            bill_types[bill]['aggregates']['cost_fees'] += row['cost_fees']
+            # bill_types[bill]['aggregates']['cost_fees'] += row['cost_fees']
+            bill_types[bill]['aggregates']['cost_fees'] += row['jasa_untaxed']
             bill_types[bill]['aggregates']['cost_bahan'] += row['cost_bahan']
             bill_types[bill]['aggregates']['amount_others'] += row['amount_others']
             bill_types[bill]['aggregates']['cost_others'] += row['cost_others']
@@ -64,7 +73,8 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             bill_types[bill]['orders'][state]['aggregates']['amount_sparepart'] += row['amount_sparepart']
             bill_types[bill]['orders'][state]['aggregates']['cost_operations'] += row['cost_operations']
             bill_types[bill]['orders'][state]['aggregates']['amount_jasa'] += row['amount_jasa']
-            bill_types[bill]['orders'][state]['aggregates']['cost_fees'] += row['cost_fees']
+            # bill_types[bill]['orders'][state]['aggregates']['cost_fees'] += row['cost_fees']
+            bill_types[bill]['orders'][state]['aggregates']['cost_fees'] += row['jasa_untaxed']
             bill_types[bill]['orders'][state]['aggregates']['cost_bahan'] += row['cost_bahan']
             bill_types[bill]['orders'][state]['aggregates']['amount_others'] += row['amount_others']
             bill_types[bill]['orders'][state]['aggregates']['cost_others'] += row['cost_others']
@@ -214,7 +224,8 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         sheet.write(row, col + 5, o['amount_sparepart'], number_normal)
                         sheet.write(row, col + 6, o['cost_operations'], number_normal)
                         sheet.write(row, col + 7, o['amount_jasa'], number_normal)
-                        sheet.write(row, col + 8, o['cost_fees'], number_normal)
+                        # sheet.write(row, col + 8, o['cost_fees'], number_normal)
+                        sheet.write(row, col + 8, o['jasa_untaxed'], number_normal)
                         sheet.write(row, col + 9, o['cost_bahan'], number_normal)
                         sheet.write(row, col + 10, o['amount_others'], number_normal)
                         sheet.write(row, col + 11, o['cost_others'], number_normal)

@@ -2,6 +2,9 @@
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from .service import SUPPLY_TYPES
+from odoo.osv import expression
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.float_utils import float_compare, float_round, float_is_zero
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -56,7 +59,7 @@ class StockPicking(models.Model):
         @return: True
         """
         
-        if self.picking_type_id.name == 'Pick':
+        if self.picking_type_id.name == 'Pick' or self.picking_type_id.name == 'Delivery Orders':
             not_valid = self.mapped('move_lines').filtered(lambda move: move.product_category == 'Sparepart' and (move.vendor_qty == 0 or not move.vendor_date))
             if not_valid:
                 raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
