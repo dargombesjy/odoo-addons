@@ -11,16 +11,14 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name AS partner_name,\
             s.amount_untaxed, s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,\
             s.amount_jasa, s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax,\
-            s.register_date, s.received_date, s.planned_date, s.finish_date,\
             SUM(COALESCE(po.amount_untaxed,0)) AS jasa_untaxed, SUM(COALESCE(po.amount_total,0)) AS jasa_total\
             FROM service_order s\
             LEFT JOIN res_partner p ON (s.insurance_id=p.id)\
             LEFT JOIN purchase_order po ON (s.id=po.service_id)\
-            WHERE s.register_date >= %s AND s.register_date <= %s\
+            WHERE s.register_date >= %s AND s.register_date <= %s AND po.po_type = 'service'\
             GROUP BY s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name, s.amount_untaxed,\
             s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,s.amount_jasa,\
-            s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax, s.register_date, s.received_date,\
-            s.planned_date, s.finish_date\
+            s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax\
             ORDER BY s.state, s.name''')
         params = (data['form']['date_from'], data['form']['date_to'])
         # params = ('KMS01/0470/03/2021',)
@@ -154,10 +152,10 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         sheet.write(row, col + 11, 'Biaya Lain2', bold_right)
         sheet.write(row, col + 13, 'PPN', bold_right)
         sheet.write(row, col + 14, 'Pend. Own Risk', bold_right)
-        if objs['data']['with_details']:
-            sheet.write(row, col + 16, 'Tgl. Masuk')
-            sheet.write(row, col + 17, 'Tgl. Masuk Produksi')
-            sheet.write(row, col + 18, 'Tgl. Selesai')
+        # if objs['data']['with_details']:
+        #     sheet.write(row, col + 16, 'Tgl. Masuk')
+        #     sheet.write(row, col + 17, 'Tgl. Masuk Produksi')
+        #     sheet.write(row, col + 18, 'Tgl. Selesai')
         
         row += 1
         for order in orders.items():
@@ -231,9 +229,9 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         sheet.write(row, col + 11, o['cost_others'], number_normal)
                         sheet.write(row, col + 13, o['amount_tax'], number_normal)
                         sheet.write(row, col + 14, o['amount_own_risk'], number_normal)
-                        sheet.write(row, col + 16, o['register_date'], date_normal)
-                        sheet.write(row, col + 17, o['received_date'], date_normal)
-                        sheet.write(row, col + 18, o['finish_date'], date_normal)
+                        # sheet.write(row, col + 16, o['register_date'], date_normal)
+                        # sheet.write(row, col + 17, o['received_date'], date_normal)
+                        # sheet.write(row, col + 18, o['finish_date'], date_normal)
                         row += 1
                 row += 1
             row += 1

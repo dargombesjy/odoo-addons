@@ -191,7 +191,7 @@ class StockPicking(models.Model):
                 purchase = Purchase.create({
                     'po_type': 'warehouse',
                     'origin': 'Part-%s.' % (pick.service_id.name),
-                    'service_id': pick.service_id.id,
+                    # 'service_id': pick.service_id.id,
                     'eq_name': pick.eq_name,
                     'eq_model': pick.eq_model,
                     'partner_id': item[0].id,

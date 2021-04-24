@@ -17,6 +17,7 @@
         'views/zdg_portal_templates.xml',
         'wizards/wizard_own_risk.xml',
         'wizards/wizard_service_order.xml',
+        'wizards/wizard_work_order.xml',
     ],
     'installable': True,
     'auto_install': False,

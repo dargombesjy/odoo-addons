@@ -13,9 +13,11 @@
     <menuitem id="menu_main_zdg_dashboard" name="Dashboard"
       	sequence="40" groups="service.group_service_manager"/>
       
-    <!-- <menuitem id="menu_dashboard_production" name="Production"
-      	parent="menu_main_zdg_dashboard"
-      	action="action_dashboard_production"/> -->
+    <menuitem id="menu_dashboard_production" name="Service and Production"
+      	parent="menu_main_zdg_dashboard"/>
+
+	<menuitem id="menu_dashboard_invoicing" name="Invoicing"
+		parent="menu_main_zdg_dashboard"/>
       
   </data>
 </odoo>

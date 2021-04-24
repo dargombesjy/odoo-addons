@@ -8,6 +8,14 @@
 			menu="False"
 			name="zdg_dashboard.report_service_order_xlsx"
 			file="Report Service Order"/>
+		
+		<report id="report_work_order"
+			model="zdg_dashboard.work.order.wizard"
+			string="Report Production"
+			report_type="xlsx"
+			menu="False"
+			name="zdg_dashboard.report_work_order_xlsx"
+			file="Report Production"/>
 
         <report id="report_own_risk"
 			model="zdg_dashboard.own.risk.wizard"

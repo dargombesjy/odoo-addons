@@ -33,26 +33,32 @@
 			</field>
 		</record>
 
-		<record id="view_service_order_pivot" model="ir.ui.view">
+		<!-- <record id="view_service_order_pivot" model="ir.ui.view" display_quantity="True">
 			<field name="name">service.pivot</field>
 			<field name="model">service.order</field>
 			<field name="arch" type="xml">
 				<pivot string="Service Order" display_quantity="True">
-					<field name="company_id" type="row" />
-					<field name="bill_type" type="row" />
-					<!-- <field name="state" type="col" /> -->
-					<!-- <field name="amount_others" type="measure" groups="service.group_service_manager"/> -->
-					<field name="amount_total" type="measure" string="Pend. Total"/>
-					<field name="cost_total" type="measure"/>
-					<!-- <field name="amount_untaxed" type="measure" string="Pend. Total sebelum PPN" groups="service.group_service_manager"/> -->
-					<!-- <field name="amount_tax" type="measure" string="PPN Total" groups="service.group_service_manager"/> -->
-					<!-- <field name="amount_tax_sparepart" type="measure" string="PPN Sparepart" groups="service.group_service_manager"/> -->
-					<!-- <field name="amount_tax_jasa" type="measure" string="PPN Jasa" groups="service.group_service_manager"/> -->
-					<!-- <field name="amount_tax_others" type="measure" string="PPN Other" groups="service.group_service_manager"/> -->
-					<!-- <field name="amount_own_risk" type="measure" string="Pend. Own Risk" groups="service.group_service_user"/> -->
+					<field name="company_id" type="row"/>
+					<field name="bill_type" type="row"/>
+					<field name="state" type="col"/>
+					<field name="amount_sparepart" invisible="1"/>
+					<field name="amount_jasa" invisible="1"/>
+					<field name="amount_others" invisible="1"/>
+					<field name="amount_total" invisible="1"/>
+					<field name="amount_untaxed" invisible="1"/>
+					<field name="amount_tax" invisible="1"/>
+					<field name="amount_tax_sparepart" invisible="1"/>
+					<field name="amount_tax_jasa" invisible="1"/>
+					<field name="amount_tax_others" invisible="1"/>
+					<field name="amount_own_risk" invisible="1"/>
+					<field name="cost_total" invisible="1"/>
+					<field name="cost_operations" invisible="1"/>
+					<field name="cost_fees" invisible="1"/>
+					<field name="cost_others" invisible="1"/>
+					<field name="cost_bahan" invisible="1"/>
 				</pivot>
 			</field>
-		</record>
+		</record> -->
 
 		<record id="view_service_order_form" model="ir.ui.view">
 			<field name="name">service.form</field>
@@ -364,14 +370,14 @@
 			<field name="view_mode">kanban,tree</field>
 		</record>
 
-		<record id="action_dashboard_production"
+		<!-- <record id="action_dashboard_production"
 			model="ir.actions.act_window">
 			<field name="name">Dashboard Production</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">service.order</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">pivot,tree</field>      
-    	</record>
+    	</record> -->
 
 		<menuitem id="menu_service_order" name="Service"
 			sequence="36" groups="service.group_service_menu" />
@@ -389,10 +395,10 @@
 			action="action_account_work_order_list" name="Service To Be Invoiced"
 			sequence="1" />
 
-		<menuitem id="menu_dashboard_production" name="Production"
-      		parent="zdg_dashboard.menu_main_zdg_dashboard"
+		<!-- <menuitem id="menu_dashboard_production" name="Production"
+      		parent="zdg_dashboard.menu_dashboard_production"
 			sequence="1"
-      		action="action_dashboard_production"/>
+      		action="action_dashboard_production"/> -->
 
 		<!-- <menuitem id="menu_service_order_report" parent="menu_service_order" 
 			action="action_report_service_order" name="Reports"/> -->

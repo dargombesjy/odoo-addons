@@ -290,7 +290,7 @@
 
 		<record id="action_work_order_tree"
 			model="ir.actions.act_window.view">
-			<field name="sequence" eval="1" />
+			<field name="sequence" eval="2" />
 			<field name="view_mode">tree</field>
 			<field name="view_id" ref="view_work_order_tree" />
 			<field name="act_window_id" ref="action_work_order_list" />
@@ -298,7 +298,7 @@
 
 		<record id="action_work_order_form"
 			model="ir.actions.act_window.view">
-			<field name="sequence" eval="2" />
+			<field name="sequence" eval="3" />
 			<field name="view_mode">form</field>
 			<field name="view_id" ref="view_work_order_form" />
 			<field name="act_window_id" ref="action_work_order_list" />
@@ -306,7 +306,7 @@
 
 		<record id="action_work_order_pivot"
 			model="ir.actions.act_window.view">
-			<field name="sequence" eval="3" />
+			<field name="sequence" eval="1" />
 			<field name="view_mode">pivot</field>
 			<field name="view_id" ref="view_work_order_pivot" />
 			<field name="act_window_id" ref="action_work_order_list" />
@@ -334,6 +334,15 @@
 			<field name="domain">['&amp;', ('type','=','in_invoice'),('origin_type','=','service'), ('bill_printed','=',False)]</field>
 		</record>
 
+		<record id="action_dashboard_production"
+			model="ir.actions.act_window">
+			<field name="name">Dashboard Production</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">service.order</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">pivot,tree</field>      
+    	</record>
+
 		<menuitem id="menu_work_order" name="Production"
 			groups="work.group_work_user" />
 
@@ -355,6 +364,11 @@
 			parent="menu_work_purchase"
 			groups="work.group_work_user"
 			action="action_work_invoice_supplier_list"/>
+		
+		<menuitem id="menu_dashboard_production" name="Production"
+      		parent="zdg_dashboard.menu_dashboard_production"
+			sequence="1"
+      		action="action_work_order_list"/>
 	
 	</data>
 </odoo>

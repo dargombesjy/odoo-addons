@@ -37,8 +37,9 @@
 <!-- 			target="new"/> -->
 		
 		<menuitem id="menu_dashboard_own_risk" name="Own Risk"
-    		parent="menu_main_zdg_dashboard"
-			sequence="2"
-    		action="action_report_own_risk"/>
+    		parent="menu_dashboard_invoicing"
+			sequence="1"
+    		action="action_report_own_risk"
+    		groups="service.group_service_manager"/>
 	</data>
 </odoo>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <record id="view_service_order_wizard" model="ir.ui.view">
-            <field name="name">Report Service Order</field>
-            <field name="model">zdg_dashboard.service.order.wizard</field>
+        <record id="view_work_order_wizard" model="ir.ui.view">
+            <field name="name">Report Work Order</field>
+            <field name="model">zdg_dashboard.work.order.wizard</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Report Service Order">
+                <form string="Report Work Order">
 					<group>
 						<field name="date_from"/>
 						<field name="date_to"/>
@@ -24,24 +24,24 @@
             </field>
         </record>
 
-        <record id="action_wizard_service_order"
+        <record id="action_wizard_work_order"
             model="ir.actions.act_window">
             <field name="name">Service Order</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">zdg_dashboard.service.order.wizard</field>
+            <field name="res_model">zdg_dashboard.work.order.wizard</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_service_order_wizard" />
+            <field name="view_id" ref="view_work_order_wizard" />
             <field name="target">new</field>
             <!-- <field name="binding_model_id"
                 ref="account.model_account_account" />
             <field name="binding_type">report</field> -->
         </record>
-
-        <menuitem id="menu_dashboard_service_order" name="Service Order"
+        
+        <menuitem id="menu_dashboard_work_order" name="Work Order"
     		parent="menu_dashboard_production"
-			sequence="2"
-    		action="action_wizard_service_order"
+			sequence="3"
+    		action="action_wizard_work_order"
     		groups="service.group_service_manager"/>
 
     </data>
