@@ -915,6 +915,21 @@ class ServiceOrder(models.Model):
                         'state': 'draft'
                     })
                     operation.write({'move_id': moving.id, 'requested': True})
+    
+    @api.multi
+    def action_set_part_cost(self):
+        no_cost = self.mapped('operations').filtered(lambda ops: ops.cost_unit == 0)
+        for item in no_cost:
+            if item.supply_type == 'self' and item.cost_unit == 0:
+                if item.product_id.standard_price <= 0:
+                    raise UserError(_('Product "%s" belum memiliki harga standar') % item.product_id.name)
+                item.cost_unit = item.product_id.standard_price
+
+    @api.multi
+    def write(self, values):
+        res = super(ServiceOrder, self).write(values)
+        return res
+    
     # @api.multi
     # def action_request_material(self):           
         # spb_model = self.env['inventory.move']

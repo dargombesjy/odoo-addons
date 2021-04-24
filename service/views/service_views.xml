@@ -73,8 +73,6 @@
 							string="Req. Sparepart" type="object" states="draft"/>
 						<button name="action_print_service_order" states="draft"
 							string="Print Quotation" type="object" />
-						<!-- <button name="action_export_xls" states="draft"
-							string="Export to Excel" type="object" /> -->
 						<button name="action_service_confirm" states="draft"
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"
@@ -89,6 +87,8 @@
 							string="Close Order" type="object" class="oe_highlight" />
 						<button name="action_service_cancel_draft"
 							string="Set to Draft" type="object" groups="service.group_service_finance" />
+						<button name="action_set_part_cost" type="object" groups="service.group_service_manager"
+							string="Check Sparepart" attrs="{'invisible':[('state', '=','done')]}"/>
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
 							attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 

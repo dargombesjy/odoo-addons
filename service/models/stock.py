@@ -350,7 +350,9 @@ class StockMove(models.Model):
         if self.product_category == 'Sparepart':
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
             cost = service_line.cost_unit
-            if service_line.supply_type == 'self' and cost == 0:
+            if service_line.supply_type == 'self':  # and cost == 0:
+                if self.product_id.standard_price == 0:
+                    raise UserError(_('Product "%s" belum memiliki harga standar') % self.product_id.name)
                 cost = self.product_id.standard_price
             service_line.write({'product_id': self.product_id.id, 'cost_unit': cost})
             if not self.supply_type:
@@ -363,10 +365,6 @@ class StockMove(models.Model):
     @api.multi
     def write(self, values):
         lines = super(StockMove, self).write(values)
-        for line in self:
-            if line.product_id and line.supply_type == 'self':
-                if line.product_id.standard_price == 0:
-                    raise UserError(_('Product "%s" belum memiliki harga standar') % line.product_id.name)
         return lines
     
     # def _generate_receipt(self):
