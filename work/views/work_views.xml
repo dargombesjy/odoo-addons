@@ -35,8 +35,6 @@
 						<button name="action_service_start"
 							attrs="{'invisible': ['&amp;', ('state', '!=', 'confirmed'), '!', '&amp;', ('state', '=', 'ready'), ('invoice_method', '=', 'b4repair')]}"
 							type="object" string="Start Repair" class="oe_highlight" />
-						<!-- <button name="action_service_cancel_draft" states="cancel" string="Set 
-							to Draft" type="object"/> -->
 						<button name="action_service_cancel_draft"
 							states="under_repair" string="Set to Draft" type="object" />
 						<!-- <button name="action_service_start" attrs="{'invisible': ['&amp;', 
@@ -113,15 +111,15 @@
 										</notebook>
 									</form>
 									<tree string="Spareparts" editable="bottom">
-										<field name="supply_type" />
-										<field name="product_id" />
-										<field name="name" />
-										<field name="product_uom_qty" string="Quantity" />
+										<field name="supply_type"/>
+										<field name="product_id"/>
+										<field name="name"/>
+										<field name="product_uom_qty" string="Quantity"/>
 										<field name="product_uom" string="Unit of Measure"
-											groups="uom.group_uom" />
+											groups="uom.group_uom"/>
 										<field name="approved" string="Acc?"
-											attrs="{'readonly': 1}" />
-										<field name="requested" string="Req" />
+											attrs="{'readonly': 1}"/>
+										<field name="requested" string="Req"/>
 										<field name="received" string="Rcv"
 											attrs="{'readonly': 0}" />
 										<field name="is_robbing"/>
@@ -129,6 +127,7 @@
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
 										<field name="is_robbing_done"
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
+										<field name="delete_flag" string="Del"/>
 									</tree>
 								</field>
 								<div class="oe_clear" />

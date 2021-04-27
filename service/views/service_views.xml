@@ -336,6 +336,23 @@
 			</field>
 		</record>
 
+		<record id="view_service_operations_tree" model="ir.ui.view">
+			<field name="name">service.operations</field>
+			<field name="model">service.line</field>
+			<field name="arch" type="xml">
+				<tree string="Operations">
+					<field name="name"/>
+					<field name="service_id"/>
+					<field name="supply_type"/>
+					<field name="product_id"/>
+					<field name="product_uom_qty"/>
+					<field name="product_uom"/>
+					<field name="price_unit"/>
+					<field name="cost_unit"/>
+				</tree>
+			</field>
+		</record>
+
 		<record id="action_service_order_tree"
 			model="ir.actions.act_window">
 			<field name="name">Service Order</field>
@@ -379,6 +396,14 @@
 			<field name="view_mode">pivot,tree</field>      
     	</record> -->
 
+		<record id="action_operations_list" model="ir.actions.act_window">
+			<field name="name">Operations</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">service.line</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+
 		<menuitem id="menu_service_order" name="Service"
 			sequence="36" groups="service.group_service_menu" />
 
@@ -394,6 +419,10 @@
 			parent="account.menu_finance_receivables"
 			action="action_account_work_order_list" name="Service To Be Invoiced"
 			sequence="1" />
+
+		<menuitem id="menu_service_operations" parent="menu_service_order_form"
+			action="action_operations_list" name="Spareparts"
+			groups="service.group_service_manager"/>
 
 		<!-- <menuitem id="menu_dashboard_production" name="Production"
       		parent="zdg_dashboard.menu_dashboard_production"

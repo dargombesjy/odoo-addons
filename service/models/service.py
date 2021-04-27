@@ -1120,11 +1120,11 @@ class ServiceOrder(models.Model):
             # 'target': 'new',
         # }
 
-class ServiceOrderExcelWizard(models.TransientModel):
-    _name = 'service.order.excel.wizard'
+# class ServiceOrderExcelWizard(models.TransientModel):
+#     _name = 'service.order.excel.wizard'
 
-    excel_file = fields.Binary('Excel File')
-    excel_file_name = fields.Char('Excel File Name')
+#     excel_file = fields.Binary('Excel File')
+#     excel_file_name = fields.Char('Excel File Name')
 
 class ServiceLine(models.Model):
     _name = 'service.line'
@@ -1182,6 +1182,7 @@ class ServiceLine(models.Model):
     is_robbing = fields.Boolean('Robbing?', copy=False)
     eq_robbed = fields.Char('Nopol Robbed')
     is_robbing_done = fields.Boolean('Robbing Done?', copy=False)
+    delete_flag = fields.Boolean('To Be Deleted', copy=False)
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id', 'tax_id') #, 'service_id.invoice_method')
@@ -1243,13 +1244,19 @@ class ServiceLine(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
-    @api.multi
+    # @api.multi
     def unlink(self):
-        for material in self:
-            if material.received:
-                raise UserError(_('Material sudah diambil, harap dikembalikan ke Warehouse terlebih dahulu'))
-            elif material.requested:
-                raise UserError(_('Material sudah direquest, harap batalkan request Material ke Warehouse terlebih dahulu'))
+        if self.invoice_line_id:
+            raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+
+        transfer_line = self.env['stock.move'].search([('service_line_id', '=', self.id)], limit=1)
+        if transfer_line:
+            raise UserError(_('Material sudah requested, centang field \'Del\' dan minta Warehouse hapus item Transfer terlebih dahulu'))
+        # for material in self:
+            # if material.received:
+            #     raise UserError(_('Material sudah diambil, harap dikembalikan ke Warehouse terlebih dahulu'))
+            # elif material.requested:
+            #     raise UserError(_('Material sudah direquest, harap batalkan request Material ke Warehouse terlebih dahulu'))
         return models.Model.unlink(self)
 
 class ServiceFee(models.Model):

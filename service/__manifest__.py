@@ -12,7 +12,7 @@
         # 'views/resources.xml',
         'views/service_views.xml',
         'views/equipment_views.xml',
-        # 'views/partner_views.xml',
+        'data/ir_config_parameter.xml',
         # 'data/ir_sequence_data.xml',
         # 'data/product_category.xml',
         'report/paperformat.xml',

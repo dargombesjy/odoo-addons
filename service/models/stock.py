@@ -67,7 +67,10 @@ class StockPicking(models.Model):
             to_receive = self.mapped('move_lines')\
                 .filtered(lambda move:move.supply_type == 'vendor' and move.product_category == 'Sparepart'\
                 and move.vendor_id and move.vendor_qty > 0 and move.vendor_date and not move.auto_receipt_id)
-            if to_receive:
+            
+            # hanya auto receive jika ada config parameter allow_auto_receipt
+            allow_auto_receipt = self.env['ir.config_parameter'].sudo().get_param('service.allow_auto_receipt')
+            if to_receive and allow_auto_receipt == 'True':
                 self.action_create_supply_receipt(to_receive)
 
         self.filtered(lambda picking: picking.state == 'draft').action_confirm()
@@ -81,6 +84,19 @@ class StockPicking(models.Model):
         moves._action_assign()
         package_level_done.write({'is_done': True})
         return True
+
+    def _create_transfer_dict(self, move_lines):
+        receipt_vendor = {}
+        for move in move_lines:
+            if move.supply_type != 'vendor' or move.product_category != 'Sparepart':
+                continue
+            if move.vendor_id not in receipt_vendor:
+                receipt_vendor[move.vendor_id] = [move,]
+            else:
+                receipt_vendor[move.vendor_id].append(move)
+        if not receipt_vendor:
+            raise UserError(_('Tidak ada Part Vendor Supply'))
+        return receipt_vendor
     
     def action_create_supply_receipt(self, move_lines):
         """ Create automatic receipt for sparepart supplied by vendor
@@ -94,71 +110,77 @@ class StockPicking(models.Model):
         source = self.env['stock.location'].search([('name', '=', 'Vendors')], limit=1)
         destination = pick.default_location_dest_id
         
-        picking = Picking.create({
-                    # 'name': '',
-                    'service_id': self.service_id.id,
-                    'origin': 'receipt_4: %s' % (self.name),
-                    'eq_name': self.eq_name,
-                    'eq_make': self.eq_make,
-                    'eq_model': self.eq_model,
-                    'move_type': 'one',
-                    'partner_id': self.partner_id.id,
-                    'picking_type_id': pick.id,
-                    'location_id': source.id,
-                    'location_dest_id': self.location_id.id,
-                    'state': 'draft',
-                })
-        # if self.picking_type_id.name == 'Pick':
-        for move in move_lines:
-            # if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0:
-            # if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0\
-                # and move.supply_type == 'vendor' and not move.auto_receipt_id:
-                    
-            total_received = move.vendor_received + move.vendor_qty
-            move_qty = 0
-            if total_received <= move.product_uom_qty:
-                move_qty = move.vendor_qty
-            else:
-                if move.vendor_received < move.product_uom_qty:
-                    move_qty = move.product_uom_qty - move.vendor_received
-                    total_received = move.product_uom_qty
-    
-            if move_qty > 0:
-                supply = move_supply.create({
-                    # 'name': 'receipt_4: %s' % (move.name),
-                    'name': 'receipt_4: %s-%s' % (move.picking_id.name, move.name),
-                    'date': move.vendor_date,
-                    'product_id': move.product_id.id,
-                    'product_uom_qty': move.product_uom_qty,
-                    'product_uom': move.product_uom.id,
-                    'product_category': move.product_category,
-                    'supply_type': 'vendor',
-                    # 'partner_id': move.picking_id.partner_id.id,
-                    'partner_id': move.vendor_id.id,
-                    'picking_type_id': pick.id,
-                    'picking_id': picking.id,
-                    'location_id': source.id,
-                    'location_dest_id': move.location_id.id,
-                    'move_line_ids': [(0, 0, {'product_id': move.product_id.id,
-                                              #'lot_id': move.lot_id,
-                                            'product_uom_qty': move.product_uom_qty,  # bypass reservation here
-                                            'product_uom_id': move.product_uom.id,
-                                            'qty_done': move_qty,
-                                            'package_id': False,
-                                            'result_package_id': False,
-                                            #'owner_id': #owner_id,
-                                            'location_id': source.id, #TODO: owner stuff
-                                            'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
-                    'origin': move.id,
-                    'service_id': move.service_id.id,
-                    'service_line_id': move.service_line_id,
-                })
-                move.write({
-                    'vendor_received': total_received,
-                    'auto_receipt_id': supply.id
-                })
-                # supply._action_done()
-        picking.action_done()
+        transfer_dict = self._create_transfer_dict(move_lines)
+        transfer_items = list(transfer_dict.items())
+
+        for item in transfer_items:
+            picking = Picking.create({
+                        # 'name': '',
+                        'service_id': self.service_id.id,
+                        'origin': 'receipt_4: %s' % (self.name),
+                        'eq_name': self.eq_name,
+                        'eq_make': self.eq_make,
+                        'eq_model': self.eq_model,
+                        'move_type': 'one',
+                        'partner_id': item[0].id,
+                        'picking_type_id': pick.id,
+                        'location_id': source.id,
+                        'location_dest_id': self.location_id.id,
+                        'state': 'draft',
+                    })
+            # if self.picking_type_id.name == 'Pick':
+            
+            for move in item[1]:
+            # for move in move_lines:
+                # if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0:
+                # if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0\
+                    # and move.supply_type == 'vendor' and not move.auto_receipt_id:
+                        
+                total_received = move.vendor_received + move.vendor_qty
+                move_qty = 0
+                if total_received <= move.product_uom_qty:
+                    move_qty = move.vendor_qty
+                else:
+                    if move.vendor_received < move.product_uom_qty:
+                        move_qty = move.product_uom_qty - move.vendor_received
+                        total_received = move.product_uom_qty
+        
+                if move_qty > 0:
+                    supply = move_supply.create({
+                        # 'name': 'receipt_4: %s' % (move.name),
+                        'name': 'receipt_4: %s-%s' % (move.picking_id.name, move.name),
+                        'date': move.vendor_date,
+                        'product_id': move.product_id.id,
+                        'product_uom_qty': move.product_uom_qty,
+                        'product_uom': move.product_uom.id,
+                        'product_category': move.product_category,
+                        'supply_type': 'vendor',
+                        # 'partner_id': move.picking_id.partner_id.id,
+                        'partner_id': move.vendor_id.id,
+                        'picking_type_id': pick.id,
+                        'picking_id': picking.id,
+                        'location_id': source.id,
+                        'location_dest_id': move.location_id.id,
+                        'move_line_ids': [(0, 0, {'product_id': move.product_id.id,
+                                                #'lot_id': move.lot_id,
+                                                'product_uom_qty': move.product_uom_qty,  # bypass reservation here
+                                                'product_uom_id': move.product_uom.id,
+                                                'qty_done': move_qty,
+                                                'package_id': False,
+                                                'result_package_id': False,
+                                                #'owner_id': #owner_id,
+                                                'location_id': source.id, #TODO: owner stuff
+                                                'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
+                        'origin': move.id,
+                        'service_id': move.service_id.id,
+                        'service_line_id': move.service_line_id,
+                    })
+                    move.write({
+                        'vendor_received': total_received,
+                        'auto_receipt_id': supply.id
+                    })
+                    # supply._action_done()
+            picking.action_done()
         return True
     
     def _create_po_dict(self):
@@ -351,8 +373,8 @@ class StockMove(models.Model):
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
             cost = service_line.cost_unit
             if service_line.supply_type == 'self':  # and cost == 0:
-                if self.product_id.standard_price == 0:
-                    raise UserError(_('Product "%s" belum memiliki harga standar') % self.product_id.name)
+                # if self.product_id.standard_price == 0:
+                #     raise UserError(_('Product "%s" belum memiliki harga standar') % self.product_id.name)
                 cost = self.product_id.standard_price
             service_line.write({'product_id': self.product_id.id, 'cost_unit': cost})
             if not self.supply_type:
@@ -366,27 +388,18 @@ class StockMove(models.Model):
     def write(self, values):
         lines = super(StockMove, self).write(values)
         return lines
-    
-    # def _generate_receipt(self):
-        # move = self.env['stock.move']
-        # warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.service_id.company_id.id)], limit=1)
-        # pick = self.env['stock.picking.type'].search([('name', '=', 'Receipts'), ('warehouse_id', '=', warehouse.id)], limit=1)
-        # source = 8
-        # destination = pick.default_location_dest_id
-        # if self.supply_type == 'vendor':
-            # move.create({
-                # 'service_id': self.service_id,
-                # 'service_line_id': self.service_line_id,
-                # 'name': self.name,
-                # 'product_category': self.product_category,
-                # 'picking_type_id': pick.id,
-                # 'product_id': self.product_id.id,
-                # 'product_uom_qty': self.product_uom_qty,
-                # 'product_uom': self.product_uom.id,
-                # 'package_id': False,
-                # 'package_level_id': False,
-                # 'location_id': source,
-                # 'location_dest_id': destination,})
+
+    def unlink(self):
+        if self.product_category == 'Sparepart' or self.product_category == 'Bahan':
+            service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
+        
+            if not service_line.delete_flag:
+                raise UserError(_('Silakan meminta bagian Produksi agar menandai item ini untuk dihapus,'
+                                    ' dengan men-cek pada field \'Del\''))
+
+        res = super(StockMove, self).unlink()
+        service_line.unlink()
+        return res
 
     def _action_assign(self):
         """ Reserve stock moves by creating their stock move lines. A stock move is
