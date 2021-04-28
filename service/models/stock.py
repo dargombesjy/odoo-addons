@@ -395,7 +395,7 @@ class StockMove(models.Model):
         
             if not service_line.delete_flag:
                 raise UserError(_('Silakan meminta bagian Produksi agar menandai item ini untuk dihapus,'
-                                    ' dengan men-cek pada field \'Del\''))
+                                    ' dengan klik icon Delete'))
 
         res = super(StockMove, self).unlink()
         service_line.unlink()

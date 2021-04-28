@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import xlsxwriter
-import base64
+# import xlsxwriter
+# import base64
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from num2words import num2words
@@ -11,233 +11,6 @@ SUPPLY_TYPES = [
         ('customer', 'Customer Supply'),
         ('vendor', 'Vendor Supply')]
 
-
-# class StockPicking(models.Model):
-    # _inherit = 'stock.picking'
-    #
-    # service_id = fields.Many2one('service.order')
-    # eq_name = fields.Char('License Plate')
-    # eq_make = fields.Char('Make')
-    # eq_model = fields.Char('Model')
-    # receiver = fields.Char('Receiver')
-    # received_date = fields.Date('Received Date')
-    # vendor_id = fields.Many2one(
-        # 'res.partner', 'Vendor', index=True, readonly=True,
-        # states={'draft': [('readonly', False)]})
-    # is_sparepart = fields.Boolean('Is Sparepart', compute='_compute_ispart')
-    #
-    # @api.one
-    # @api.depends('origin')
-    # def _compute_ispart(self):
-        # self.is_sparepart = True
-        # if self.origin:
-            # self.is_sparepart = 'Part-' in self.origin
-        # # self.is_sparepart = 'Part-' in self.origin
-        #
-    # @api.multi
-    # def action_confirm(self):
-        # if self.mapped('move_lines').filtered(lambda move: not move.product_id):
-            # raise UserError(_('All items must have Product ID'))
-            #
-        # self.mapped('package_level_ids').filtered(lambda pl: pl.state == 'draft' and not pl.move_ids)._generate_moves()
-        # # call `_action_confirm` on every draft move
-        # self.mapped('move_lines')\
-            # .filtered(lambda move: move.state == 'draft')\
-            # ._action_confirm()
-        # # call `_action_assign` on every confirmed move which location_id bypasses the reservation
-        # self.filtered(lambda picking: picking.location_id.usage in ('supplier', 'inventory', 'production') and picking.state == 'confirmed')\
-            # .mapped('move_lines')._action_assign()
-        # return True
-        #
-    # @api.multi
-    # def action_assign(self):
-        # """ Check availability of picking moves.
-        # This has the effect of changing the state and reserve quants on available moves, and may
-        # also impact the state of the picking as it is computed based on move's states.
-        # @return: True
-        # """
-        # move_supply = self.env['stock.move']
-        # for move in self.move_lines:
-            # if move.product_category == 'Sparepart' and move.vendor_id and move.vendor_qty > 0:
-                # total_received = move.vendor_received + move.vendor_qty
-                # move_qty = 0
-                # if total_received <= move.product_uom_qty:
-                    # move_qty = move.vendor_qty
-                # else:
-                    # if move.vendor_received < move.product_uom_qty:
-                        # move_qty = move.product_uom_qty - move.vendor_received
-                        # total_received = move.product_uom_qty
-                        #
-                # if move_qty > 0:
-                    # supply = move_supply.create({
-                        # 'name': move.name,
-                        # 'date': move.vendor_date,
-                        # 'product_id': move.product_id.id, #operation.product_id.id,
-                        # 'product_uom_qty': move.product_uom_qty, #operation.product_uom_qty,
-                        # 'product_uom': move.product_uom.id, #operation.product_uom.id,
-                        # 'partner_id': move.picking_id.partner_id.id, #repair.address_id.id,
-                        # 'location_id': 8, #operation.location_id.id,
-                        # 'location_dest_id': move.location_id.id, #operation.location_dest_id.id,
-                        # 'move_line_ids': [(0, 0, {'product_id': move.product_id.id, #operation.product_id.id,
-                                                  # #'lot_id': move.lot_id, #operation.lot_id.id,
-                                                  # 'product_uom_qty': move.product_uom_qty,  # bypass reservation here
-                                                  # 'product_uom_id': move.product_uom.id, #operation.product_uom.id,
-                                                  # 'qty_done': move_qty, #operation.product_uom_qty,
-                                                  # 'package_id': False,
-                                                  # 'result_package_id': False,
-                                                  # #'owner_id': #owner_id,
-                                                  # 'location_id': 8, #move.location_id, #operation.location_id.id, #TODO: owner stuff
-                                                  # 'location_dest_id': move.location_id.id })], #operation.location_dest_id.id,})],
-                        # 'origin': move.service_id.id, #repair.id,
-                        # 'service_id': move.service_id.id, #repair.id,
-                        # 'service_line_id': move.service_line_id, #repair.name,
-                    # })
-                    # move.write({'vendor_received': total_received})
-                    # supply._action_done()
-                    #
-        # self.filtered(lambda picking: picking.state == 'draft').action_confirm()
-        # moves = self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))
-        # if not moves:
-            # raise UserError(_('Nothing to check the availability for.'))
-        # # If a package level is done when confirmed its location can be different than where it will be reserved.
-        # # So we remove the move lines created when confirmed to set quantity done to the new reserved ones.
-        # package_level_done = self.mapped('package_level_ids').filtered(lambda pl: pl.is_done and pl.state == 'confirmed')
-        # package_level_done.write({'is_done': False})
-        # moves._action_assign()
-        # package_level_done.write({'is_done': True})
-        # return True
-        #
-# class StockMove(models.Model):
-    # _inherit = 'stock.move'
-    #
-    # service_id = fields.Many2one('service.order')
-    # service_line_id = fields.Integer('Line Id')
-    # product_id = fields.Many2one(
-        # 'product.product', 'Product',
-        # domain=[('type', 'in', ['product', 'consu'])], index=True, required=False)
-    # product_category = fields.Char('Product Category')
-    # supply_type = fields.Selection(SUPPLY_TYPES, 'Supply Type')
-    # part_number = fields.Char('Kode Part Admin', compute='_compute_part_admin')
-    # vendor_id = fields.Many2one('res.partner', 'Vendor', index=True)
-    # vendor_qty = fields.Float('Qty. Terima')
-    # vendor_date = fields.Date('Tgl. Terima')
-    # vendor_received = fields.Float('Recv')
-    # receiver = fields.Char('Penerima')
-    # received_date = fields.Date('Tgl. Ambil')
-    #
-    # @api.one
-    # @api.depends('service_line_id')
-    # def _compute_part_admin(self):
-        # service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
-        # self.part_number = service_line.part_number
-        #
-    # def action_set_draft(self):
-        # return self.write({'state': 'draft'})
-        #
-    # @api.constrains('product_uom')
-    # def _check_uom(self):
-        # moves_error = self.filtered(lambda move: move.product_id.uom_id.category_id != move.product_uom.category_id)
-        # sparepart = self.filtered(lambda move: move.product_category == 'Sparepart')
-        # if sparepart:
-            # moves_error = False
-        # # if self.product_category == 'Sparepart' and self.state == 'draft':
-        # #     moves_error = False
-        # if moves_error:
-            # user_warning = _('You cannot perform the move because the unit of measure has a different category as the product unit of measure.')
-            # for move in moves_error:
-                # user_warning += _('\n\n%s --> Product UoM is %s (%s) - Move UoM is %s (%s)') % (move.product_id.display_name, move.product_id.uom_id.name, move.product_id.uom_id.category_id.name, move.product_uom.name, move.product_uom.category_id.name)
-            # user_warning += _('\n\nBlocking: %s') % ' ,'.join(moves_error.mapped('name'))
-            # raise UserError(user_warning)
-            #
-    # @api.one
-    # @api.depends('product_id', 'product_uom', 'product_uom_qty')
-    # def _compute_product_qty(self):
-        # rounding_method = self._context.get('rounding_method', 'UP')
-        # if not self.product_category == 'Sparepart':
-            # self.product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id, rounding_method=rounding_method)
-        # else:
-            # if self.state == 'draft':
-                # self.product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_uom, rounding_method=rounding_method)
-                #
-    # def _action_confirm(self, merge=True, merge_into=False):
-        # """ Confirms stock move or put it in waiting if it's linked to another move.
-        # :param: merge: According to this boolean, a newly confirmed move will be merged
-        # in another move of the same picking sharing its characteristics.
-        # """
-        # move_create_proc = self.env['stock.move']
-        # move_to_confirm = self.env['stock.move']
-        # move_waiting = self.env['stock.move']
-        #
-        # to_assign = {}
-        # for move in self:
-            # if move.service_id:
-                # if move.product_category == 'Sparepart' or move.product_category == 'Bahan':
-                    # service_line = move.env['service.line'].search([('id', '=', move.service_line_id)], limit=1)
-                # else:
-                    # service_line = move.env['service.consumable'].search([('id', '=', move.service_line_id)], limit=1)
-                # service_line.write({'received': True})
-                #
-            # # if the move is preceeded, then it's waiting (if preceeding move is done, then action_assign has been called already and its state is already available)
-            # if move.move_orig_ids:
-                # move_waiting |= move
-            # else:
-                # if move.procure_method == 'make_to_order':
-                    # move_create_proc |= move
-                # else:
-                    # move_to_confirm |= move
-            # if move._should_be_assigned():
-                # key = (move.group_id.id, move.location_id.id, move.location_dest_id.id)
-                # if key not in to_assign:
-                    # to_assign[key] = self.env['stock.move']
-                # to_assign[key] |= move
-                #
-        # # create procurements for make to order moves
-        # for move in move_create_proc:
-            # values = move._prepare_procurement_values()
-            # origin = (move.group_id and move.group_id.name or (move.origin or move.picking_id.name or "/"))
-            # self.env['procurement.group'].run(move.product_id, move.product_uom_qty, move.product_uom, move.location_id, move.rule_id and move.rule_id.name or "/", origin,
-                                              # values)
-                                              #
-        # move_to_confirm.write({'state': 'confirmed'})
-        # (move_waiting | move_create_proc).write({'state': 'waiting'})
-        #
-        # # assign picking in batch for all confirmed move that share the same details
-        # for moves in to_assign.values():
-            # moves._assign_picking()
-        # self._push_apply()
-        # if merge:
-            # return self._merge_moves(merge_into=merge_into)
-        # return self
-        #
-    # @api.onchange('product_id')
-    # def onchange_product_id(self):
-        # if self.product_category == 'Sparepart':
-            # service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
-            # cost = service_line.cost_unit
-            # if service_line.supply_type == 'self' and cost == 0:
-                # cost = self.product_id.standard_price
-            # service_line.write({'product_id': self.product_id.id, 'cost_unit': cost})
-            # if not self.supply_type:
-                # self.supply_type = service_line.supply_type
-                #
-        # product = self.product_id.with_context(lang=self.partner_id.lang or self.env.user.lang)
-        # self.product_uom = product.uom_id.id
-        # return {'domain': {'product_uom': [('category_id', '=', product.uom_id.category_id.id)]}}
-        #
-    # @api.multi
-    # def write(self, values):
-        # lines = super(StockMove, self).write(values)
-        # for line in self:
-            # if line.product_id and line.supply_type == 'self':
-                # if line.product_id.standard_price == 0:
-                    # raise UserError(_('Product "%s" belum memiliki harga standar') % line.product_id.name)
-        # return lines
-        #
-# class StockMoveLine(models.Model):
-    # _inherit = 'stock.move.line'
-    #
-    # # service_line_id = fields.Many2one('service.line')
-    # product_alias = fields.Char('Product Alias')
 
 class ServiceOrder(models.Model):
     _name = 'service.order'
@@ -930,6 +703,10 @@ class ServiceOrder(models.Model):
         res = super(ServiceOrder, self).write(values)
         return res
     
+    @api.multi
+    def unlink(self):
+        raise UserError(_('Service Order tidak boleh dihapus, hanya boleh di Cancel'))
+    
     # @api.multi
     # def action_request_material(self):           
         # spb_model = self.env['inventory.move']
@@ -960,171 +737,6 @@ class ServiceOrder(models.Model):
                         # 'product_uom': uom_id, 
                         # 'state': 'draft'})
 
-    # @api.multi
-    # def action_export_xls(self):
-        # file_name = '/home/kmsadmin/temp/service_order.xlsx'
-        # workbook = xlsxwriter.Workbook(file_name, {'in_memory': True})
-        # worksheet = workbook.add_worksheet('SPK')
-        #
-        # number_format = workbook.add_format({
-            # 'num_format': '#,##0',
-            # 'border': 1
-        # })
-        # border_format = workbook.add_format({
-            # 'border': 1
-        # })
-        # header_format_main = workbook.add_format({
-            # 'font_size': 14,
-            # 'bold': True,
-            # 'align': 'center',
-            # 'valign': 'center',
-            # 'border': 1
-        # })
-        # header_format = workbook.add_format({
-            # 'bold': True,
-            # 'align': 'center',
-            # 'valign': 'center',
-            # 'border': 1
-        # })
-        # header_format_wrap = workbook.add_format({
-            # 'bold': True,
-            # 'align': 'center',
-            # 'valign': 'center',
-            # 'text_wrap': True,
-            # 'border': 1
-        # })
-        # section_format = workbook.add_format({
-            # 'border': 1,
-            # 'bold': True
-        # })
-        # center_format = workbook.add_format({
-            # 'align': 'center',
-            # 'valign': 'center',
-            # 'border': 1
-        # })
-        # merged_format_top = workbook.add_format({
-            # 'align': 'left',
-            # 'valign': 'top',
-            # 'border': 1
-        # })
-        # merged_format_bottom = workbook.add_format({
-            # 'align': 'center',
-            # 'valign': 'bottom',
-            # 'border': 1
-        # })
-        # wrap_format = workbook.add_format({
-            # 'text_wrap': True,
-            # 'border': 1
-        # })
-        # wrap_format_top = workbook.add_format({
-            # 'text_wrap': True,
-            # 'valign': 'top',
-            # 'border': 1
-        # })
-        #
-        # # worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
-        # worksheet.merge_range(1, 0, 1, 1, 'No. Estimasi', border_format)
-        # worksheet.write(1, 2, self.name, border_format)
-        # worksheet.merge_range(2, 0, 2, 1, 'Asuransi', border_format)
-        # worksheet.write(2, 2, self.insurance_id.name or '', border_format)
-        # worksheet.merge_range(3, 0, 3, 1, 'Merek Mobil', border_format)
-        # worksheet.write(3, 2, '%s %s' % (self.make, self.model), border_format)
-        # worksheet.merge_range(4, 0, 4, 1, 'No. Polisi / Chassis', wrap_format)
-        # worksheet.write(4, 2, '%s / %s' % (self.equipment_id.name, self.chassis_no), wrap_format)
-        # worksheet.merge_range(5, 0, 5, 1, 'Warna', border_format)
-        # worksheet.write(5, 2, self.base_colour or '', border_format)
-        #
-        # worksheet.merge_range(1, 3, 1, 4, 'Nama Pelanggan', border_format)
-        # worksheet.merge_range(1, 5, 1, 6, self.partner_id.name, wrap_format)
-        # worksheet.merge_range(2, 3, 2, 4, 'Alamat', border_format)
-        # worksheet.merge_range(2, 5, 2, 6, self.partner_id.street or '', border_format)
-        # worksheet.merge_range(3, 3, 3, 4, 'Telepon', border_format)
-        # worksheet.merge_range(3, 5, 3, 6, self.partner_id.phone or '', border_format)
-        # worksheet.merge_range(4, 3, 4, 4, 'No. Polis Asuransi', wrap_format)
-        # worksheet.merge_range(4, 5, 4, 6, self.policy_no or '', wrap_format)
-        # worksheet.merge_range(5, 3, 5, 4, 'No. Berkas', border_format)
-        # worksheet.merge_range(5, 5, 5, 6, self.claim_id or '', border_format)
-        # # details
-        # worksheet.write(7, 0, 'No.', header_format)
-        # worksheet.merge_range(7, 1, 7, 3, 'KETERANGAN', header_format)
-        # worksheet.write(7, 4, 'QTY', header_format)
-        # worksheet.write(7, 5, 'HARGA SATUAN \n(Rp.)', header_format_wrap)
-        # worksheet.write(7, 6, 'TOTAL HARGA \n(Rp.)', header_format_wrap)
-        #
-        # worksheet.merge_range(8, 0, 8, 6, 'PERBAIKAN DAN PENGECATAN', section_format)
-        # row = 9
-        # idx = 1
-        # total_jasa = 0
-        # for o in self.fees_lines:
-            # worksheet.write(row, 0, idx, border_format)
-            # worksheet.write(row, 1, '', border_format)
-            # worksheet.merge_range(row, 2, row, 3, o.name, border_format)
-            # worksheet.write(row, 4, o.product_uom_qty, border_format)
-            # worksheet.write(row, 5, o.price_unit, number_format)
-            # worksheet.write(row, 6, o.price_subtotal, number_format)
-            # total_jasa += o.price_subtotal
-            # row += 1
-            # idx += 1
-        # worksheet.merge_range(row, 0, row, 5, 'Total Jasa', section_format)
-        # worksheet.write(row, 6, total_jasa, number_format)
-        # row += 1
-        #
-        # worksheet.merge_range(row, 0, row, 6, 'PENGGANTIAN SPAREPART', section_format)
-        # row += 1
-        # idx = 1
-        # total_spareparts = 0
-        # for r in self.operations:
-            # worksheet.write(row, 0, idx, border_format)
-            # worksheet.write(row, 1, r.part_number, border_format)
-            # worksheet.merge_range(row, 2, row, 3, r.name, border_format)
-            # worksheet.write(row, 4, r.product_uom_qty, border_format)
-            # worksheet.write(row, 5, r.price_unit, number_format)
-            # worksheet.write(row, 6, r.price_subtotal, number_format)
-            # total_spareparts += r.price_subtotal
-            # row += 1
-            # idx += 1
-        # worksheet.merge_range(row, 0, row, 5, 'Total Sparepart', section_format)
-        # worksheet.write(row, 6, total_spareparts, number_format)
-        #
-        # row += 1
-        # worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
-        # worksheet.write(row, 6, self.amount_untaxed, number_format)
-        #
-        # row += 1
-        # total = total_spareparts + total_jasa
-        # worksheet.merge_range(row, 0, row, 1, 'Terbilang:', border_format)
-        # worksheet.merge_range(row, 2, row, 4, num2words(total, lang='id'), wrap_format)
-        # worksheet.merge_range(row, 5, row, 6, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
-        #
-        # row += 1
-        # worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
-        # worksheet.merge_range(row, 2, row + 2, 4, self.quotation_notes or '', wrap_format_top)
-        # worksheet.merge_range(row, 5, row + 2, 6, self.service_advisor or '', merged_format_bottom)
-        # # Save workbook
-        # workbook.close()
-        # # read and save as binary
-        # with open(file_name, "rb") as file:
-            # file_base64 = base64.b64encode(file.read())
-            #
-        # record_id = self.env['service.order.excel.wizard'].create(
-            # {'excel_file': file_base64, 'excel_file_name': 'testing.xls'})
-            #
-        # return {
-            # 'name': _('Excel file created'),
-            # 'view_mode': 'form',
-            # 'res_id': record_id.id,
-            # 'res_model': 'service.order.excel.wizard',
-            # 'view_type': 'form',
-            # 'type': 'ir.actions.act_window',
-            # # 'context': context
-            # 'target': 'new',
-        # }
-
-# class ServiceOrderExcelWizard(models.TransientModel):
-#     _name = 'service.order.excel.wizard'
-
-#     excel_file = fields.Binary('Excel File')
-#     excel_file_name = fields.Char('Excel File Name')
 
 class ServiceLine(models.Model):
     _name = 'service.line'
@@ -1245,19 +857,30 @@ class ServiceLine(models.Model):
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
     # @api.multi
-    def unlink(self):
+    # def write(self, values):
+    #     res = super(ServiceLine, self).write(values)
+    #     return res
+
+    # @api.multi
+    def action_unlink(self):
         if self.invoice_line_id:
             raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
-
         transfer_line = self.env['stock.move'].search([('service_line_id', '=', self.id)], limit=1)
         if transfer_line:
-            raise UserError(_('Material sudah requested, centang field \'Del\' dan minta Warehouse hapus item Transfer terlebih dahulu'))
-        # for material in self:
-            # if material.received:
-            #     raise UserError(_('Material sudah diambil, harap dikembalikan ke Warehouse terlebih dahulu'))
-            # elif material.requested:
-            #     raise UserError(_('Material sudah direquest, harap batalkan request Material ke Warehouse terlebih dahulu'))
-        return models.Model.unlink(self)
+            self.delete_flag = True 
+            return {
+                'name': _('Warning'),
+                'view_mode': 'form',
+                'view_type': 'form',
+                'view_id': self.env.ref('service.view_warning_message').id,
+                'res_model': 'service.warning.message.wizard',
+                # 'res_id': self.id,
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+            }
+        else:
+            return super(ServiceLine, self).unlink()
+            # return models.Model.unlink(self)
 
 class ServiceFee(models.Model):
     _name = 'service.fee'

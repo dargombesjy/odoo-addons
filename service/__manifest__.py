@@ -15,6 +15,7 @@
         'data/ir_config_parameter.xml',
         # 'data/ir_sequence_data.xml',
         # 'data/product_category.xml',
+        'wizards/warning_message_wizard.xml',
         'report/paperformat.xml',
         'report/service_reports.xml',
         'report/service_layout.xml',

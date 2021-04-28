@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_warning_message" model="ir.ui.view">
+            <field name="name">Warning</field>
+            <field name="model">service.warning.message.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Warning">
+                    <group>
+                        <span class="o_form_label">
+                            Material sudah ditandai untuk dihapus selanjutnya minta Warehouse hapus item Transfer
+                        </span>
+                    </group>
+                    <footer>
+                        <button name="wizard_confirm" string="OK" type="object" class="btn-primary"/>
+                        <!-- <button string="Cancel" class="btn-secondary" special="cancel" /> -->
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

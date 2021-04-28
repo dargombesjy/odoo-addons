@@ -54,7 +54,7 @@
 					<sheet>
 						<!-- <div class="oe_button_box" name="button_box"/> -->
 						<div class="oe_button_box" name="button_box" />
-						<label for="name" />
+						<label for="name"/>
 						<h1>
 							<field name="name" />
 						</h1>
@@ -110,7 +110,7 @@
 											<page string="History"> History </page>
 										</notebook>
 									</form>
-									<tree string="Spareparts" editable="bottom">
+									<tree string="Spareparts" editable="bottom" delete="0">
 										<field name="supply_type"/>
 										<field name="product_id"/>
 										<field name="name"/>
@@ -127,7 +127,10 @@
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
 										<field name="is_robbing_done"
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
-										<field name="delete_flag" string="Del"/>
+										<field name="delete_flag" string="Del" invisible="0" readonly="True"/>
+										<field name="state" invisible="1"/>
+										<button name="action_unlink" type="object" icon="fa-trash-o" class="oe_edit_only"/>
+										<!-- attrs="{'invisible': [('state', '=', 'draft')]}" /> -->
 									</tree>
 								</field>
 								<div class="oe_clear" />
