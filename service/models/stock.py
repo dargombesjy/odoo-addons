@@ -389,6 +389,7 @@ class StockMove(models.Model):
         lines = super(StockMove, self).write(values)
         return lines
 
+    @api.multi
     def unlink(self):
         if self.product_category == 'Sparepart' or self.product_category == 'Bahan':
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
