@@ -392,7 +392,7 @@ class StockMove(models.Model):
     @api.multi
     def unlink(self):
         for item in self:
-            service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
+            service_line = item.env['service.line'].search([('id', '=', item.service_line_id)], limit=1)
             if item.product_category == 'Sparepart' or item.product_category == 'Bahan':
                 if service_line and not service_line.delete_flag:
                     raise UserError(_('Silakan meminta bagian Produksi agar menandai item ini untuk dihapus,'
