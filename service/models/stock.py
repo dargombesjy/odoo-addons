@@ -58,8 +58,9 @@ class StockPicking(models.Model):
         also impact the state of the picking as it is computed based on move's states.
         @return: True
         """
-        
-        if self.picking_type_id.name == 'Pick' or self.picking_type_id.name == 'Delivery Orders':
+        material_out = self.picking_type_id.name == 'Pick' or self.picking_type_id.name == 'Delivery Orders'
+        # if self.picking_type_id.name == 'Pick' or self.picking_type_id.name == 'Delivery Orders':
+        if material_out:
             not_valid = self.mapped('move_lines').filtered(lambda move: move.product_category == 'Sparepart' and (move.vendor_qty == 0 or not move.vendor_date))
             if not_valid:
                 raise UserError(_('Qty. Terima dan Tgl. Terima harus diisi'))
@@ -83,6 +84,10 @@ class StockPicking(models.Model):
         package_level_done.write({'is_done': False})
         moves._action_assign()
         package_level_done.write({'is_done': True})
+        
+        if material_out:
+            if self.mapped('move_lines').filtered(lambda move:move.supply_type == 'self' and move.product_category == 'Sparepart'):
+                self.service_id.action_set_part_cost()
         return True
 
     def _create_transfer_dict(self, move_lines):
@@ -370,6 +375,9 @@ class StockMove(models.Model):
     @api.onchange('product_id')
     def onchange_product_id(self):
         if self.product_category == 'Sparepart':
+            category = self.product_id.categ_id.name
+            if category not in ['Sparepart', 'Bahan']:
+                raise UserError(_('%s tidak termasuk kategori Sparepart atau Bahan' % (self.product_id.name)))
             service_line = self.env['service.line'].search([('id', '=', self.service_line_id)], limit=1)
             cost = service_line.cost_unit
             if service_line.supply_type == 'self':  # and cost == 0:

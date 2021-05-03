@@ -8,7 +8,7 @@
 
         <record id="service_stock_auto_receipt" model="ir.config_parameter">
             <field name="key">service.allow_auto_receipt</field>
-            <field name="value">False</field>
+            <field name="value">True</field>
         </record>
     </data>
 </odoo>

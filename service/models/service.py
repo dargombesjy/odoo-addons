@@ -849,17 +849,27 @@ class ServiceLine(models.Model):
 
         # if not self.product_id or not self.product_uom_qty:
         # return
-        if self.product_id:
-            self.part_number = self.product_id.name
-            # self.name = self.product_id.default_code
-            self.product_uom = self.product_id.uom_id.id
-        if partner and self.product_id:
-            self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+        category = self.product_id.categ_id.name
+        if category == 'Sparepart' or category == 'Bahan':
+            if self.product_id:
+                self.part_number = self.product_id.name
+                # self.name = self.product_id.default_code
+                self.product_uom = self.product_id.uom_id.id
+            if partner and self.product_id:
+                self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+        else:
+            raise UserError(_('Kategori product / material harus Sparepart atau Bahan'))
 
-    # @api.multi
-    # def write(self, values):
-    #     res = super(ServiceLine, self).write(values)
-    #     return res
+    @api.multi
+    def write(self, values):
+        if 'product_id' in values and self.supply_type == 'self':
+            product = self.env['product.product'].search([('id', '=', values['product_id'])], limit=1)
+            if product.categ_id.name == 'Sparepart' or product.categ_id.name == 'Bahan':
+                pass
+            else:
+                raise UserError(_('%s tidak termasuk kategori Sparepart atau Bahan' % (self.product_id.name)))
+        res = super(ServiceLine, self).write(values)
+        return res
 
     # @api.multi
     def action_unlink(self):

@@ -119,24 +119,25 @@ class ReportMoveXlsx(models.AbstractModel):
             idx = 1
             total_spareparts = 0
             for r in service.operations:
-                worksheet.write(row, 0, idx, border_format)
-                worksheet.write(row, 1, r.part_number, border_format)
-                worksheet.merge_range(row, 2, row, 3, r.name, border_format)
-                worksheet.write(row, 4, r.product_uom_qty, border_format)
-                worksheet.write(row, 5, r.price_unit, number_format)
-                worksheet.write(row, 6, r.price_subtotal, number_format)
-                total_spareparts += r.price_subtotal
-                row += 1
-                idx += 1
+                if r.approved:
+                    worksheet.write(row, 0, idx, border_format)
+                    worksheet.write(row, 1, r.part_number, border_format)
+                    worksheet.merge_range(row, 2, row, 3, r.name, border_format)
+                    worksheet.write(row, 4, r.product_uom_qty, border_format)
+                    worksheet.write(row, 5, r.price_unit, number_format)
+                    worksheet.write(row, 6, r.price_subtotal, number_format)
+                    total_spareparts += r.price_subtotal
+                    row += 1
+                    idx += 1
             worksheet.merge_range(row, 0, row, 5, 'Total Sparepart', section_format)
             worksheet.write(row, 6, total_spareparts, number_format)
 
+            total = total_spareparts + total_jasa
             row += 1
             worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
-            worksheet.write(row, 6, service.amount_untaxed, number_format)
+            worksheet.write(row, 6, total, number_format)
 
             row += 1
-            total = total_spareparts + total_jasa
             worksheet.merge_range(row, 0, row, 1, 'Terbilang:', border_format)
             worksheet.merge_range(row, 2, row, 4, num2words(total, lang='id'), wrap_format)
             worksheet.merge_range(row, 5, row, 6, '%s, %s' % ('Bekasi', fields.Date.today()), center_format)
