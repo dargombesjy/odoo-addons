@@ -183,20 +183,31 @@ class ReportFinancialXlsx(models.AbstractModel):
             # 'valign': 'center',
             # 'border': 1
         })
+        bold_h4 = workbook.add_format({
+            'bold': True,
+            'font_size': 14,
+        })
         bold = workbook.add_format({
             'bold': True,
             # 'align': 'right',
             # 'valign': 'center',
             # 'border': 1
         })
-        
-        sheet.write(1, 1, objs['data']['account_report_id'][1])
-        sheet.write(2, 1, 'Date From')
-        sheet.write(2, 2, objs['data']['date_from'])
-        sheet.write(2, 3, 'Date To')
-        sheet.write(2, 4, objs['data']['date_to'])
 
-        row = 4
+        sheet.hide_gridlines(2)
+        sheet.set_column(0, 0, 2)
+        sheet.set_column(1, 1, 40)
+        sheet.set_column(2, 4, 18)
+        
+        sheet.write(1, 1, objs['data']['account_report_id'][1], bold_h4)
+        sheet.write(2, 1, '%s: %s' % ('Date From', objs['data']['date_from']))
+        sheet.write(3, 1, '%s: %s' % ('Date To', objs['data']['date_to']))
+        # sheet.write(2, 1, 'Date From')
+        # sheet.write(2, 2, objs['data']['date_from'])
+        # sheet.write(2, 3, 'Date To')
+        # sheet.write(2, 4, objs['data']['date_to'])
+
+        row = 5
         col = 1
         sheet.write(row, col, 'Name', bold)
         if objs['data']['debit_credit'] == 1:

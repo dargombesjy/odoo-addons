@@ -8,15 +8,15 @@ class ReportServiceOrderXlsx(models.AbstractModel):
     def _get_orders(self, data):
         cr = self.env.cr
 
-        sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name AS partner_name,\
+        sql = ('''SELECT s.name, s.company_id, s.bill_type, s.state, s.equipment_id, e.name AS equipment_name,\
             s.amount_untaxed, s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,\
             s.amount_jasa, s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax,\
             SUM(COALESCE(po.amount_untaxed,0)) AS jasa_untaxed, SUM(COALESCE(po.amount_total,0)) AS jasa_total\
             FROM service_order s\
-            LEFT JOIN res_partner p ON (s.insurance_id=p.id)\
+            LEFT JOIN service_equipment e ON (s.equipment_id=e.id)\
             LEFT JOIN purchase_order po ON (s.id=po.service_id)\
             WHERE s.register_date >= %s AND s.register_date <= %s AND po.po_type = 'service'\
-            GROUP BY s.name, s.company_id, s.bill_type, s.state, s.insurance_id, p.name, s.amount_untaxed,\
+            GROUP BY s.name, s.company_id, s.bill_type, s.state, s.equipment_id, e.name, s.amount_untaxed,\
             s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,s.amount_jasa,\
             s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax\
             ORDER BY s.state, s.name''')
@@ -130,13 +130,26 @@ class ReportServiceOrderXlsx(models.AbstractModel):
 
         orders = objs['service_orders']
 
-        sheet.write(1, 1, 'Estimasi Pendapatan Service Order', bold_h4)
-        sheet.write(2, 1, 'Date From')
-        sheet.write(2, 2, objs['data']['date_from'])
-        sheet.write(2, 3, 'Date To')
-        sheet.write(2, 4, objs['data']['date_to'])
+        sheet.hide_gridlines(2)
+        sheet.set_column(0, 0, 2)
+        sheet.set_column(1, 1, 22)
+        sheet.set_column(2, 2, 10)
+        sheet.set_column(3, 5, 15)
+        sheet.set_column(6, 6, 2)
+        sheet.set_column(7, 13, 15, None, {'level': 1})
+        sheet.set_column(14, 14, 2, None, {'collapsed': True})
+        sheet.set_column(15, 16, 15, None, {'level': 1})
+        sheet.set_column(17, 17, 2, None, {'collapsed': True})
 
-        row = 4
+        sheet.write(1, 1, 'Estimasi Pendapatan Service Order', bold_h4)
+        sheet.write(2, 1, '%s: %s' % ('Date From', objs['data']['date_from']))
+        sheet.write(3, 1, '%s: %s' % ('Date To', objs['data']['date_to']))
+        # sheet.write(2, 1, 'Date From')
+        # sheet.write(2, 2, objs['data']['date_from'])
+        # sheet.write(2, 3, 'Date To')
+        # sheet.write(2, 4, objs['data']['date_to'])
+
+        row = 5
         col = 1
         if objs['data']['with_details']:
             col += 1
@@ -163,8 +176,9 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             sheet.write(row, col, order[1]['description'], bold_h4)
             if objs['data']['with_details']:
                 col += 1
-                if order[1]['name'] == 'claim': 
-                    sheet.write(row, col, 'Insurance', bold_h4)
+                sheet.write(row, col, 'No. Plat', bold_h4)
+                # if order[1]['name'] == 'claim': 
+                    # sheet.write(row, col, 'Insurance', bold_h4)
             # for agg in order[1]['aggregates'].items():
                 # sheet.write(row, col, '%s %s' % (agg[0], agg[1]), bold_h4)
                 # col += 1
@@ -214,8 +228,9 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         col = 1
                         sheet.write(row, col, '%s %s' % ('....', o['name']))
                         col += 1
-                        if order[1]['name'] == 'claim':
-                            sheet.write(row, col, o['partner_name'])
+                        sheet.write(row, col, o['equipment_name'])
+                        # if order[1]['name'] == 'claim':
+                            # sheet.write(row, col, o['partner_name'])
                         sheet.write(row, col + 1, o['amount_untaxed'], number_normal)
                         sheet.write(row, col + 2, o['cost_total'], number_normal)
                         sheet.write(row, col + 3, o['amount_untaxed'] - o['cost_total'], number_normal)
@@ -232,7 +247,9 @@ class ReportServiceOrderXlsx(models.AbstractModel):
                         # sheet.write(row, col + 16, o['register_date'], date_normal)
                         # sheet.write(row, col + 17, o['received_date'], date_normal)
                         # sheet.write(row, col + 18, o['finish_date'], date_normal)
+                        sheet.set_row(row, None, None, {'level': 1})
                         row += 1
+                        sheet.set_row(row, 3, None, {'collapsed': True})
                 row += 1
             row += 1
 

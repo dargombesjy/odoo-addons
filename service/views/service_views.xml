@@ -77,20 +77,22 @@
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"
 							string="Create Own Risk" groups="account.group_account_invoice"
-							attrs="{'invisible': ['|', ('bill_type', '=', 'self'), ('own_risk_invoiced', '=', True)]}"/>
+							attrs="{'invisible': ['|', ('bill_type', '=', 'self'), ('own_risk_invoiced', '=', True), ('state', '=', 'draft')]}"/>
 						<button name="action_print_pass_keluar" type="object"
-							string="Print Pass Keluar" groups="account.group_account_invoice" />
+							string="Print Pass Keluar" groups="account.group_account_invoice"
+							attrs="{'invisible':[('state', 'not in',('2binvoiced','ready'))]}"/>
 						<button name="action_service_invoice_create"
 							states="2binvoiced" type="object" string="Create Invoice"
 							class="oe_highlight" groups="account.group_account_invoice" />
 						<button name="action_service_end" states="ready"
 							string="Close Order" type="object" class="oe_highlight" />
 						<button name="action_service_cancel_draft"
-							string="Set to Draft" type="object" groups="service.group_service_finance" />
+							string="Set to Draft" type="object" groups="service.group_service_finance"
+							attrs="{'invisible':[('state', '=', 'draft')]}"/>
 						<button name="action_set_part_cost" type="object" groups="service.group_service_manager"
 							string="Check Sparepart" attrs="{'invisible':[('state', '=','done')]}"/>
-						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
-							attrs="{'invisible':[('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
+						<button name="action_service_cancel" string="Cancel Service" type="object"
+							states="draft"/>
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
 							attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
 						<field name="state" widget="statusbar"

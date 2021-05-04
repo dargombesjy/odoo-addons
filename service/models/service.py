@@ -328,11 +328,11 @@ class ServiceOrder(models.Model):
 
     @api.multi
     def action_print_service_order(self):
-        return self.env.ref('service.action_report_service_order').report_action(self)
+        return self.env.ref('service.action_report_service_order').with_context(discard_logo_check=True).report_action(self)
 
     @api.multi
     def action_print_pass_keluar(self):
-        return self.env.ref('service.report_gate_pass').report_action(self)
+        return self.env.ref('service.report_gate_pass').with_context(discard_logo_check=True).report_action(self)
 
     def action_service_invoice_create(self):
         for service in self:
@@ -697,6 +697,10 @@ class ServiceOrder(models.Model):
                 if item.product_id.standard_price <= 0:
                     raise UserError(_('Product "%s" belum memiliki harga standar') % item.product_id.name)
                 item.cost_unit = item.product_id.standard_price
+    
+    @api.multi
+    def action_service_cancel(self):
+        return self.write({'state': 'cancel'})
 
     @api.multi
     def write(self, values):

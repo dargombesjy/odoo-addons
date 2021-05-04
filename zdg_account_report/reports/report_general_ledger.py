@@ -141,35 +141,49 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
             'num_format': '#,##0',
             # 'border': 1
         })
+        number_bold = workbook.add_format({
+            'num_format': '#,##0',
+            'bold': True,
+        })
         date_format = workbook.add_format({
             'num_format': 'dd/mm/yyyy',
             # 'border': 1
         })
         header_format = workbook.add_format({
             'bold': True,
-            # 'align': 'center',
-            'valign': 'center',
+            # 'align': 'left',
+            # 'valign': 'center',
             # 'border': 1
         })
 
         journals = objs['print_journal']
 
-        sheet.write(1, 1, 'General Ledger')
-        sheet.write(2, 1, 'Journals')
-        sheet.write(2, 2, ', '.join([lt or '' for lt in journals]))
+        sheet.hide_gridlines(2)
+        sheet.set_column(0, 0, 2)
+        sheet.set_column(1, 1, 12)
+        sheet.set_column(3, 3, 20)
+        sheet.set_column(4, 5, 15)
+        sheet.set_column(6, 6, 25)
+        sheet.set_column(7, 9, 15)
+        sheet.write(1, 1, 'General Ledger', header_format)
+        sheet.write(2, 1, 'Journals', header_format)
+        sheet.write(2, 2, ', '.join([lt or '' for lt in journals]), header_format)
         sheet.write(3, 1, 'Date From')
         sheet.write(3, 2, objs['data']['date_from'])
         sheet.write(3, 3, 'Date To')
         sheet.write(3, 4, objs['data']['date_to'])
 
-        row = 4
+        row = 6
+        sheet.write(row, 7, 'Debit', number_bold)
+        sheet.write(row, 8, 'Credit', number_bold)
+        sheet.write(row, 9, 'Balance', number_bold)
         for account in objs['Accounts']:
             row += 1
-            sheet.write(row, 1, account['code'])
-            sheet.write(row, 2, account['name'])
-            sheet.write(row, 7, account['debit'], number_format)
-            sheet.write(row, 8, account['credit'], number_format)
-            sheet.write(row, 9, account['balance'], number_format)
+            sheet.write(row, 1, account['code'], number_bold)
+            sheet.write(row, 2, account['name'], number_bold)
+            sheet.write(row, 7, account['debit'], number_bold)
+            sheet.write(row, 8, account['credit'], number_bold)
+            sheet.write(row, 9, account['balance'], number_bold)
             # sheet.write(row, 10, res_company.currency_id)
             row += 1
             sheet.write(row, 1, 'Date')
@@ -181,6 +195,7 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
             sheet.write(row, 7, 'Debit')
             sheet.write(row, 8, 'Credit')
             sheet.write(row, 9, 'Balance')
+            sheet.set_row(row, None, None, {'level': 1})
             # sheet.write(row, 10, 'Currency')
             
             for line in account['move_lines']:
@@ -195,9 +210,10 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
                 sheet.write(row, 7, line['debit'], number_format)
                 sheet.write(row, 8, line['credit'], number_format)
                 sheet.write(row, 9, line['balance'], number_format)
+                sheet.set_row(row, None, None, {'level': 1})
                 # sheet.write(row, 10, line['amount_currency'])
             row += 1
-    
+            sheet.set_row(row, 2, None, {'collapsed': True})
 # this is the pdf version
 class ReportGeneralLedger(models.AbstractModel):
     _name = 'report.zdg_account_report.report_generalledger'
