@@ -80,7 +80,7 @@
 							attrs="{'invisible': ['|', ('bill_type', '=', 'self'), ('own_risk_invoiced', '=', True), ('state', '=', 'draft')]}"/>
 						<button name="action_print_pass_keluar" type="object"
 							string="Print Pass Keluar" groups="account.group_account_invoice"
-							attrs="{'invisible':[('state', 'not in',('2binvoiced','ready'))]}"/>
+							attrs="{'invisible':[('state', '=', 'draft')]}"/>
 						<button name="action_service_invoice_create"
 							states="2binvoiced" type="object" string="Create Invoice"
 							class="oe_highlight" groups="account.group_account_invoice" />
