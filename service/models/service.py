@@ -853,16 +853,17 @@ class ServiceLine(models.Model):
 
         # if not self.product_id or not self.product_uom_qty:
         # return
-        category = self.product_id.categ_id.name
-        if category == 'Sparepart' or category == 'Bahan':
-            if self.product_id:
+        if self.product_id:
+            category = self.product_id.categ_id.name
+            if category == 'Sparepart' or category == 'Bahan':
+                # if self.product_id:
                 self.part_number = self.product_id.name
                 # self.name = self.product_id.default_code
                 self.product_uom = self.product_id.uom_id.id
-            if partner and self.product_id:
-                self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
-        else:
-            raise UserError(_('Kategori product / material harus Sparepart atau Bahan'))
+                if partner:  # and self.product_id:
+                    self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+            else:
+                raise UserError(_('Kategori product / material harus Sparepart atau Bahan'))
 
     @api.multi
     def write(self, values):
