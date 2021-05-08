@@ -36,6 +36,7 @@ class AccountInvoice(models.Model):
         wht_base = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda l: l.product_category == 'Service Fee'))
 
         self.wht_base = wht_base
+        self.sub_material = 0
         self.wht_tax = wht_tax
         self.wht_proportion = wht_proportion
         if wht_proportion > 0:
