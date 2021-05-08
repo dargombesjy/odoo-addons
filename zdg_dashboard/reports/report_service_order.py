@@ -110,7 +110,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
         bold_right = workbook.add_format({
             'bold': True,
             'align': 'right',
-            # 'valign': 'center',
+            # 'valign': 'vcenter',
             # 'border': 1
         })
         bold = workbook.add_format({
@@ -125,7 +125,7 @@ class ReportServiceOrderXlsx(models.AbstractModel):
             'num_format': '#,##0',
             # 'align': 'right',
             # 'valign': 'center',
-            # 'border': 1
+            'bottom': 1
         })
 
         orders = objs['service_orders']

@@ -272,6 +272,9 @@ class ServiceOrder(models.Model):
     def _cost_untaxed(self):
         cost_part = sum(operation.cost_subtotal for operation in self.operations)
         cost_jasa = sum(fee.cost_subtotal for fee in self.fees_lines)
+        cost_jasa_po = self._calculate_fees_cost()
+        if cost_jasa_po > 0:
+            cost_jasa = cost_jasa_po
         cost_others = 0
         for other in self.others_lines:
             if other.product_id.name != 'Own Risk':
@@ -303,6 +306,16 @@ class ServiceOrder(models.Model):
     def button_dummy(self):
         # TDE FIXME: this button is very interesting
         return True
+
+    @api.multi
+    def _calculate_fees_cost(self):
+        cost_jasa_po = 0
+        if self.purchase_ids:
+            purchase_orders = self.env['purchase.order'].search([('id', 'in', [x.id for x in self.purchase_ids])])
+            for po in purchase_orders:
+                cost_jasa_po += po.amount_total
+        
+        return cost_jasa_po
 
     @api.multi
     def action_service_confirm(self):
@@ -348,10 +361,13 @@ class ServiceOrder(models.Model):
 
     def action_service_ready(self):
         if self.operations.filtered(lambda op: op.requested and not op.received):
-            raise UserError(_('There are requested items not yet received'))
+            raise UserError(_('Masih ada Sparepart yang belum received'))
         if self.consumable_lines.filtered(lambda op:op.requested and not op.received):
-            raise UserError(_('There are requested consumables not yet received'))
+            raise UserError(_('Masih ada Consumable yang belum received'))
         self.mapped('operations').write({'state': 'confirmed'})
+        cost_jasa_po = self._calculate_fees_cost()
+        if cost_jasa_po > 0:
+            self.cost_fees = cost_jasa_po
         return self.write({'state': '2binvoiced', 'work_stage': 'done'})
 
     @api.multi

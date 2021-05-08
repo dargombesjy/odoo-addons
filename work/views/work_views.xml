@@ -121,7 +121,7 @@
 											attrs="{'readonly': 1}"/>
 										<field name="requested" string="Req"/>
 										<field name="received" string="Rcv"
-											attrs="{'readonly': 0}" />
+											attrs="{'readonly': 1}"/>
 										<field name="is_robbing"/>
 										<field name="eq_robbed"
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>

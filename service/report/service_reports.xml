@@ -21,5 +21,14 @@
       		file="service.report_quotation_xlsx"
 			print_report_name="'Quotation %s' % (object.name)"/>
 
+		<report id="form_service_xlsx"
+      		model="service.order"
+      		string="Service Detail View"
+      		report_type="xlsx"
+      		name="service.form_service_xlsx"
+      		file="service.form_service_xlsx"
+			print_report_name="'Analisa %s' % (object.name)"
+			groups="service.group_service_manager"/>
+
 	</data>
 </odoo>
