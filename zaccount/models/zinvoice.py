@@ -34,11 +34,12 @@ class AccountInvoice(models.Model):
         wht_tax = self.partner_id.wht_tax
         wht_proportion = self.partner_id.wht_proportion
         wht_base = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda l: l.product_category == 'Service Fee'))
-        wht_base_rev = wht_base * wht_proportion
 
+        self.wht_base = wht_base
         self.wht_tax = wht_tax
         self.wht_proportion = wht_proportion
         if wht_proportion > 0:
+            wht_base_rev = wht_base * wht_proportion
             self.wht_base = wht_base_rev
             self.sub_material = wht_base - wht_base_rev
         self.sub_spareparts = sum(sp.price_subtotal for sp in self.invoice_line_ids.filtered(lambda s: s.product_category == 'Sparepart'))
