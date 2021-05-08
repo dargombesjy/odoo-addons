@@ -543,7 +543,7 @@ class ServiceOrder(models.Model):
                             account_id = fee.product_id.categ_id.property_account_income_categ_id.id
                         else:
                             raise UserError(_('No account defined for product "%s%".') % fee.product_id.name)
-
+                        
                         invoice_line = InvoiceLine.create({
                             'invoice_id': invoice.id,
                             'name': name,
@@ -553,7 +553,8 @@ class ServiceOrder(models.Model):
                             'invoice_line_tax_ids': [(6, 0, [x.id for x in fee.tax_id])],
                             'uom_id': fee.product_uom.id,
                             'product_id': fee.product_id and fee.product_id.id or False,
-                            'product_category': fee.product_id.categ_id.name,
+                            # 'product_category': fee.product_id.categ_id.name,
+                            'product_category': 'Service Fee',
                             'price_unit': fee.price_unit,
                             'price_subtotal': fee.product_uom_qty * fee.price_unit
                         })

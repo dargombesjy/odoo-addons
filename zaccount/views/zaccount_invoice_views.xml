@@ -9,9 +9,12 @@
 				<xpath expr="//header/button[@name='preview_invoice']"
 					position="after">
 					<button name="action_print_invoice_or"
-						string="Print Invoice OR" type="object" />
+						string="Print Invoice OR" type="object"/>
 					<button name="action_set_draft"
-						string="Set to Draft" type="object" />
+						string="Set to Draft" type="object"/>
+					<button name="action_recompute_wht"
+						string="Recalc. WHT" type="object"
+						groups="service.group_service_manager"/>
 				</xpath>
 				<xpath expr="//sheet/group/group/field[@name='payment_term_id']" position="after">
 					<field name="service_id"/>

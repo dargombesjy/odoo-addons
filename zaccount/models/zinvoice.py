@@ -19,10 +19,17 @@ class AccountInvoice(models.Model):
     def action_set_draft(self):
         return self.write({'state': 'draft'})
 
+    @api.multi
+    def action_recompute_wht(self):
+        self._calc_wht()
+
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
                  'currency_id', 'company_id', 'date_invoice', 'type')
     def _compute_wht(self):
+        self._calc_wht()
+    
+    def _calc_wht(self):
         round_curr = self.currency_id.round
         wht_tax = self.partner_id.wht_tax
         wht_proportion = self.partner_id.wht_proportion
