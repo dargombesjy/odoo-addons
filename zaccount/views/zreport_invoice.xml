@@ -33,7 +33,8 @@
 								<span>Jl. Siliwangi Km. 7 No. 50</span>
 							</div>
 						</div> -->
-						<h4 style="margin-top: 5px;">
+						<div class="oe_structure" style="height:10px"/>
+						<h4>
 							<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
 							<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
 							<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
