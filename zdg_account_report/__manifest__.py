@@ -19,9 +19,11 @@
         'wizards/general_ledger.xml',
         'wizards/balance_sheet.xml',
         'wizards/profit_and_loss.xml',
+        'wizards/partner_ledger.xml',
         'reports/reports.xml',
         'reports/report_general_ledger.xml',
-        'reports/report_financial.xml'
+        'reports/report_financial.xml',
+        'reports/report_partner_ledger.xml'
     ],
     'installable': True,
     'application': False,
