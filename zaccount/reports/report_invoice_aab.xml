@@ -173,21 +173,22 @@
                 <div class="row">
                   <div class="col-4">
 <!--                     <div><span>Total Tagihan Spareparts</span></div> -->
-					<div><span>Part</span></div>
+					          <div><span>Part</span></div>
                   </div>
                   <div class="col-3">
-                    <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_spareparts" /></div>
+                    <div>: <span t-field="o.sub_spareparts" /></div>
+                    <!-- <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_spareparts" /></div> -->
                   </div>
                 </div>
-<!--                 <div class="row"> -->
-<!--                   <div class="col-4"> -->
-<!--                     <div><span>Lain-Lain</span></div> -->
-<!--                   </div> -->
-<!--                   <div class="col-3"> -->
-<!--                     <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div> -->
-<!--                   </div> -->
-<!--                 </div> -->
-				<t t-set="gross" t-value="o.amount_untaxed + o.own_risk"/>
+                <div class="row">
+                  <div class="col-4">
+                    <div><span>Other</span></div>
+                  </div>
+                  <div class="col-3">
+                    <div style="border-bottom:1px solid grey;">: <span t-field="o.sub_others" /></div>
+                  </div>
+                </div>
+				        <t t-set="gross" t-value="o.amount_untaxed + o.own_risk"/>
                 <div class="row">
                   <div class="col-4">
                     <div><span>Jumlah</span></div>
