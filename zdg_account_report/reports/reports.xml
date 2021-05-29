@@ -8,14 +8,22 @@
             name="zdg_account_report.report_generalledger_xlsx"
             file="General Ledger"
             attachment_use="False"/>
+        
+        <report id="action_report_partner_ledger"
+            model="account.report.partner.ledger"
+            string="Partner Ledger"
+            report_type="xlsx"
+            name="zdg_account_report.report_partnerledger_xlsx"
+            file="Partner Ledger"
+            attachment_use="False"/>
 
 	    <report id="action_report_financial"
-				model="account.financial.report"
-				string="Financial report"
-				report_type="xlsx"
-				menu="False"
-				name="zdg_account_report.report_financial_xlsx"
-				file="Financial Report"/>
+			model="account.financial.report"
+			string="Financial report"
+			report_type="xlsx"
+			menu="False"
+			name="zdg_account_report.report_financial_xlsx"
+			file="Financial Report"/>
 
     </data>
 </odoo>

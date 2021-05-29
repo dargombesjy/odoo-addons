@@ -214,6 +214,7 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
                 # sheet.write(row, 10, line['amount_currency'])
             row += 1
             sheet.set_row(row, 2, None, {'collapsed': True})
+            
 # this is the pdf version
 class ReportGeneralLedger(models.AbstractModel):
     _name = 'report.zdg_account_report.report_generalledger'
