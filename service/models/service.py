@@ -899,7 +899,8 @@ class ServiceLine(models.Model):
             raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
         transfer_line = self.env['stock.move'].search([('service_line_id', '=', self.id)], limit=1)
         if transfer_line:
-            self.delete_flag = True 
+            self.delete_flag = True
+            transfer_line.write({'delete_flag': True})
             return {
                 'name': _('Warning'),
                 'view_mode': 'form',

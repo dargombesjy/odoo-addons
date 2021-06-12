@@ -292,6 +292,7 @@ class StockMove(models.Model):
     receiver = fields.Char('Penerima')
     received_date = fields.Date('Tgl. Ambil')
     auto_receipt_id = fields.Many2one('stock.move', 'Receipt', copy=False)
+    delete_flag = fields.Boolean('Deleted', default=False)
     
     @api.one
     @api.depends('service_line_id')
