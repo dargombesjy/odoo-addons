@@ -145,7 +145,7 @@
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="received_date"
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
-									<field name="delete_flag" invisible="1" readonly="1"/>
+									<field name="delete_flag" invisible="0" readonly="1"/>
 									<button name="action_set_draft" type="object" icon="fa-cubes"
 										attrs="{'invisible': [('state', '=', 'draft')]}"
 										groups="service.group_admin_superadmin" />
