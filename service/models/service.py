@@ -708,7 +708,7 @@ class ServiceOrder(models.Model):
     
     @api.multi
     def action_set_part_cost(self):
-        no_cost = self.mapped('operations').filtered(lambda ops: ops.cost_unit == 0)
+        no_cost = self.mapped('operations').filtered(lambda ops: ops.cost_unit == 0 and ops.approved)
         for item in no_cost:
             if item.supply_type == 'self' and item.cost_unit == 0:
                 if item.product_id.standard_price <= 0:
