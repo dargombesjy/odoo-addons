@@ -140,7 +140,7 @@
               <div class="mt8 mb8" style="border-bottom:1px solid grey;">
                 <div class="row">
                   <div class="col-3"><span>KWITANSI KLAIM NO</span></div>
-                  <div class="col-4">
+                  <div class="col-3">
                     <div>: <span t-field="o.number"/></div>
                   </div>
                   <div class="col-3"><span>BERKAS KLAIM NO</span></div>
