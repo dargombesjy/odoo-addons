@@ -25,6 +25,7 @@ encoding//om_account_asset/models/account_invoice.py=utf-8
 encoding//om_account_asset/models/product.py=utf-8
 encoding//om_account_budget/models/account_analytic_account.py=utf-8
 encoding//om_account_budget/models/account_budget.py=utf-8
+encoding//service/__init__.py=utf-8
 encoding//service/__manifest__.py=utf-8
 encoding//service/models/__init__.py=utf-8
 encoding//service/models/equipment.py=utf-8

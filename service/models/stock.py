@@ -336,7 +336,12 @@ class StockMove(models.Model):
         move_create_proc = self.env['stock.move']
         move_to_confirm = self.env['stock.move']
         move_waiting = self.env['stock.move']
-
+        
+        # suwarno: this to overrife merge behaviour
+        # todo: check if merge is required
+        allow_merge = self.env['ir.config_parameter'].sudo().get_param('service.allow_merge_move')
+        merge = allow_merge == 'True'
+        
         to_assign = {}
         for move in self:
             if move.service_id:
