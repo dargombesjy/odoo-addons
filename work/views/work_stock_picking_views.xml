@@ -100,7 +100,8 @@
 									string="Stock Moves" editable="bottom">
 									<field name="service_id" invisible="1"/>
 									<field name="service_line_id" invisible="1" />
-									<field name="product_category" invisible="0" groups='service.group_service_manager' />
+									<!-- <field name="product_category" invisible="0" groups='service.group_service_manager' /> -->
+									<field name="product_category" invisible="0"/>
 									<field name="date_expected" invisible="1" />
 									<field name="state" invisible="1" readonly="0" />
 									<field name="picking_type_id" invisible="1" />

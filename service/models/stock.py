@@ -3,13 +3,22 @@
 # from dateutil import relativedelta
 from itertools import groupby
 from operator import itemgetter
-
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from .service import SUPPLY_TYPES
 from odoo.osv import expression
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_round, float_is_zero
+
+PRODUCT_CATEGORIES = [
+        ('All', 'All'),
+        ('Sparepart', 'Sparepart'),
+        ('Bahan', 'Bahan'),
+        ('Consumable', 'Consumable'),
+        ('Service Fee', 'Service Fee'),
+        ('Service Other', 'Service Other'),
+        ('Expenses', 'Expenses'),
+        ('Saleable', 'Saleable')]
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -282,7 +291,8 @@ class StockMove(models.Model):
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], index=True, required=False)
-    product_category = fields.Char('Product Category')
+    # product_category = fields.Char('Product Category')
+    product_category = fields.Selection(PRODUCT_CATEGORIES, 'Product Category')
     supply_type = fields.Selection(SUPPLY_TYPES, 'Supply Type')
     part_number = fields.Char('Kode Part Admin', compute='_compute_part_admin')
     vendor_id = fields.Many2one('res.partner', 'Vendor', index=True)
