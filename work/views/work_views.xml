@@ -215,7 +215,7 @@
 									<form string="Consumables">
 										<group>
 											<field name="product_id"
-												domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
+												domain="[('type', '=', 'product'), ('categ_id', 'in', (7, 8))]" />
 											<field name="name" />
 											<label for="product_uom_qty" />
 											<div class="o_row">
@@ -230,7 +230,7 @@
 									</form>
 									<tree string="Consumables" editable="bottom">
 										<field name="product_id" string="Bahan"
-											domain="[('type', '=', 'product'), ('categ_id', '=', 7)]" />
+											domain="[('type', '=', 'product'), ('categ_id', 'in', (7, 8))]" />
 										<field name="name" invisible="1" />
 										<field name="product_uom_qty" string="Quantity" />
 										<field name="product_uom" string="Unit of Measure"
