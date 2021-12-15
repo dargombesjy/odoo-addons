@@ -53,7 +53,7 @@ class ReportVendorBillingXlsx(models.AbstractModel):
             sheet.write(row, 5, line.service_id.model)
             sheet.write(row, 6, line.residual, number_normal)
         row += 1
-        sheet.write(row, 7, sum_, number_normal)
+        sheet.write(row, 6, sum_, number_normal)
 
         row += 2
         sheet.merge_range(row, 6, row, 7, '%s, %s' % ('Bekasi', datetime.date.today()), center_normal)
