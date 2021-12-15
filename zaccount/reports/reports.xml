@@ -25,11 +25,20 @@
 			name="zaccount.report_invoice_aab" file="zaccount.report_invoice_aab"
 			groups="account.group_account_invoice" />
 			
-		<report string="Vendor Bill"
+		<!-- <report string="Vendor Bill"
 			id="action_vendor_bill_request"
 			model="account.invoice"
 			name="zaccount.vendor_bill_request_list"
 			report_type="qweb-pdf"
+			menu="True"
+			groups="work.group_work_user"/> -->
+
+		<report string="Vendor Billing Excel"
+			id="action_report_vendor_billing_xlsx"
+			model="account.invoice"
+			name="zaccount.report_vendor_billing_xlsx"
+			file="Vendor Billing"
+			report_type="xlsx"
 			menu="True"
 			groups="work.group_work_user"/>
 
