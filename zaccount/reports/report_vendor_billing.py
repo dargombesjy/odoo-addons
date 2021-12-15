@@ -31,7 +31,7 @@ class ReportVendorBillingXlsx(models.AbstractModel):
         })
 
         row = 2
-        sheet.write(row, 0, '#', bold)
+        sheet.write(row, 0, 'No.', bold)
         sheet.write(row, 1, 'No. SPK', bold)
         sheet.write(row, 2, 'No. Billing', bold)
         sheet.write(row, 3, 'Vendor', bold)
@@ -45,13 +45,13 @@ class ReportVendorBillingXlsx(models.AbstractModel):
             row += 1
             n += 1
             sum_ += line.residual
-            sheet.write(row, 1, n)
-            sheet.write(row, 2, line.service_id.name)
-            sheet.write(row, 3, line.number)
-            sheet.write(row, 4, line.partner_id.name)
-            sheet.write(row, 5, line.service_id.equipment_id.name)
-            sheet.write(row, 6, line.service_id.model)
-            sheet.write(row, 7, line.residual, number_normal)
+            sheet.write(row, 0, n)
+            sheet.write(row, 1, line.service_id.name)
+            sheet.write(row, 2, line.number)
+            sheet.write(row, 3, line.partner_id.name)
+            sheet.write(row, 4, line.service_id.equipment_id.name)
+            sheet.write(row, 5, line.service_id.model)
+            sheet.write(row, 6, line.residual, number_normal)
         row += 1
         sheet.write(row, 7, sum_, number_normal)
 
