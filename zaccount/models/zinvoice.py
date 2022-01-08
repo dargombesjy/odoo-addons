@@ -17,6 +17,14 @@ class AccountInvoice(models.Model):
     
     @api.multi
     def action_set_draft(self):
+        if self.move_id:
+            if self.move_id.state == 'draft':
+                self.move_id.unlink()
+            else:
+                m_lines = self.move_id.reverse_moves()
+                # if m_lines == []:
+                    # self.move_id.unlink()
+                self.move_id = None
         return self.write({'state': 'draft'})
 
     @api.multi
@@ -112,6 +120,7 @@ class AccountInvoice(models.Model):
             tax_grouped[wht_key]['base'] = round_curr(wht_val['base'])
         return tax_grouped
 
+    # override standard methods
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
                  'currency_id', 'company_id', 'date_invoice', 'type')
@@ -134,6 +143,72 @@ class AccountInvoice(models.Model):
         self.amount_total_company_signed = amount_total_company_signed * sign
         self.amount_total_signed = self.amount_total * sign
         self.amount_untaxed_signed = amount_untaxed_signed * sign
+
+    # # override standard methods
+    # @api.onchange('invoice_line_ids')
+    # def _onchange_invoice_line_ids(self):
+    #     taxes_grouped = self.get_taxes_values()
+    #     tax_lines = self.tax_line_ids.filtered('manual')
+    #     for tax in taxes_grouped.values():
+    #         tax_lines += tax_lines.new(tax)
+    #     self.tax_line_ids = tax_lines
+    #     if self.move_id:
+    #         move_lines = self._rebuild_move_line()
+
+    #     return
+
+    # def _rebuild_move_line(self):
+    #     inv = self
+    #     # create move lines (one per invoice line + eventual taxes and analytic lines)
+    #     iml = inv.invoice_line_move_line_get()
+    #     iml += inv.tax_line_move_line_get()
+
+    #     diff_currency = inv.currency_id != company_currency
+    #     # create one move line for the total and possibly adjust the other lines amount
+    #     total, total_currency, iml = inv.compute_invoice_totals(company_currency, iml)
+
+    #     name = inv.name or ''
+    #     if inv.payment_term_id:
+    #         totlines = inv.payment_term_id.with_context(currency_id=company_currency.id).compute(total, inv.date_invoice)[0]
+    #         res_amount_currency = total_currency
+    #         for i, t in enumerate(totlines):
+    #             if inv.currency_id != company_currency:
+    #                 amount_currency = company_currency._convert(t[1], inv.currency_id, inv.company_id, inv._get_currency_rate_date() or fields.Date.today())
+    #             else:
+    #                 amount_currency = False
+
+    #             # last line: add the diff
+    #             res_amount_currency -= amount_currency or 0
+    #             if i + 1 == len(totlines):
+    #                 amount_currency += res_amount_currency
+
+    #             iml.append({
+    #                 'type': 'dest',
+    #                 'name': name,
+    #                 'price': t[1],
+    #                 'account_id': inv.account_id.id,
+    #                 'date_maturity': t[0],
+    #                 'amount_currency': diff_currency and amount_currency,
+    #                 'currency_id': diff_currency and inv.currency_id.id,
+    #                 'invoice_id': inv.id
+    #             })
+    #     else:
+    #         iml.append({
+    #             'type': 'dest',
+    #             'name': name,
+    #             'price': total,
+    #             'account_id': inv.account_id.id,
+    #             'date_maturity': inv.date_due,
+    #             'amount_currency': diff_currency and total_currency,
+    #             'currency_id': diff_currency and inv.currency_id.id,
+    #             'invoice_id': inv.id
+    #         })
+    #     part = self.env['res.partner']._find_accounting_partner(inv.partner_id)
+    #     line = [(0, 0, self.line_get_convert(l, part.id)) for l in iml]
+    #     line = inv.group_lines(iml, line)
+
+    #     line = inv.finalize_invoice_move_lines(line)
+    #     return line
 
     @api.model
     def create(self, vals):
