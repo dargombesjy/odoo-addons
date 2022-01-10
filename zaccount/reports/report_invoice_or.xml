@@ -311,28 +311,28 @@
 											<td style="width:30%">Account No.</td>
 											<td>:</td>
 											<td>
-												<span>1560000331167</span>
+												<span t-field="o.company_id.partner_id.bank_ids[0].acc_number"></span>
 											</td>
 										</tr>
 										<tr>
 											<td style="width:30%">Account Name</td>
 											<td>:</td>
 											<td>
-												<span>Karya Murni Sentosa</span>
+												<span t-field="o.company_id.partner_id.bank_ids[0].acc_holder_name"></span>
 											</td>
 										</tr>
 										<tr>
 											<td style="width:30%">Bank Name</td>
 											<td>:</td>
 											<td>
-												<span>Mandiri</span>
+												<span t-field="o.company_id.partner_id.bank_ids[0].bank_id.name"></span>
 											</td>
 										</tr>
 										<tr>
 											<td style="width:30%">Email Notification</td>
 											<td>:</td>
 											<td>
-												<span>finance.karyamurni@gmail.com</span>
+												<span t-field="o.company_id.email"></span>
 											</td>
 										</tr>
 									</table>
