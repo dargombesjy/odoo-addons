@@ -7,7 +7,7 @@
           <t t-call="web.external_layout">
             <t t-set="o" t-value="o.with_context(lang=lang)"/>
             <!-- goes below are the contents   -->
-            <div class="page" style="font-size:0.95rem">
+            <div class="page" style="font-size:0.90rem">
               <style type="text/css">
                 .bold {
                   font-weight: bold;
