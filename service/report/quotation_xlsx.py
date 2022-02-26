@@ -157,4 +157,4 @@ class QuotationXlsx(models.AbstractModel):
             row += 1
             worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
             worksheet.merge_range(row, 2, row + 2, 4, service.quotation_notes or '', wrap_format_top)
-            worksheet.merge_range(row, 5, row + 2, 6, service.service_advisor or '', merged_format_bottom)
+            worksheet.merge_range(row, 5, row + 2, 6, service.service_advisor1.name or service.service_advisor or '', merged_format_bottom)
