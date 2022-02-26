@@ -18,7 +18,7 @@
 							<div class="row mb32">
 								<div id="partner" class="col-4">
 									<h6>
-										<strong>PT. Karya Murni Sentosa</strong>
+										<strong>PT. Alam Surya Putra</strong>
 									</h6>
 									<span t-field="res_company.street" />
 									<br></br>

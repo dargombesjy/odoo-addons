@@ -84,6 +84,7 @@ class ServiceOrder(models.Model):
         states={'draft': [('readonly', False)]})
     partner_type = fields.Char('Customer Type', compute='_compute_partner', store=True)
     service_advisor = fields.Char('Service Advisor')
+    service_advisor1 = fields.Many2one('res.partner', 'Service Advisor')
     address_id = fields.Many2one(
         'res.partner', 'Delivery Address', index=True, readonly=True,
         states={'draft': [('readonly', False)]})
@@ -194,6 +195,14 @@ class ServiceOrder(models.Model):
         ('name', 'unique (name)', 'The name of the Service Order must be unique!')
     ]
     
+    @api.onchange('operations', 'fees_lines', 'consumable_lines', 'others_lines')
+    def onchange_lines(self):
+        if self.invoice_id:
+            if self.invoice_id.state == 'open':
+                raise UserError('Sudah terbit Invoice, harap menghubungi Finance')
+            elif self.invoice_id.state == 'paid':
+                raise UserError('Service sudah dibayar, tidak boleh rubah harga')
+
     @api.onchange('equipment_id')
     def onchange_equipment_id(self):
         self.partner_id = self.equipment_id.partner_id.id

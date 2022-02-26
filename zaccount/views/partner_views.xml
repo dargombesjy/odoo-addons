@@ -13,6 +13,9 @@
 						<field name="wht_tax" />
 						<field name="wht_proportion" />
 					</group>
+					<group string="Employee" name="emp">
+						<field name="employee" />
+					</group>
 				</xpath>
 			</field>
 		</record>
