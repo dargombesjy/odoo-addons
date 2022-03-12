@@ -19,7 +19,7 @@ class ReportWorkOrderXlsx(models.AbstractModel):
         cr.execute(sql, params)
 
         states = [('draft', 'Quotation'), ('confirmed', 'Confirmed'), ('under_repair', 'Under Repair'),
-            ('ready', 'Repair Done'), ('2binvoiced', 'To Be Invoiced'), ('done', 'Closed'),]
+            ('ready', 'Repair Done'), ('2binvoiced', 'To Be Invoiced'), ('done', 'Closed'), ('cancel', 'Cancelled'),]
         # states = data['form']['state']
         bill_types = {}
         for (k, v) in [('claim', 'Bill to Insurance'), ('self', 'Bill to Customer'),]:
