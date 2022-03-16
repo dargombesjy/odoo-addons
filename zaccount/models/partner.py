@@ -12,6 +12,13 @@ class ResPartner(models.Model):
         # fields.Many2many('account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'WHT Taxes')
     wht_proportion = fields.Float('WHT proportion', default=1.0)
 
+    def get_wht(self, company):
+        if company == self.wht_tax.company_id:
+            return self.wht_tax
+        else:
+            wht = self.env['account.tax'].search([('name', '=', self.wht_tax.name), ('company_id', '=', company.id)], limit=1)
+            return wht
+
     @api.multi
     def write(self, vals):
         # if vals['wht_proportion']:

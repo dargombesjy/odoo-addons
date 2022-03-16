@@ -39,7 +39,8 @@ class AccountInvoice(models.Model):
     
     def _calc_wht(self):
         round_curr = self.currency_id.round
-        wht_tax = self.partner_id.wht_tax
+        # wht_tax = self.partner_id.wht_tax
+        wht_tax = self.partner_id.get_wht(self.company_id)
         wht_proportion = self.partner_id.wht_proportion
         wht_base = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda l: l.product_category == 'Service Fee'))
 
@@ -113,7 +114,8 @@ class AccountInvoice(models.Model):
                     tax_grouped[key]['amount'] += val['amount']
                     tax_grouped[key]['base'] += round_curr(val['base'])
         if wht_line:
-            wht_tax = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)['taxes']
+            wht_tax_list = self.wht_tax.compute_all(price_unit=self.wht_base, currency=self.currency_id, partner=self.partner_id)
+            wht_tax = wht_tax_list['taxes']
             wht_val = self._prepare_tax_line_vals(wht_line, wht_tax[0])
             wht_key = account_tax.browse(wht_tax[0]['id']).get_grouping_key(wht_val)
             tax_grouped[wht_key] = wht_val
