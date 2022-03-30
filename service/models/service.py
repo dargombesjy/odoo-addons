@@ -428,6 +428,7 @@ class ServiceOrder(models.Model):
                         'service_id': service.id,
                         'eq_name': service.equipment_id.name,
                         'type': 'out_invoice',
+                        'company_id': service.company_id.id,
                         'account_id': service.partner_id.property_account_receivable_id.id,
                         # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
                         'partner_id': service.partner_id.id,

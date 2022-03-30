@@ -215,7 +215,7 @@ class AccountInvoice(models.Model):
     @api.model
     def create(self, vals):
         if vals['origin_type'] == 'own_risk':
-            journal = self.env['account.journal'].search([('code', '=', 'ORINV')], limit=1)
+            journal = self.env['account.journal'].search([('code', '=', 'ORINV'), ('company_id', '=', vals['company_id'])], limit=1)
             vals['journal_id'] = journal.id
          
         result = super(AccountInvoice, self).create(vals)
