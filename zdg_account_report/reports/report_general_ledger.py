@@ -123,7 +123,16 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
         if data['form'].get('journal_ids', False):
             codes = [journal.code for journal in self.env['account.journal'].search([('id', 'in', data['form']['journal_ids'])])]
 
-        accounts = docs if self.model == 'account.account' else self.env['account.account'].search([])
+        accounts = docs if self.model == 'account.account' else self.env['account.account'].search([('id', 'in', data['form']['account_ids'])])
+        # if self.model == 'account.account':
+        #     accounts = docs
+        # elif data['form'].get('account_ids'):
+        #     accounts = data['form']['account_ids']
+        # elif data['form'].get('account_type_ids'):
+        #     accounts = self.env['account.account'].search([('user_type_id', 'in', data['form']['account_type_ids'])])
+        # else:
+        #     accounts = self.env['account.account'].search([('id', 'in', data['form']['account_ids'])])
+
         accounts_res = self.with_context(data['form'].get('used_context',{}))._get_account_move_entry(accounts, init_balance, sortby, display_account)
         return {
             'doc_ids': docids,
@@ -155,23 +164,29 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
             # 'valign': 'center',
             # 'border': 1
         })
+        title_format = workbook.add_format({
+            'bold': True,
+            'font_size': 18,
+            'underline': 33,
+        })
 
         journals = objs['print_journal']
 
         sheet.hide_gridlines(2)
         sheet.set_column(0, 0, 2)
         sheet.set_column(1, 1, 12)
-        sheet.set_column(3, 3, 20)
-        sheet.set_column(4, 5, 15)
-        sheet.set_column(6, 6, 25)
+        sheet.set_column(3, 3, 30)
+        sheet.set_column(4, 4, 30)
+        sheet.set_column(5, 6, 20)
         sheet.set_column(7, 9, 15)
-        sheet.write(1, 1, 'General Ledger', header_format)
+        sheet.set_row(1, 20)
+        sheet.write(1, 1, 'General Ledger Report', title_format)
         sheet.write(2, 1, 'Journals', header_format)
         sheet.write(2, 2, ', '.join([lt or '' for lt in journals]), header_format)
         sheet.write(3, 1, 'Date From')
         sheet.write(3, 2, objs['data']['date_from'])
-        sheet.write(3, 3, 'Date To')
-        sheet.write(3, 4, objs['data']['date_to'])
+        sheet.write(4, 1, 'Date To')
+        sheet.write(4, 2, objs['data']['date_to'])
 
         row = 6
         sheet.write(row, 7, 'Debit', number_bold)

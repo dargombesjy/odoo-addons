@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
 	<record id="action_account_report_pl"
@@ -19,4 +19,4 @@
 		parent="zdg_account_report.menu_finance_legal_statement"
 		groups="account.group_account_user" />
 
-</odoo>
+</odoo> -->

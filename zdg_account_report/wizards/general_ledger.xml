@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-	<record id="account_report_general_ledger_view"
-		model="ir.ui.view">
+	<record id="account_report_general_ledger_view" model="ir.ui.view">
 		<field name="name">General Ledger</field>
 		<field name="model">account.report.general.ledger</field>
 		<field name="inherit_id"
@@ -15,9 +14,42 @@
 					<field name="initial_balance" />
 					<newline />
 				</xpath>
+
+				<xpath expr="//field[@name='journal_ids']" position="before">
+					<field name="report_type"/>
+					<field name="account_type_ids" widget="many2many_tags" options="{'no_create': True}"/>
+					<field name="account_ids" widget="many2many_tags" options="{'no_create': True}" domain="[('company_id', '=', company_id)]"/>
+				</xpath>
 			</data>
 		</field>
 	</record>
+
+	<!-- <record id="account_report_general_ledger_view" model="ir.ui.view">
+		<field name="name">General Ledger</field>
+		<field name="model">account.report.general.ledger</field>
+		<field name="arch" type="xml">
+			<form string="Report Options">
+				<group col="4">
+					<field name="target_move" widget="radio"/>
+					<field name="date_from"/>
+					<field name="date_to"/>
+					<field name="sortby" widget="radio" />
+					<field name="display_account" widget="radio" />
+					<field name="initial_balance" />
+					<newline />
+				</group>
+				<group>
+					<field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+					<field name="journal_ids" widget="many2many_tags" options="{'no_create': True}"/>
+					<field name="account_ids" widget="many2many_tags" options="{'no_create': True}" domain="[('company_id', '=', company_id)]"/>
+				</group>
+				<footer>
+					<button name="check_report" string="Print" type="object" default_focus="1" class="oe_highlight"/>
+					<button string="Cancel" class="btn btn-secondary" special="cancel" />
+				</footer>
+			</form>
+        </field>
+	</record> -->
 
 	<record id="action_account_general_ledger_menu"
 		model="ir.actions.act_window">
