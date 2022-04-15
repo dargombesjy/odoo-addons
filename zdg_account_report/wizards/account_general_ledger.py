@@ -15,6 +15,7 @@ class AccountReportGeneralLedger(models.TransientModel):
                                     help='If you selected date, this field allow you to add a row to display the amount of debit/credit/balance that precedes the filter you\'ve set.')
     sortby = fields.Selection([('sort_date', 'Date'), ('sort_journal_partner', 'Journal & Partner')], string='Sort by', required=True, default='sort_date')
     report_type = fields.Selection([('cashflow', 'Cash Flow'),
+                                    ('expenses', 'Expenses'),
                                     ('balance', 'Balance Sheet'),
                                     ('profitloss', 'Profit Loss'),
                                     ('all', 'All Entries'),
@@ -26,16 +27,19 @@ class AccountReportGeneralLedger(models.TransientModel):
     @api.onchange('report_type')
     def _onchange_report_type(self):
         if self.report_type == 'cashflow':
-            self.journal_ids = self.env['account.journal'].search([('type', 'in', ('cash', 'bank'))])
+            self.journal_ids = self.env['account.journal'].search([('type', 'in', ('cash', 'bank', 'purchase')), ('company_id', '=', self.company_id.id)])
             self.account_type_ids = self.env['account.account.type'].search([('type', '=', 'liquidity')])
+        if self.report_type == 'expenses':
+            self.journal_ids = self.env['account.journal'].search([('type', 'in', ('cash', 'bank')), ('company_id', '=', self.company_id.id)])
+            self.account_type_ids = self.env['account.account.type'].search([('internal_group', 'in', ('liability', 'expense'))])
         elif self.report_type == 'balance':
-            self.journal_ids = self.env['account.journal'].search([('type', 'not in', ('general',))])
+            self.journal_ids = self.env['account.journal'].search([('type', 'not in', ('general',)), ('company_id', '=', self.company_id.id)])
             self.account_type_ids = self.env['account.account.type'].search([('internal_group', 'not in', ('income', 'expense'))])
         elif self.report_type == 'profitloss':
-            self.journal_ids = self.env['account.journal'].search([('type', 'not in', ('general',))])
+            self.journal_ids = self.env['account.journal'].search([('type', 'not in', ('general',)), ('company_id', '=', self.company_id.id)])
             self.account_type_ids = self.env['account.account.type'].search([('internal_group', 'in', ('income', 'expense'))])
         
-        self.account_ids = self.env['account.account'].search([('user_type_id', 'in', self.account_type_ids.ids)])
+        self.account_ids = self.env['account.account'].search([('user_type_id', 'in', self.account_type_ids.ids), ('company_id', '=', self.company_id.id)])
     
     def _print_report(self, data):
         data = self.pre_print_report(data)

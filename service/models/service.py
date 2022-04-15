@@ -414,14 +414,14 @@ class ServiceOrder(models.Model):
             for other in service.others_lines:
                 if other.name == 'Own Risk':
                     own_risk_found = True
-                    # account_id = self.env['account.account'].search([('company_id', '=', self.company_id.id), ('code', '=', '4-2000')])
-                    # if not account_id:
-                    if other.product_id.property_account_income_id:
-                        account_id = other.product_id.property_account_income_id
-                    elif other.product_id.categ_id.property_account_income_categ_id:
-                        account_id = other.product_id.categ_id.property_account_income_categ_id
-                    else:
-                        raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
+                    account_id = self.env['account.account'].search([('company_id', '=', self.company_id.id), ('code', '=', '4-2000')])
+                    if not account_id:
+                        if other.product_id.property_account_income_id:
+                            account_id = other.product_id.property_account_income_id
+                        elif other.product_id.categ_id.property_account_income_categ_id:
+                            account_id = other.product_id.categ_id.property_account_income_categ_id
+                        else:
+                            raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
 
                     receivable_account = self.env['account.account'].search([('company_id', '=', service.company_id.id), ('code', '=', '1-1411')])
                     if not receivable_account:
