@@ -173,33 +173,39 @@ class ReportFinancialXlsx(models.AbstractModel):
             'bold': True,
             # 'border': 1
         })
-        date_format = workbook.add_format({
-            'num_format': 'dd/mm/yyyy',
-            # 'border': 1
-        })
+        # date_format = workbook.add_format({
+        #     'num_format': 'dd/mm/yyyy',
+        #     # 'border': 1
+        # })
         bold_right = workbook.add_format({
             'bold': True,
             'align': 'right',
             # 'valign': 'center',
             # 'border': 1
         })
-        bold_h4 = workbook.add_format({
-            'bold': True,
-            'font_size': 14,
-        })
+        # bold_h4 = workbook.add_format({
+        #     'bold': True,
+        #     'font_size': 14,
+        # })
         bold = workbook.add_format({
             'bold': True,
             # 'align': 'right',
             # 'valign': 'center',
             # 'border': 1
         })
+        title_format = workbook.add_format({
+            'bold': True,
+            'font_size': 18,
+            'underline': 33,
+        })
 
         sheet.hide_gridlines(2)
         sheet.set_column(0, 0, 2)
         sheet.set_column(1, 1, 40)
         sheet.set_column(2, 4, 18)
+        sheet.set_row(1, 20)
         
-        sheet.write(1, 1, objs['data']['account_report_id'][1], bold_h4)
+        sheet.write(1, 1, objs['data']['account_report_id'][1], title_format)
         sheet.write(2, 1, '%s: %s' % ('Date From', objs['data']['date_from']))
         sheet.write(3, 1, '%s: %s' % ('Date To', objs['data']['date_to']))
         # sheet.write(2, 1, 'Date From')

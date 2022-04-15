@@ -20,7 +20,7 @@ class AccountReportGeneralLedger(models.TransientModel):
                                     ('all', 'All Entries'),
                                     ], string='Report Type', required=True, default='all')
     journal_ids = fields.Many2many('account.journal', 'account_report_general_ledger_journal_rel', 'account_id', 'journal_id', string='Journals', required=True)
-    account_ids = fields.Many2many('account.account', string='Accounts', default=lambda self: self.env['account.account'].search(['&', ('company_id', '=', self.company_id.id), ('deprecated', '=', False)]))
+    account_ids = fields.Many2many('account.account', string='Accounts', default=lambda self: self.env['account.account'].search([('company_id', '=', self.company_id.id), ('deprecated', '=', False)]))
     account_type_ids = fields.Many2many('account.account.type', string='Account Type', default=lambda self: self.env['account.account.type'].search([]))  #('type', '=', 'asset')]))
 
     @api.onchange('report_type')

@@ -68,14 +68,14 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
 
         # Get move lines base on sql query and Calculate the total balance of move lines
         sql = ('''SELECT l.id AS lid, l.account_id AS account_id, l.date AS ldate, j.code AS lcode, l.currency_id, l.amount_currency, l.ref AS lref, l.name AS lname, COALESCE(l.debit,0) AS debit, COALESCE(l.credit,0) AS credit, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) AS balance,\
-            m.name AS move_name, c.symbol AS currency_code, p.name AS partner_name\
+            m.name AS move_name, m.narration, c.symbol AS currency_code, p.name AS partner_name\
             FROM account_move_line l\
             JOIN account_move m ON (l.move_id=m.id)\
             LEFT JOIN res_currency c ON (l.currency_id=c.id)\
             LEFT JOIN res_partner p ON (l.partner_id=p.id)\
             JOIN account_journal j ON (l.journal_id=j.id)\
             JOIN account_account acc ON (l.account_id = acc.id) \
-            WHERE l.account_id IN %s ''' + filters + ''' GROUP BY l.id, l.account_id, l.date, j.code, l.currency_id, l.amount_currency, l.ref, l.name, m.name, c.symbol, p.name ORDER BY ''' + sql_sort)
+            WHERE l.account_id IN %s ''' + filters + ''' GROUP BY l.id, l.account_id, l.date, j.code, l.currency_id, l.amount_currency, l.ref, l.name, m.name, m.narration, c.symbol, p.name ORDER BY ''' + sql_sort)
         params = (tuple(accounts.ids),) + tuple(where_params)
         cr.execute(sql, params)
 
@@ -225,6 +225,7 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
                 sheet.write(row, 7, line['debit'], number_format)
                 sheet.write(row, 8, line['credit'], number_format)
                 sheet.write(row, 9, line['balance'], number_format)
+                sheet.write(row, 10, line['narration'])
                 sheet.set_row(row, None, None, {'level': 1})
                 # sheet.write(row, 10, line['amount_currency'])
             row += 1

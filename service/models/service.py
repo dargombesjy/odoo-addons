@@ -414,12 +414,18 @@ class ServiceOrder(models.Model):
             for other in service.others_lines:
                 if other.name == 'Own Risk':
                     own_risk_found = True
+                    # account_id = self.env['account.account'].search([('company_id', '=', self.company_id.id), ('code', '=', '4-2000')])
+                    # if not account_id:
                     if other.product_id.property_account_income_id:
-                        account_id = other.product_id.property_account_income_id.id
+                        account_id = other.product_id.property_account_income_id
                     elif other.product_id.categ_id.property_account_income_categ_id:
-                        account_id = other.product_id.categ_id.property_account_income_categ_id.id
+                        account_id = other.product_id.categ_id.property_account_income_categ_id
                     else:
                         raise UserError(_('No account defined for product "%s%".') % other.product_id.name)
+
+                    receivable_account = self.env['account.account'].search([('company_id', '=', service.company_id.id), ('code', '=', '1-1411')])
+                    if not receivable_account:
+                        receivable_account = service.partner_id.property_account_receivable_id
 
                     invoice_or = Invoice.create({
                         # 'name': service.name,
@@ -429,7 +435,7 @@ class ServiceOrder(models.Model):
                         'eq_name': service.equipment_id.name,
                         'type': 'out_invoice',
                         'company_id': service.company_id.id,
-                        'account_id': service.partner_id.property_account_receivable_id.id,
+                        'account_id': receivable_account.id,
                         # 'partner_id': service.partner_invoice_id.id or service.partner_id.id,
                         'partner_id': service.partner_id.id,
                         'currency_id': service.currency_id.id,
@@ -442,7 +448,7 @@ class ServiceOrder(models.Model):
                             'invoice_id': invoice_or.id,
                             'name': other.name,
                             'origin': other.name,
-                            'account_id': account_id,
+                            'account_id': account_id.id,
                             'quantity': other.product_uom_qty,
                             'invoice_line_tax_ids': [(6, 0, [x.id for x in other.tax_id])],
                             'uom_id': other.product_uom.id,
