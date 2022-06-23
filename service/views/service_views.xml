@@ -19,6 +19,7 @@
 					<field name="bill_type" groups="service.group_service_manager"/>
 					<field name="claim_id" />
 					<field name="state" />
+					<field name="work_stage" />
 					<field name="planned_date" string="Pln. Finish" />
 					<field name="finish_date" string="Act. Finish" />
 					<field name="amount_total" groups="service.group_service_manager"/>
