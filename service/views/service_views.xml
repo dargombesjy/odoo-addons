@@ -145,7 +145,8 @@
 								<field name="equipment_id" />
 								<field name="status_unit" />
 								<field name="work_stage"
-									attrs="{'invisible':[('state', 'in', ('draft', 'confirmed', 'under_repair'))]}" />
+									attrs="{'invisible':[('state', 'in', ('draft',))], 'readonly': 1}" />
+								<field name="finish_date" attrs="{'readonly': 1}" />
 								<field name="make" />
 								<field name="model" />
 								<field name="manuf_year" />
