@@ -16,6 +16,8 @@
 					<field name="equipment_id" />
 					<field name="status_unit" />
 					<field name="insurance_id" />
+					<field name="service_advisor" />
+					<field name="service_advisor1" />
 					<field name="bill_type" groups="service.group_service_manager"/>
 					<field name="claim_id" />
 					<field name="state" />
