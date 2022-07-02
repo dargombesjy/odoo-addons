@@ -15,6 +15,7 @@
 					<field name="claim_reference" />
 					<field name="claim_id" />
 					<field name="insurance_id" />
+					<field name="service_advisor1" />
 					<field name="equipment_id" />
 					<field name="model" />
 					<field name="received_date" />
