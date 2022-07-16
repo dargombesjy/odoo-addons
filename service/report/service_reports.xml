@@ -30,5 +30,21 @@
 			print_report_name="'Analisa %s' % (object.name)"
 			groups="service.group_service_manager"/>
 
+		<report id="report_sa"
+			model="service.report.sa.wizard"
+			string="Report SA"
+			report_type="xlsx"
+			menu="False"
+			name="service.report_sa_xlsx"
+			file="Report SA"/>
+
+		<report id="report_service_income"
+			model="service.report.service.income.wizard"
+			string="Report Service Income"
+			report_type="xlsx"
+			menu="False"
+			name="service.report_service_income_xlsx"
+			file="Report Service Income"/>
+
 	</data>
 </odoo>
