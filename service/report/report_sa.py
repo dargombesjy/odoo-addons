@@ -13,8 +13,8 @@ class ReportSaXlsx(models.AbstractModel):
             p.name AS insurance
             FROM service_order s LEFT JOIN account_invoice i ON (s.invoice_id=i.id)
             LEFT JOIN res_partner p ON (s.insurance_id=p.id)
-            WHERE s.register_date >= %s AND s.register_date <= %s ORDER BY s.state, s.name''')
-        params = (data['form']['date_from'], data['form']['date_to'])
+            WHERE s.register_date >= %s AND s.register_date <= %s AND s.company_id = %s ORDER BY s.state, s.name''')
+        params = (data['form']['date_from'], data['form']['date_to'], data['form']['company_id'][0])
         cr.execute(sql, params)
 
         state_map = {
@@ -117,7 +117,7 @@ class ReportSaXlsx(models.AbstractModel):
         sheet.set_column(2, 6, 12)
 
         sheet.hide_gridlines(2)
-        sheet.write(1, 1, 'Report SA', bold_h4)
+        sheet.write(1, 1, 'Report SA - %s' % (objs['form']['company_id'][1]), bold_h4)
         sheet.write(2, 1, '%s: %s' % ('Date From', objs['form']['date_from']))
         sheet.write(3, 1, '%s: %s' % ('Date To', objs['form']['date_to']))
 

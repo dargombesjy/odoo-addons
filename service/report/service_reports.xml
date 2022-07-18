@@ -30,6 +30,14 @@
 			print_report_name="'Analisa %s' % (object.name)"
 			groups="service.group_service_manager"/>
 
+		<report id="report_cso"
+			model="service.report.cso.wizard"
+			string="Report CSO"
+			report_type="xlsx"
+			menu="False"
+			name="service.report_cso_xlsx"
+			file="Report CSO"/>
+
 		<report id="report_sa"
 			model="service.report.sa.wizard"
 			string="Report SA"

@@ -22,12 +22,12 @@ class ReportServiceIncome(models.AbstractModel):
                 ON (s.id=f.service_id)
             LEFT JOIN service_equipment e ON (s.equipment_id=e.id)
             LEFT JOIN purchase_order po ON (s.id=po.service_id)
-            WHERE s.register_date >= %s AND s.register_date <= %s AND po.po_type = 'service'
+            WHERE s.register_date >= %s AND s.register_date <= %s AND s.company_id = %s AND po.po_type = 'service'
             GROUP BY s.name, s.company_id, s.bill_type, s.state, s.equipment_id, e.name, s.amount_untaxed,
             s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,s.amount_jasa,
             s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax, l.est_part, f.est_jasa
             ORDER BY s.state, s.name''')
-        params = (data['form']['date_from'], data['form']['date_to'])
+        params = (data['form']['date_from'], data['form']['date_to'], data['form']['company_id'][0])
         # params = ('KMS01/0470/03/2021',)
         cr.execute(sql, params)
 
@@ -150,7 +150,7 @@ class ReportServiceIncome(models.AbstractModel):
         # sheet.set_column(15, 16, 15, None, {'level': 1})
         # sheet.set_column(17, 17, 2, None, {'collapsed': True})
 
-        sheet.write(1, 1, 'SERVICE ORDER INCOME', bold_h4)
+        sheet.write(1, 1, 'SERVICE ORDER INCOME - %s' % (objs['data']['company_id'][1]), bold_h4)
         sheet.write(2, 1, '%s: %s' % ('Date From', objs['data']['date_from']))
         sheet.write(3, 1, '%s: %s' % ('Date To', objs['data']['date_to']))
         # sheet.write(2, 1, 'Date From')

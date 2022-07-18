@@ -16,6 +16,7 @@
         # 'data/ir_sequence_data.xml',
         # 'data/product_category.xml',
         'wizards/warning_message_wizard.xml',
+        'wizards/report_cso_wizard.xml',
         'wizards/report_sa_wizard.xml',
         'wizards/report_service_income_wizard.xml',
         'report/paperformat.xml',
