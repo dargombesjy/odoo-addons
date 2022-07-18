@@ -22,7 +22,7 @@ class ReportServiceIncome(models.AbstractModel):
                 ON (s.id=f.service_id)
             LEFT JOIN service_equipment e ON (s.equipment_id=e.id)
             LEFT JOIN purchase_order po ON (s.id=po.service_id)
-            WHERE s.register_date >= %s AND s.register_date <= %s AND s.company_id = %s AND po.po_type = 'service'
+            WHERE s.register_date >= %s AND s.register_date <= %s AND s.company_id = %s
             GROUP BY s.name, s.company_id, s.bill_type, s.state, s.equipment_id, e.name, s.amount_untaxed,
             s.cost_total, s.amount_own_risk, s.amount_sparepart, s.cost_operations,s.amount_jasa,
             s.cost_bahan, s.amount_others, s.cost_others, s.amount_tax, l.est_part, f.est_jasa
@@ -31,7 +31,7 @@ class ReportServiceIncome(models.AbstractModel):
         # params = ('KMS01/0470/03/2021',)
         cr.execute(sql, params)
 
-        states = [('draft', 'Quotation'), ('confirmed', 'Confirmed'), ('under_repair', 'Under Repair'),
+        states = [('draft', 'Quotation'), ('cancel', 'Cancelled'), ('confirmed', 'Confirmed'), ('under_repair', 'Under Repair'),
             ('ready', 'Repair Done'), ('2binvoiced', 'To Be Invoiced'), ('done', 'Closed'),]
         # states = data['form']['state']
         bill_types = {}
@@ -54,7 +54,9 @@ class ReportServiceIncome(models.AbstractModel):
                 }
             bill_types[k] = ty
 
+        count = 0
         for row in cr.dictfetchall():
+            count += 1
             state = row.pop('state')
             bill = row.pop('bill_type')
             est_part = est_jasa = 0
