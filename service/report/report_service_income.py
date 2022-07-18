@@ -289,7 +289,12 @@ class ReportServiceIncome(models.AbstractModel):
                             os_spart = o['amount_sparepart'] - o['cost_operations']
                         op_all = o['amount_untaxed'] + o['amount_tax'] + o['amount_own_risk']
                         os_all = op_all - o['cost_total']
-                        op_est = o['est_part'] + o['est_jasa']
+                        op_est_part = op_est_jasa = 0
+                        if not o['est_part'] is None:
+                            op_est_part = o['est_part']
+                        if not o['est_jasa'] is None:
+                            op_est_jasa = o['est_jasa']
+                        op_est = op_est_part + op_est_jasa
 
                         col = 1
                         sheet.write(row, col, '%s %s' % ('....', o['name']))
