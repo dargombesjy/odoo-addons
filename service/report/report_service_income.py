@@ -14,10 +14,10 @@ class ReportServiceIncome(models.AbstractModel):
             l.est_part, f.est_jasa,
             SUM(COALESCE(po.amount_untaxed,0)) AS jasa_untaxed, SUM(COALESCE(po.amount_total,0)) AS jasa_total
             FROM service_order s
-            INNER JOIN (SELECT service_id, SUM(COALESCE(estimate_unit,0)) AS est_part
+            LEFT JOIN (SELECT service_id, SUM(COALESCE(estimate_unit,0)) AS est_part
                 FROM service_line WHERE approved IS TRUE GROUP BY service_id) AS l
                 ON (l.service_id=s.id)
-            INNER JOIN (SELECT service_id, SUM(COALESCE(estimate_unit,0)) AS est_jasa
+            LEFT JOIN (SELECT service_id, SUM(COALESCE(estimate_unit,0)) AS est_jasa
                 FROM service_fee WHERE approved IS TRUE GROUP BY service_id) AS f
                 ON (s.id=f.service_id)
             LEFT JOIN service_equipment e ON (s.equipment_id=e.id)
@@ -57,10 +57,16 @@ class ReportServiceIncome(models.AbstractModel):
         for row in cr.dictfetchall():
             state = row.pop('state')
             bill = row.pop('bill_type')
+            est_part = est_jasa = 0
+            if not row['est_part'] is None:
+                est_part = row['est_part']
+            if not row['est_jasa'] is None:
+                est_jasa = row['est_jasa']
+
             # for item in bill_types:
             #     if item['name'] == bill:
             bill_types[bill]['aggregates']['jml_spk'] += 1
-            bill_types[bill]['aggregates']['estimasi'] += row['est_part'] + row['est_jasa']
+            bill_types[bill]['aggregates']['estimasi'] += est_part + est_jasa
             bill_types[bill]['aggregates']['amount_untaxed'] += row['amount_untaxed']
             bill_types[bill]['aggregates']['cost_total'] += row['cost_total']
             bill_types[bill]['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']
@@ -75,7 +81,7 @@ class ReportServiceIncome(models.AbstractModel):
             bill_types[bill]['aggregates']['amount_tax'] += row['amount_tax']
             bill_types[bill]['aggregates']['amount_own_risk'] += row['amount_own_risk']
             bill_types[bill]['orders'][state]['aggregates']['jml_spk'] += 1
-            bill_types[bill]['orders'][state]['aggregates']['estimasi'] += row['est_part'] + row['est_jasa']
+            bill_types[bill]['orders'][state]['aggregates']['estimasi'] += est_part + est_jasa
             bill_types[bill]['orders'][state]['aggregates']['amount_untaxed'] += row['amount_untaxed']
             bill_types[bill]['orders'][state]['aggregates']['cost_total'] += row['cost_total']
             bill_types[bill]['orders'][state]['aggregates']['margin'] += row['amount_untaxed'] - row['cost_total']

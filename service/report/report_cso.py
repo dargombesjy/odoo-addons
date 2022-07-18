@@ -11,8 +11,8 @@ class ReportCsoXlsx(models.AbstractModel):
         sql = ('''SELECT s.name, s.company_id, s.bill_type, s.insurance_id, s.service_advisor1, s.status_unit,
             i.insurance_name, p.sa_name
             FROM service_order s
-            INNER JOIN (SELECT id AS ins_id, name AS insurance_name FROM res_partner) AS i ON (i.ins_id=s.insurance_id)
-            INNER JOIN (SELECT id AS par_id, name AS sa_name FROM res_partner) AS p ON (p.par_id=s.service_advisor1)
+            LEFT JOIN (SELECT id AS ins_id, name AS insurance_name FROM res_partner) AS i ON (i.ins_id=s.insurance_id)
+            LEFT JOIN (SELECT id AS par_id, name AS sa_name FROM res_partner) AS p ON (p.par_id=s.service_advisor1)
             WHERE s.register_date >= %s AND s.register_date <= %s AND s.company_id = %s ORDER BY s.state, s.name''')
         params = (data['form']['date_from'], data['form']['date_to'], data['form']['company_id'][0])
         cr.execute(sql, params)
