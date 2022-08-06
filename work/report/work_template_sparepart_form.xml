@@ -111,6 +111,7 @@
 								<th>Description</th>
 								<th>Qty DMD</th>
 								<th>Qty Sup</th>
+								<th>Hrg Jual</th>
 								<th>Remark</th>
 							</tr>
 						</thead>
@@ -134,6 +135,9 @@
 									</td>
 									<td>
 										<span t-field="line.product_uom_qty" />
+									</td>
+									<td>
+										<span t-field="line.sell_price" />
 									</td>
 									<td></td>
 									<td></td>

@@ -295,6 +295,7 @@ class StockMove(models.Model):
     product_category = fields.Selection(PRODUCT_CATEGORIES, 'Product Category')
     supply_type = fields.Selection(SUPPLY_TYPES, 'Supply Type')
     part_number = fields.Char('Kode Part Admin', compute='_compute_part_admin')
+    sell_price = fields.Float('Selling Price', digits=(12,0))
     vendor_id = fields.Many2one('res.partner', 'Vendor', index=True)
     vendor_qty = fields.Float('Qty. Terima')
     vendor_date = fields.Date('Tgl. Terima')

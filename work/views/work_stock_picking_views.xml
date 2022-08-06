@@ -123,6 +123,8 @@
 									<field name="name" invisible="0" />
 									<field name="part_number"
 										attrs="{'column_invisible': [('parent.is_sparepart', '=', False)]}" />
+									<field name="sell_price"
+										attrs="{'column_invisible': ['|', ('parent.is_sparepart', '=', False)]}" />
 									<field name="vendor_id"
 										attrs="{'column_invisible': [('parent.picking_type_code', '=', 'incoming')]}"/>
 									<field name="vendor_qty"

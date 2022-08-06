@@ -686,7 +686,6 @@ class ServiceOrder(models.Model):
                     'eq_model': service.model,
                     'move_type': 'one',
                     'partner_id': partner.id,
-                    # 'picking_type_id': 2,
                     'picking_type_id': pick.id,
                     'location_id': service.location_id.id,  # 12,
                     'location_dest_id': 9,
@@ -709,11 +708,11 @@ class ServiceOrder(models.Model):
                         'product_category': 'Sparepart',
                         'supply_type': operation.supply_type,
                         'picking_id': picking.id,
-                        # 'picking_type_id': 2,
                         'picking_type_id': pick.id,
                         'product_id': operation.product_id.id,
                         'product_uom_qty': operation.product_uom_qty,
                         'product_uom': uom_id, # operation.product_uom.id,
+                        'sell_price': operation.price_unit,
                         'package_id': False,
                         'package_level_id': False,
                         'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
@@ -744,36 +743,6 @@ class ServiceOrder(models.Model):
     def unlink(self):
         raise UserError(_('Service Order tidak boleh dihapus, hanya boleh di Cancel'))
     
-    # @api.multi
-    # def action_request_material(self):           
-        # spb_model = self.env['inventory.move']
-        # spb_line_model = self.env['inventory.move.line']
-        #
-        # for service in self:
-            # part_line = service.operations.filtered(lambda line: line.product_id.categ_id == 8 and line.supply_type == 'self')
-            # spb = spb_model.create({
-                # 'service_id': service.id,
-                # 'eq_name': service.equipment_id.name,
-                # 'state': 'draft'})
-            # if part_line:
-                # for part in part_line:
-                    # if part.product_id:
-                        # uom_id = part.product_uom.id
-                    # else:
-                        # uom_id = 1
-                    # spb_line = spb_line_model.create({
-                        # 'name': part.name,
-                        # 'move_id': spb.id,
-                        # 'service_id': service.id,
-                        # 'service_line_id': operation.id,
-                        # 'product_category': 'Sparepart',
-                        # 'supply_type': part.supply_type,
-                        # 'product_id': part.product_id.id,
-                        # 'part_number': part.part_number,
-                        # 'product_uom_qty': part.product_uom_qty,
-                        # 'product_uom': uom_id, 
-                        # 'state': 'draft'})
-
 
 class ServiceLine(models.Model):
     _name = 'service.line'
