@@ -13,12 +13,13 @@
               <field name="end_date" />
             </group>
             <group>
-              <field name="picking_type" />
-              <field name="apply_filter" />
+              <!-- <field name="picking_type" />
+              <field name="apply_filter" /> -->
+              <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
             </group>
           </group>
           <footer>
-            <button name="get_report" string="Download to Excel" type="object" class="oe_highlight" />
+            <button name="get_report" string="Get Report" type="object" class="oe_highlight" />
             <button string="Cancel" special="cancel" />
           </footer>
         </form>
@@ -26,7 +27,7 @@
     </record>
 
     <record id="action_stock_move_wizard" model="ir.actions.act_window">
-      <field name="name">Stock Move Report</field>
+      <field name="name">report.discount.part</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">zdg_inventory.stock.move.wizard</field>
       <field name="view_type">form</field>
@@ -38,7 +39,7 @@
     </record>
 
     <menuitem id="menu_stock_move_report"
-      name="Monitoring Stock"
+      name="Report Pembelian Part"
       action="action_stock_move_wizard"
       parent="stock.menu_warehouse_report"
       sequence="200" />

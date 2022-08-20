@@ -6,7 +6,7 @@
       string="Print to XLSX"
       report_type="xlsx"
       name="zdg_inventory.report_move_xlsx"
-      file="stock_move"
+      file="report_discount"
       attachment_use="False" />
     </data>
 </odoo>

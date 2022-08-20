@@ -8,8 +8,9 @@ class StockMoveWizard(models.TransientModel):
 
     start_date = fields.Date('Start Date', default=fields.Date.today)
     end_date = fields.Date('End Date', default=fields.Date.today)
-    picking_type = fields.Many2one('stock.picking.type', 'Type', default=1)
-    apply_filter = fields.Boolean('Apply Filter?', default=False)
+    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
+    # picking_type = fields.Many2one('stock.picking.type', 'Type', default=1)
+    # apply_filter = fields.Boolean('Apply Filter?', default=False)
 
     @api.multi
     def get_report(self):
@@ -21,9 +22,9 @@ class StockMoveWizard(models.TransientModel):
         data = {}
         data['ids'] = self.env.context.get('active_ids', [])
         data['model'] = self.env.context.get('active_model', 'ir.ui.menu')
-        if not self.picking_type:
-            raise UserError(_('Type harus diisi'))
-        data['form'] = self.read(['start_date', 'end_date', 'picking_type', 'apply_filter'])[0]
+        # if not self.picking_type:
+        #     raise UserError(_('Type harus diisi'))
+        data['form'] = self.read(['start_date', 'end_date', 'company_id'])[0]   # , 'picking_type', 'apply_filter'])[0]
         # data = {
         #     'start_date': self.start_date,
         #     'end_date': self.end_date,
