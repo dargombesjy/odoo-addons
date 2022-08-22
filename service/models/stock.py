@@ -232,7 +232,7 @@ class StockPicking(models.Model):
                 purchase = Purchase.create({
                     'po_type': 'warehouse',
                     'origin': 'Part-%s.' % (pick.service_id.name),
-                    # 'service_id': pick.service_id.id,
+                    'service_id': pick.service_id.id,
                     'eq_name': pick.eq_name,
                     'eq_model': pick.eq_model,
                     'partner_id': item[0].id,
@@ -248,6 +248,9 @@ class StockPicking(models.Model):
                         'product_qty': v.product_uom_qty,
                         'product_uom': v.product_uom.id,
                         'price_unit': v.product_id.standard_price,
+                        'move_id': v.id,
+                        'service_id': v.service_id,
+                        'service_line_id': v.service_line_id,
                         # 'qty_received': v.product_uom_qty
                     })
                     # v.write({'purchase_line_id': purchase_line.id})
