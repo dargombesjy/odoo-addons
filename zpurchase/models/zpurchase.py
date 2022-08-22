@@ -68,6 +68,8 @@ class PurchaseOrderLine(models.Model):
     
     move_id = fields.Many2one('stock.move', 'Stock Move', copy=False)
     discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
+    service_id = fields.Integer('Service ID')
+    service_line_id = fields.Integer('Service Line ID')
 
     def _prepare_compute_all_values(self):
         # Hook method to returns the different argument values for the
