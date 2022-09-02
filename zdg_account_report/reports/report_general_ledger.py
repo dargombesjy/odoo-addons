@@ -229,7 +229,7 @@ class ReportGeneralLedgerXlsx(models.AbstractModel):
                 sheet.set_row(row, None, None, {'level': 1})
                 # sheet.write(row, 10, line['amount_currency'])
             row += 1
-            sheet.set_row(row, 2, None, {'collapsed': True})
+            sheet.set_row(row, None, None, {'collapsed': True})
             
 # this is the pdf version
 class ReportGeneralLedger(models.AbstractModel):

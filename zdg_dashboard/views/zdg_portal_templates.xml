@@ -1,21 +1,6 @@
 <odoo>
   <template id="portal_my_orders" name="Monitoring Orders">
     <t t-call="website.layout">
-      <style>
-      .table-xl {
-        font-size: 1.5rem;
-        width: 100%;
-      }
-      .centered {
-        max-width: 95%;
-        min-width: 90%;
-        margin: auto;
-      }
-      .table-xl thead tr {
-        border-top: 2px solid grey;
-        border-bottom: 2px solid grey;
-      }
-      </style>
       <t t-set="title">Order Monitoring</t>
       <div class="oe_structure"> <!--onload="timer = setTimeout('auto_reload()', 30000)" -->
         <div class="oe_container centered">
