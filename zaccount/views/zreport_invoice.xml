@@ -11,18 +11,21 @@
 						"contact", "fields": ["address", "name"], "no_marker": True}' /> <div t-if="o.partner_id.vat"
 						class="mt16"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>:
 						<span t-field="o.partner_id.vat"/></div> </t> -->
-					<div class="page" style="font-size:0.9rem">
+					<div class="page" style="font-size:0.85rem">
 						<style type="text/css">
 							.signature-block {
-							page-break-inside: avoid;
+								page-break-inside: avoid;
+							}
+							.table-sm td {
+								padding: 0.1rem;
 							}
 							.table-no-border {
-							width: 100%;
-							margin-bottom: 1rem;
-							background-color: transparent;
+								width: 100%;
+								margin-bottom: 1rem;
+								background-color: transparent;
 							}
 							.table-no-border td {
-							vertical-align: top;
+								vertical-align: top;
 							}
 						</style>
 						<!-- <div class="text-center">

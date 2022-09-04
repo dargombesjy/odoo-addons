@@ -5,6 +5,7 @@
 			<field name="name">zaccount.invoice.form</field>
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_form" />
+			<field name="priority" eval="17" />
 			<field name="arch" type="xml">
 				<xpath expr="//header/button[@name='preview_invoice']"
 					position="after">
@@ -16,6 +17,11 @@
 					<button name="action_recompute_wht"
 						string="Recalc. WHT" type="object"
 						groups="service.group_service_manager"/>
+				</xpath>
+				<xpath expr="//header/button[@name='action_invoice_cancel']" position="replace">
+					<button name="action_invoice_cancel" type="object"
+						states="draft,open"
+						string="Cancel" groups="account.group_account_invoice"/>
 				</xpath>
 				<xpath expr="//sheet/group/group/field[@name='payment_term_id']" position="after">
 					<field name="service_id"/>

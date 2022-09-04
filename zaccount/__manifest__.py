@@ -19,6 +19,7 @@
         'reports/report_invoice_customer.xml',
         'reports/report_invoice_or.xml',
         'reports/report_invoice_aab.xml',
+        'reports/report_invoice_non_merimen.xml',
         'reports/report_vendor_billing_list.xml',
         'wizards/bill_vendor_view.xml',
     ],

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 	<data>
-		<template id="report_invoice_customer">
+		<template id="report_invoice_non_merimen">
 			<t t-call="web.html_container">
 				<t t-foreach="docs" t-as="o">
 					<t t-call="web.external_layout">
 						<t t-set="o" t-value="o.with_context(lang=lang)" />
-						<div class="page" style="font-size:0.85rem">
+						<div class="page" style="font-size:0.825rem">
 							<style type="text/css">
 								.signature-block {
 									page-break-inside: avoid;
 								}
 								.table-sm td {
-									padding: 0.1rem;
+									padding: 0.05rem 0.1rem;
 								}
 								.table-no-border {
 									width: 100%;
@@ -23,7 +23,7 @@
 									vertical-align: top;
 								}
 							</style>
-							<div style="height: 16px;"></div>
+							<div style="height: 18px;"></div>
 							<h4 class="mt-32">
 								<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
 								<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
@@ -53,13 +53,6 @@
 								<t t-if="o.origin_type in ('service', 'own_risk')">
 									<div class="col-7 bm-2">
 										<table class="table table-sm">
-<!-- 											<tr> -->
-<!-- 												<td style="width:30%">Nama Asuransi</td> -->
-<!-- 												<td>:</td> -->
-<!-- 												<td> -->
-<!-- 													<span t-field="o.service_id.insurance_id.name" /> -->
-<!-- 												</td> -->
-<!-- 											</tr> -->
 											<tr>
 												<td style="width:30%">Customer</td>
 												<td>:</td>
@@ -81,29 +74,6 @@
 									</div>
 									<div class="col-5 bm-2">
 										<table class="table table-sm">
-<!-- 											<tr> -->
-<!-- 												<td style="width:30%">Claim Ref.No</td> -->
-<!-- 												<td>:</td> -->
-<!-- 												<td> -->
-<!-- 													<span t-field="o.service_id.claim_reference" /> -->
-<!-- 												</td> -->
-<!-- 											</tr> -->
-<!-- 											<tr> -->
-<!-- 												<td style="width:30%">Claim No</td> -->
-<!-- 												<td>:</td> -->
-<!-- 												<td> -->
-<!-- 													<span t-field="o.service_id.claim_id" /> -->
-<!-- 												</td> -->
-<!-- 											</tr> -->
-<!-- 											<tr> -->
-<!-- 												<td style="width:30%">No. Polis</td> -->
-<!-- 												<td>:</td> -->
-<!-- 												<td> -->
-<!-- 													<span t-field="o.service_id.policy_no" /> -->
-<!-- 												</td> -->
-<!-- 											</tr> -->
-											<!-- <tr> <td style="width:30%">Delivery Date</td> <td>:</td> 
-												<td><span t-field="o.service_id.finish_date"/></td> </tr> -->
 											<tr>
 												<td style="width:30%">No. Polisi</td>
 												<td>:</td>
@@ -132,85 +102,216 @@
 							<t t-set="display_discount"
 								t-value="any([l.discount for l in o.invoice_line_ids])" />
 
-							<table class="table table-sm o_main_table"
-								name="invoice_line_table">
-								<thead>
-									<tr>
+							<!-- <table class="table table-sm o_main_table" name="invoice_line_table"> -->
+								<!-- <thead> -->
+									<!-- <tr> -->
 										<!-- TODO: remove in master -->
-										<t t-set="colspan" t-value="6" />
-										<th colspan="4" class="text-left">
+										<!-- <t t-set="colspan" t-value="9" />
+										<th colspan="5" class="text-left">
 											<span>Description</span>
 										</th>
+										<th colspan="2"></th>
 										<th class="text-right">
 											<span
 												groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
 											<span
 												groups="account.group_show_line_subtotals_tax_included">Total Price</span>
-										</th>
-									</tr>
-								</thead>
-								<tbody class="invoice_tbody">
+										</th> -->
+									<!-- </tr> -->
+								<!-- </thead> -->
+								<!-- <tbody class="invoice_tbody">
 									<tr>
 										<t t-set="line_text" t-value="'Biaya Perbaikan %s %s %s' % (o.service_id.equipment_id.name, o.service_id.make, o.service_id.model)"/>
-										<td colspan="4">
+										<td colspan="5">
 											<span t-esc="line_text"/>
 										</td>
+										<td colspan="2"></td>
 										<td class="text-right o_price_total">
 											<span t-field="o.amount_untaxed"/>
 										</td>
 									</tr>
-								</tbody>
-							</table>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">Jasa</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.wht_base"/>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">Material</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.sub_material"/>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">Spareparts</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.sub_spareparts"/>
+										</td>
+									</tr>
+									<t t-if="o.sub_others">
+										<tr>
+										<td colspan="5"></td>
+											<td colspan="2">Others</td>
+											<td class="text-right o_price_total">
+												<span t-field="o.sub_others"/>
+											</td>
+										</tr>
+									</t>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">PPN</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.amount_tax"/>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">PPH</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.amount_wht"/>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5"></td>
+										<td colspan="2">Own Risk</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.own_risk"/>
+										</td>
+									</tr>
+									<tr class="border-black">
+										<td colspan="5"></td>
+										<td colspan="2">Total</td>
+										<td class="text-right o_price_total">
+											<span t-field="o.residual"/>
+										</td>
+									</tr>
+								</tbody> -->
+							<!-- </table> -->
+
 
 							<div class="clearfix">
-								<div id="total" class="row">
-									<div
-										t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
-										<table class="table table-sm">
-											<tr class="border-black o_subtotal" style="">
-												<td>
-													<strong>Subtotal</strong>
-												</td>
-												<td class="text-right">
-													<span t-field="o.amount_untaxed" />
-												</td>
-											</tr>
-											<t t-foreach="o.amount_by_group" t-as="amount_by_group">
-												<tr style="">
-													<t
-														t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
-														<td>
-															<span t-esc="amount_by_group[0]" />
-														</td>
-														<td class="text-right o_price_total">
-															<span t-esc="amount_by_group[3]" />
-														</td>
-													</t>
-													<t t-else="">
-														<td>
-															<span t-esc="amount_by_group[0]" />
-															<span>
-																&amp;nbsp;
-																<span>on</span>
-																<t t-esc="amount_by_group[4]" />
-															</span>
-														</td>
-														<td class="text-right o_price_total">
-															<span t-esc="amount_by_group[3]" />
-														</td>
-													</t>
+								<div id="total" class="row" style="">
+									<t t-set="line_text" t-value="'Biaya Perbaikan %s %s %s' % (o.service_id.equipment_id.name, o.service_id.make, o.service_id.model)"/>
+									<!-- <div t-attf-class="#{'col-8' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto"> -->
+									<div class="col-8" style="padding-right: 0;">
+										<div style="border-top: 1px solid;">
+											<span t-esc="line_text"/>
+										</div>
+									</div>
+									<!-- <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto"> -->
+									<div class="col-4" style="padding-left: 0;">
+										<div style="border-top: 1px solid;">
+											<table class="table table-sm">
+												<tr class="" style="">
+													<td>
+														<strong>Subtotal</strong>
+													</td>
+													<td class="text-right">
+														<span t-field="o.amount_total" />
+													</td>
 												</tr>
-											</t>
-										
-											<tr class="border-black o_total">
-												<td>
-													<strong>Total</strong>
-												</td>
-												<td class="text-right">
-													<span t-field="o.residual" />
-												</td>
-											</tr>
-										</table>
+												<tr>
+													<td>Jasa</td>
+													<td class="text-right o_price_total">
+														<span t-field="o.wht_base" />
+													</td>
+												</tr>
+												<tr>
+													<td>Material</td>
+													<td class="text-right o_price_total">
+														<span t-field="o.sub_material" />
+													</td>
+												</tr>
+												<tr>
+													<td>Spareparts</td>
+													<td class="text-right o_price_total">
+														<span t-field="o.sub_spareparts" />
+													</td>
+												</tr>
+												<t t-if="o.sub_others">
+													<tr>
+														<td>Others</td>
+														<td class="text-right o_price_total">
+															<span t-field="o.sub_others" />
+														</td>
+													</tr>
+												</t>
+												<tr class="border-black o_subtotal" style="">
+													<td>
+														<strong>PPN</strong>
+													</td>
+													<td class="text-right">
+														<span t-field="o.amount_tax" />
+													</td>
+												</tr>
+												<tr class="border-black o_subtotal" style="">
+													<td>
+														<strong>PPH</strong>
+													</td>
+													<td class="text-right">
+														<span t-field="o.amount_wht" />
+													</td>
+												</tr>
+												<tr class="border-black o_subtotal" style="">
+													<td>
+														<strong>Own Risk</strong>
+													</td>
+													<td class="text-right">
+														<span t-field="o.own_risk" />
+													</td>
+												</tr>
+												<!-- <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+													<tr style="">
+														<t
+															t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
+															<td>
+																<span t-esc="amount_by_group[0]" />
+															</td>
+															<td class="text-right o_price_total">
+																<span t-esc="amount_by_group[3]" />
+															</td>
+														</t>
+														<t t-else="">
+															<td>
+																<span t-esc="amount_by_group[0]" />
+																<span>
+																	&amp;nbsp;
+																	<span>on</span>
+																	<t t-esc="amount_by_group[4]" />
+																</span>
+															</td>
+															<td class="text-right o_price_total">
+																<span t-esc="amount_by_group[3]" />
+															</td>
+														</t>
+													</tr>
+												</t> -->
+												<!-- <t t-if="o.service_id.insurance_id">
+													<t t-foreach="deductibles" t-as="d">
+														<tr>
+															<td>
+																<span t-esc="d.name"/>
+															</td>
+															<td class="text-right o_price_total">
+																<span t-esc="d.price_subtotal"
+																	t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+															</td>
+														</tr>
+													</t>
+												</t> -->
+												<tr class="border-black o_total">
+													<td>
+														<strong>Total</strong>
+													</td>
+													<td class="text-right">
+														<span t-field="o.residual" />
+													</td>
+												</tr>
+											</table>
+										</div>
 									</div>
 								</div>
 							</div>
