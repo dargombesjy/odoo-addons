@@ -1080,7 +1080,7 @@ class ServiceConsumable(models.Model):
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
-        self.cost_unit = self.product_id.standard_price
+        self.cost_unit = self.product_id.list_price    # self.product_id.standard_price
 
     @api.onchange('service_id')
     def onchange_service_id(self):
