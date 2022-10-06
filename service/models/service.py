@@ -879,26 +879,30 @@ class ServiceLine(models.Model):
         return res
 
     # @api.multi
-    def action_unlink(self):
-        if self.invoice_line_id:
-            raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
-        transfer_line = self.env['stock.move'].search([('service_line_id', '=', self.id)], limit=1)
-        if transfer_line:
-            self.delete_flag = True
-            transfer_line.write({'delete_flag': True})
-            return {
-                'name': _('Warning'),
-                'view_mode': 'form',
-                'view_type': 'form',
-                'view_id': self.env.ref('service.view_warning_message').id,
-                'res_model': 'service.warning.message.wizard',
-                # 'res_id': self.id,
-                'type': 'ir.actions.act_window',
-                'target': 'new',
-            }
-        else:
-            return super(ServiceLine, self).unlink()
-            # return models.Model.unlink(self)
+    # def action_unlink(self):
+    @api.multi
+    def unlink(self):
+        for serv_line in self:
+            if serv_line.invoice_line_id:
+                raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+            # transfer_line = self.env['stock.move'].search([('service_line_id', '=', serv_line.id)], limit=1)
+            if self.move_id:
+                serv_line.delete_flag = True
+                self.move_id.write({'delete_flag': True})
+                # raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+                return {
+                    'name': _('Warning'),
+                    'view_mode': 'form',
+                    'view_type': 'form',
+                    'view_id': self.env.ref('service.view_warning_message').id,
+                    'res_model': 'service.warning.message.wizard',
+                    # 'res_id': self.id,
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                }
+            else:
+                return super(ServiceLine, self).unlink()
+                # return models.Model.unlink(self)
 
 class ServiceFee(models.Model):
     _name = 'service.fee'

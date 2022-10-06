@@ -16,7 +16,8 @@
 						attrs="{'invisible': [('state', 'not in', 'open')]}"/>
 					<button name="action_recompute_wht"
 						string="Recalc. WHT" type="object"
-						groups="service.group_service_manager"/>
+						groups="service.group_service_manager"
+						attrs="{'invisible': [('state', '=', 'paid')]}"/>
 				</xpath>
 				<xpath expr="//header/button[@name='action_invoice_cancel']" position="replace">
 					<button name="action_invoice_cancel" type="object"

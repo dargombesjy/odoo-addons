@@ -211,6 +211,8 @@
 										<field name="invoiced" invisible="1" />
 										<field name="price_subtotal" widget="monetary" />
 										<field name="approved" string="Acc?" />
+										<field name="delete_flag" string="Del" invisible="0" readonly="True"/>
+										<button name="unlink" type="object" icon="fa-trash-o" class="oe_edit_only"/>
 									</tree>
 								</field>
 								<group class="oe_subtotal_footer oe_right">

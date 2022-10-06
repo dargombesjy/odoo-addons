@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 from email.policy import default
 # from odoo.addons import decimal_precision as dp
 
@@ -27,9 +28,17 @@ class AccountInvoice(models.Model):
                 self.move_id = None
         return self.write({'state': 'draft'})
 
-    @api.multi
+    @api.one
     def action_recompute_wht(self):
-        self._calc_wht()
+        round_curr = self.currency_id.round
+        if not self.wht_tax:
+            tax = self.prepare_wht_tax()
+            self.env['account.invoice.tax'].create(tax['val'])
+        else:
+            wht = self.env['account.invoice.tax'].search([('invoice_id', '=', self.id), ('tax_id', '=', self.wht_tax[0].id)], limit=1)
+            tax = self.prepare_wht_tax()
+            wht.write({'amount': tax['val']['amount']})
+        self.amount_wht = sum(round_curr(wh.amount_total) for wh in self.tax_line_ids.filtered(lambda w: w.tax_id == self.wht_tax))
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',

@@ -131,7 +131,7 @@
 											attrs="{'invisible':[('is_robbing', '=', False)]}"/>
 										<field name="delete_flag" string="Del" invisible="0" readonly="True"/>
 										<field name="state" invisible="1"/>
-										<button name="action_unlink" type="object" icon="fa-trash-o" class="oe_edit_only"/>
+										<button name="unlink" type="object" icon="fa-trash-o" class="oe_edit_only"/>
 										<!-- attrs="{'invisible': [('state', '=', 'draft')]}" /> -->
 									</tree>
 								</field>
