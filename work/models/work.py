@@ -36,19 +36,31 @@ class ServiceOrder(models.Model):
             fee.vendor_ids = self.vendor_ids
 
     def create_po_dict(self):
+        purchased_vendors = []
+        for po in self.purchase_ids:
+            purchased_vendors.append(po.partner_id)
         po_vendor = {}
         for fee in self.fees_lines:
             if not fee.approved:  # or fee.cost_unit == 0:
                 continue
-            if not fee.purchased:
-                for vendor in fee.vendor_ids:
-                    if vendor not in po_vendor:
-                        po_vendor[vendor] = [fee,]
-                    else:
-                        po_vendor[vendor].append(fee)
+            for vendor in fee.vendor_ids:
+                if fee.purchased:
+                    if vendor in purchased_vendors:
+                        continue
+                if vendor not in po_vendor:
+                    po_vendor[vendor] = [fee,]
+                else:
+                    po_vendor[vendor].append(fee)
+                    
+            # if not fee.purchased:
+            #     for vendor in fee.vendor_ids:
+            #         if vendor not in po_vendor:
+            #             po_vendor[vendor] = [fee,]
+            #         else:
+            #             po_vendor[vendor].append(fee)
 
         if not po_vendor:
-            raise UserError(_('All items have been purchased'))
+            raise UserError(_('All items have been purchased or have not been approved'))
         return po_vendor
 
     @api.multi
