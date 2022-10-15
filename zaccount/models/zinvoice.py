@@ -143,7 +143,10 @@ class AccountInvoice(models.Model):
         # self.amount_total = self.amount_untaxed + self.amount_tax
         self.amount_tax = sum(round_curr(ln.amount_total) for ln in self.tax_line_ids.filtered(lambda w: w.tax_id != self.wht_tax))
         # self.amount_tax = tax_total + self.amount_wht
-        self.amount_total = self.amount_untaxed + self.own_risk
+        if self.amount_untaxed < self.own_risk:
+            self.amount_total = self.amount_untaxed
+        else:
+            self.amount_total = self.amount_untaxed + self.own_risk
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
         if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
@@ -235,6 +238,11 @@ class AccountInvoice(models.Model):
     def _compute_equipment(self):
         eq = self.service_id.equipment_id
         self.eq_name = eq.name
+
+    @api.onchange('service_id')
+    def _onchange_service_id(self):
+        self.eq_name = self.service_id.equipment_id.name
+        self.origin = self.service_id.name
 
     origin_type = fields.Selection([
         ('general', 'General'),
