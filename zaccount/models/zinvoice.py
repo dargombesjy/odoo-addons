@@ -137,14 +137,14 @@ class AccountInvoice(models.Model):
                  'currency_id', 'company_id', 'date_invoice', 'type')
     def _compute_amount(self):
         round_curr = self.currency_id.round
-        self.amount_total = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda w: w.deductible != True))
+        self.amount_subtotal = sum(line.price_subtotal for line in self.invoice_line_ids.filtered(lambda w: w.deductible != True))
         self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         # tax_total = sum(round_curr(line.amount_total) for line in self.tax_line_ids)
         # self.amount_tax = sum(round_curr(line.amount_total) for line in self.tax_line_ids)
         # self.amount_total = self.amount_untaxed + self.amount_tax
         self.amount_tax = sum(round_curr(ln.amount_total) for ln in self.tax_line_ids.filtered(lambda w: w.tax_id != self.wht_tax))
         # self.amount_tax = tax_total + self.amount_wht
-        # self.amount_total = self.amount_untaxed + self.own_risk
+        self.amount_total = self.amount_untaxed + self.amount_tax + self.amount_wht
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
         if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
@@ -255,6 +255,7 @@ class AccountInvoice(models.Model):
     sub_spareparts = fields.Monetary('Spareparts', compute='_compute_wht', store=True, readonly=True)
     sub_material = fields.Monetary('Material', compute='_compute_wht', store=True, readonly=True)
     sub_others = fields.Monetary('Others', compute='_compute_wht', store=True, readonly=True)
+    amount_subtotal = fields.Monetary('Subtotal', compute='_compute_amount', store=True, readonly=True)
     wht_tax = fields.Many2one('account.tax', string="Withholding Tax", compute='_compute_wht',
         store=True, readonly=True)
     wht_proportion = fields.Float('WHT proportion', compute='_compute_wht', store=True,

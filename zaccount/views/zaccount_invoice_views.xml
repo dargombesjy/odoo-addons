@@ -44,12 +44,12 @@
 						<field name="sub_spareparts" />
 						<field name="sub_material" />
 						<field name="wht_base" string="Jasa" />
-						<field name="amount_total" string="Subtotal" />
+						<field name="amount_subtotal" string="Subtotal" />
 						<field name="amount_tax" string="PPN" />
 						<field name="amount_wht" string="WHT" />
 						<field name="own_risk" />
-						<!-- <field name="amount_total"
-							class="oe_subtotal_footer_separator" /> -->
+						<field name="amount_total"
+							class="oe_subtotal_footer_separator" />
 						<field name="payments_widget" colspan="2" nolabel="1"
 							widget="payment" />
 						<field name="residual" class="oe_subtotal_footer_separator"
