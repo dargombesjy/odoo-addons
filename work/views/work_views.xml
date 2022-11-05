@@ -69,6 +69,7 @@
 								<field name="policy_no" attrs="{'readonly': 1}" />
 								<field name="insurance_id" />
 								<field name="partner_id" />
+								<field name="service_advisor1" attrs="{'readonly': 1}"/>
 							</group>
 							<group>
 								<field name="equipment_id" />

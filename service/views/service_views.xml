@@ -134,7 +134,7 @@
 								<field name="partner_id"
 									domain="[('customer', '=', True)]"/>
 <!--                                     attrs="{'invisible': [('state', '=', 'draft')]}"/> -->
-                                <field name="service_advisor" />
+                                <!-- <field name="service_advisor" /> -->
 								<field name="service_advisor1" domain="[('employee', '=', True)]"/>
 								<field name="print_tax" />
 								<field name="address_id" invisible="1" />
