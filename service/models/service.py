@@ -698,7 +698,9 @@ class ServiceOrder(models.Model):
             if outs:
                 for operation in outs:
                     if operation.product_id:
-                        uom_id = operation.product_uom.id
+                        uom_id = operation.product_id.uom_id.id
+                        if operation.product_uom:
+                            uom_id = operation.product_uom.id
                     else:
                         uom_id = 1
                     moving = Move_Line.create({
