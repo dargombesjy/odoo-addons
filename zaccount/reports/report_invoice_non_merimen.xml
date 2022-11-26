@@ -210,7 +210,7 @@
 														<strong>Subtotal</strong>
 													</td>
 													<td class="text-right">
-														<span t-field="o.amount_total" />
+														<span t-field="o.amount_subtotal" />
 													</td>
 												</tr>
 												<tr>

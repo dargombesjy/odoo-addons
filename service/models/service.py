@@ -690,6 +690,7 @@ class ServiceOrder(models.Model):
                     'location_id': service.location_id.id,  # 12,
                     'location_dest_id': 9,
                     'state': 'draft',
+                    'company_id': service.company_id.id
                 })
                 service.write({'sparepart_picking_id': picking.id})
             else:
@@ -719,7 +720,8 @@ class ServiceOrder(models.Model):
                         'package_level_id': False,
                         'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
                         'location_dest_id': 9,
-                        'state': 'draft'
+                        'state': 'draft',
+                        'company_id': service.company_id.id
                     })
                     operation.write({'move_id': moving.id, 'requested': True})
     
