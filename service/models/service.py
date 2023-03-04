@@ -104,8 +104,9 @@ class ServiceOrder(models.Model):
         ('under_repair', 'Under Repair'),
         ('ready', 'Repair Done'),
         ('2binvoiced', 'To be Invoiced'),
-        ('invoice_except', 'Invoice Exception'),
-        ('done', 'Closed')],
+        # ('invoice_except', 'Invoice Exception'),
+        ('done', 'Closed'),
+        ('paid', 'Settled')],
         string='Status', copy=False, default='draft', readonly=True,
         track_visibility='onchange',
         help="* The \'Draft\' status is used when a user is encoding a new and unconfirmed repair order.\n"
@@ -145,7 +146,7 @@ class ServiceOrder(models.Model):
     invoice_or_id = fields.Many2one(
         'account.invoice', 'Invoice OR',
         copy=False, readonly=True, track_visibility="onchange")
-    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    invoiced = fields.Boolean('Invoiced', default=False, copy=False, readonly=True)
     repaired = fields.Boolean('Repaired', copy=False, readonly=True)
     amount_sparepart = fields.Float('Pend. Sparepart', compute='_amount_untaxed', store=True, digits=(12,0))
     amount_jasa = fields.Float('Pend. Jasa', compute='_amount_untaxed', store=True, digits=(12,0))
@@ -162,7 +163,7 @@ class ServiceOrder(models.Model):
     cost_others = fields.Float('Cost Others', compute='_cost_untaxed', store=True, digit=(12,0))
     cost_bahan = fields.Float('Cost Bahan', compute='_cost_untaxed', store=True, digits=(12,0))
     cost_total = fields.Float('Cost', compute='_cost_untaxed', store=True, digits=(12,0))
-    own_risk_invoiced = fields.Boolean('Own Risk invoiced')
+    own_risk_invoiced = fields.Boolean('Own Risk invoiced', default=False)
     print_tax = fields.Boolean('Print Tax?')
 
     # ------ Operation --------- #
@@ -361,7 +362,14 @@ class ServiceOrder(models.Model):
             if service.work_stage not in ['done', 'delivered']:
                 raise UserError(_('Stage must "Done" at least'))
             service.action_invoice_create()
-            service.write({'state': 'ready'})
+            if service.bill_type == 'claim':  # and service.others_lines:
+                if service.own_risk_invoiced:
+                    self.action_service_end()
+                # else:
+                #     service.write({'state': 'invoiced'})
+            else:
+                self.action_service_end()
+            # service.write({'state': 'ready'})
 #             if service.invoice_method == 'b4repair':
 #                 service.action_service_ready()
 #             elif service.invoice_method == 'after_repair':
@@ -381,28 +389,34 @@ class ServiceOrder(models.Model):
 
     @api.multi
     def action_service_end(self):
-        if self.filtered(lambda service: service.state != 'ready'):
-            raise UserError(_("Service must done in order to close."))
-        if self.filtered(lambda service: not service.items_ok):
-            raise UserError(_('All items must received and purchased'))
-        if self.filtered(lambda service: service.work_stage != 'delivered'):
-            raise UserError(_('Stage must "Delivered" to end Service.'))
+        if self.filtered(lambda service: service.state != '2binvoiced'):
+            if self.filtered(lambda service: service.state != 'ready'):
+                raise UserError(_("Service must done in order to close."))
+        # if self.filtered(lambda service: not service.items_ok):
+        #     raise UserError(_('All items must received and purchased'))
+        # if self.filtered(lambda service: service.work_stage != 'delivered'):
+        #     raise UserError(_('Stage must "Delivered" to end Service.'))
+        if self.filtered(lambda service: not service.invoiced):
+            raise UserError(_('Services not yet billed'))
         if self.filtered(lambda service: service.bill_type == 'claim' and not service.own_risk_invoiced):
             raise UserError(_('Own Risk not yet billed'))
         for service in self:
-            service.write({'repaired': True})
-            vals = {'state': 'done'}
-            if not service.invoiced and service.invoice_method == 'after_repair':
-                vals['state'] = '2binvoiced'
+            vals = {'repaired': True}
+            if service.work_stage != 'delivered':
+                vals['work_stage'] = 'done'
+            vals['state'] = 'done'
+            # if not service.invoiced and service.invoice_method == 'after_repair':
+            #     vals['state'] = '2binvoiced'
             service.write(vals)
         return True
 
     @api.multi
     def action_invoice_or_create(self):
+        res = dict.fromkeys(self.ids, False)
         InvoiceLine = self.env['account.invoice.line']
         Invoice = self.env['account.invoice']
         own_risk_found = False
-        for service in self.filtered(lambda x: not x.own_risk_invoiced):
+        for service in self.filtered(lambda service: not service.own_risk_invoiced):
 #             own_risk = service.others_lines.search([('product_id.name', '=', 'Own Risk')], limit=1)
             if service.bill_type != 'claim':
                 raise UserError(_('Only Insurance Claim needs Own Risk billing'))
@@ -458,9 +472,14 @@ class ServiceOrder(models.Model):
                             'price_subtotal': other.product_uom_qty * other.price_unit
                         })
                     service.write({'own_risk_invoiced': True, 'invoice_or_id': invoice_or.id})
+                    if service.invoiced:
+                        self.action_service_end()
+                    # else:
+                    #     service.write({'state': 'invoiced'})
 
             if not own_risk_found:
                 raise UserError(_('No Own Risk line found in "Others" section'))
+        return res
 
     @api.multi
     def action_invoice_create(self, group=False):
@@ -770,7 +789,7 @@ class ServiceLine(models.Model):
     tax_id = fields.Many2many(
         'account.tax', 'service_operation_line_tax', 'service_operation_line_id', 'tax_id', 'Taxes')
     price_subtotal = fields.Float('Subtotal', compute="_compute_price_subtotal", store=True, digits=(12,0))
-    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    invoiced = fields.Boolean('Invoiced', default=False, copy=False, readonly=True)
     rejected = fields.Boolean('Repaired', copy=False, readonly=True)
     invoice_line_id = fields.Many2one(
         'account.invoice.line', 'Invoice Line', copy=False)
@@ -925,7 +944,7 @@ class ServiceFee(models.Model):
     tax_id = fields.Many2many('account.tax', 'service_fee_line_tax', 'service_fee_line_id', 'tax_id', 'Taxes')
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
     approved = fields.Boolean('Approved', default=False)
-    invoiced = fields.Boolean('Invoiced', copy=False, readonly=False)
+    invoiced = fields.Boolean('Invoiced', default=False, copy=False, readonly=False)
 
     # ------ Production ------ #
     cost_unit = fields.Float('Unit Cost', required=True, digits=(12,0))
@@ -994,7 +1013,7 @@ class ServiceOther(models.Model):
     tax_id = fields.Many2many('account.tax', 'service_others_line_tax', 'service_others_line_id', 'tax_id', 'Taxes')
     approved = fields.Boolean('Approved', default=True)
     invoice_line_id = fields.Many2one('account.invoice.line', 'Invoice Line', copy=False, readonly=True)
-    invoiced = fields.Boolean('Invoiced', copy=False, readonly=True)
+    invoiced = fields.Boolean('Invoiced', default=False, copy=False, readonly=True)
     deductible = fields.Boolean('Deductible')
 
     # ------ Production ------ #

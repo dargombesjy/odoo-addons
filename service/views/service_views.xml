@@ -80,20 +80,22 @@
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"
 							string="Create Own Risk" groups="account.group_account_invoice"
-							attrs="{'invisible': ['|', ('bill_type', '=', 'self'), ('own_risk_invoiced', '=', True), ('state', '=', 'draft')]}"/>
+							attrs="{'invisible': ['|', ('bill_type','=','self'), ('own_risk_invoiced','=',True), ('state','not in',('draft','ready'))]}"/>
 						<button name="action_print_pass_keluar" type="object"
 							string="Print Pass Keluar" groups="account.group_account_invoice"
-							attrs="{'invisible':[('state', '=', 'draft')]}"/>
+							attrs="{'invisible':[('state','=','draft')]}"/>
 						<button name="action_service_invoice_create"
-							states="2binvoiced" type="object" string="Create Invoice"
-							class="oe_highlight" groups="account.group_account_invoice" />
-						<button name="action_service_end" states="ready"
-							string="Close Order" type="object" class="oe_highlight" />
+							type="object" string="Create Invoice"
+							class="oe_highlight" groups="account.group_account_invoice"
+							attrs="{'invisible':['|', ('invoiced','=',True), ('state','!=','2binvoiced')]}" />
+						<button name="action_service_end"
+							string="Close Order" type="object" class="oe_highlight"
+							attrs="{'invisible':['|',('state','not in',('2binvoiced', 'ready')),'&amp;',('own_risk_invoiced','=',False),('invoiced','=',False)]}" />
 						<button name="action_service_cancel_draft"
 							string="Set to Draft" type="object" groups="service.group_service_finance"
-							attrs="{'invisible':[('state', '=', 'draft')]}"/>
+							attrs="{'invisible':[('state','=','draft')]}"/>
 						<button name="action_set_part_cost" type="object" groups="service.group_service_manager"
-							string="Check Sparepart" attrs="{'invisible':[('state', '=','done')]}"/>
+							string="Check Sparepart" attrs="{'invisible':[('state','=','done')]}"/>
 						<button name="action_service_cancel" string="Cancel Service" type="object"
 							states="draft"/>
 						<!-- <button name="action_service_cancel" string="Cancel Repair" type="object" 
@@ -141,6 +143,8 @@
 								<field name="partner_invoice_id" invisible="1" />
 								<field name="invoiced" invisible="1"/>
 								<field name="own_risk_invoiced" invisible="1"/>
+								<field name="invoice_id" invisible="1" />
+								<field name="invoice_or_id" invisible="1" />
 							</group>
 							<group>
 								<field name="register_date" />
