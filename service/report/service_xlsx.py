@@ -76,34 +76,34 @@ class FormServiceXlsx(models.AbstractModel):
         worksheet.set_column(5, 8, 15)
 
         row = 1
-        for service in services:
+        for srv in services:
             # worksheet.merge_range('A1:G1', 'ESTIMASI BIAYA PERBAIKAN KENDARAAN', header_format_main)
             worksheet.merge_range(row, 0, row, 1, 'No. Estimasi', border_format)
-            worksheet.merge_range(row, 2, row, 3, service.name, border_format)
+            worksheet.merge_range(row, 2, row, 3, srv.name, border_format)
             worksheet.merge_range(row, 4, row, 5, 'Nama Pelanggan', border_format)
-            worksheet.merge_range(row, 6, row, 8, service.partner_id.name, wrap_format)
+            worksheet.merge_range(row, 6, row, 8, srv.partner_id.name, wrap_format)
             row += 1
             worksheet.merge_range(row, 0, row, 1, 'Asuransi', wrap_format_top)
-            worksheet.merge_range(row, 2, row, 3, service.insurance_id.name or '', wrap_format_top)
+            worksheet.merge_range(row, 2, row, 3, srv.insurance_id.name or '', wrap_format_top)
             worksheet.merge_range(row, 4, row, 5, 'Alamat', wrap_format_top)
-            worksheet.merge_range(row, 6, row, 8, service.partner_id.street or '', wrap_format_top)
+            worksheet.merge_range(row, 6, row, 8, srv.partner_id.street or '', wrap_format_top)
             worksheet.set_row(row, 25, None)
             row += 1
             worksheet.merge_range(row, 0, row, 1, 'Merek Mobil', border_format)
-            worksheet.merge_range(row, 2, row, 3, '%s %s' % (service.make, service.model), border_format)
+            worksheet.merge_range(row, 2, row, 3, '%s %s' % (srv.make, srv.model), border_format)
             worksheet.merge_range(row, 4, row, 5, 'Telepon', border_format)
-            worksheet.merge_range(row, 6, row, 8, service.partner_id.phone or '', border_format)
+            worksheet.merge_range(row, 6, row, 8, srv.partner_id.phone or '', border_format)
             row += 1
             worksheet.merge_range(row, 0, row, 1, 'No. Polisi / Chassis', wrap_format_top)
-            worksheet.merge_range(row, 2, row, 3, '%s / %s' % (service.equipment_id.name, service.chassis_no), wrap_format_top)
+            worksheet.merge_range(row, 2, row, 3, '%s / %s' % (srv.equipment_id.name, srv.chassis_no), wrap_format_top)
             worksheet.merge_range(row, 4, row, 5, 'No. Polis Asuransi', wrap_format_top)
-            worksheet.merge_range(row, 6, row, 8, service.policy_no or '', wrap_format_top)
+            worksheet.merge_range(row, 6, row, 8, srv.policy_no or '', wrap_format_top)
             # worksheet.set_row(row, 25, None)
             row += 1
             worksheet.merge_range(row, 0, row, 1, 'Warna', border_format)
-            worksheet.merge_range(row, 2, row, 3, service.base_colour or '', border_format)
+            worksheet.merge_range(row, 2, row, 3, srv.base_colour or '', border_format)
             worksheet.merge_range(row, 4, row, 5, 'No. Berkas', border_format)
-            worksheet.merge_range(row, 6, row, 8, service.claim_id or '', border_format)
+            worksheet.merge_range(row, 6, row, 8, srv.claim_id or '', border_format)
             
             # details
             row += 1
@@ -115,13 +115,14 @@ class FormServiceXlsx(models.AbstractModel):
             worksheet.write(row, 7, 'TOTAL COST \n(Rp.)', header_format_wrap)
             worksheet.write(row, 8, 'GAIN / LOST \n(Rp.)', header_format_wrap)
             worksheet.set_row(row, 26, None)
+
             row += 1
             worksheet.merge_range(row, 0, row, 8, 'PERBAIKAN DAN PENGECATAN', section_format)
             
             row += 1
             idx = 1
             total_jasa = 0
-            for o in service.fees_lines:
+            for o in srv.fees_lines:
                 worksheet.write(row, 0, idx, border_format)
                 worksheet.write(row, 1, '', border_format)
                 worksheet.merge_range(row, 2, row, 3, o.name, border_format)
@@ -135,8 +136,8 @@ class FormServiceXlsx(models.AbstractModel):
                 idx += 1
             worksheet.merge_range(row, 0, row, 5, 'Total Jasa', section_format)
             worksheet.write(row, 6, total_jasa, number_format)
-            worksheet.write(row, 7, service.cost_fees, number_format)
-            worksheet.write(row, 8, total_jasa - service.cost_fees, number_format)
+            worksheet.write(row, 7, srv.cost_fees, number_format)
+            worksheet.write(row, 8, total_jasa - srv.cost_fees, number_format)
             row += 1
 
             worksheet.merge_range(row, 0, row, 8, 'PENGGANTIAN SPAREPART', section_format)
@@ -144,7 +145,7 @@ class FormServiceXlsx(models.AbstractModel):
             idx = 1
             total_spareparts = 0
             total_cost_part = 0
-            for r in service.operations:
+            for r in srv.operations:
                 if r.approved:
                     worksheet.write(row, 0, idx, border_format)
                     worksheet.write(row, 1, r.product_id.name, border_format)
@@ -160,13 +161,61 @@ class FormServiceXlsx(models.AbstractModel):
                     idx += 1
             worksheet.merge_range(row, 0, row, 5, 'Total Sparepart', section_format)
             worksheet.write(row, 6, total_spareparts, number_format)
-            worksheet.write(row, 7, service.cost_operations, number_format)
-            worksheet.write(row, 8, total_spareparts - service.cost_operations, number_format)
+            worksheet.write(row, 7, srv.cost_operations, number_format)
+            worksheet.write(row, 8, total_spareparts - srv.cost_operations, number_format)
 
-            total = total_spareparts + total_jasa
-            total_cost = service.cost_operations + service.cost_fees
             row += 1
-            worksheet.merge_range(row, 0, row, 5, 'Total', section_format)
+            worksheet.merge_range(row, 0, row, 8, 'BAHAN CONSUMABLE', section_format)
+            row += 1
+            idx = 1
+            total_cost_bahan = 0
+            for b in srv.consumable_lines:
+                worksheet.write(row, 0, idx, border_format)
+                worksheet.write(row, 1, b.product_id.name, border_format)
+                worksheet.merge_range(row, 2, row, 3, b.name, border_format)
+                worksheet.write(row, 4, b.product_uom_qty, border_format)
+                worksheet.write(row, 5, 0, number_format)
+                worksheet.write(row, 6, 0, number_format)
+                worksheet.write(row, 7, b.cost_subtotal, number_format)
+                worksheet.write(row, 8, b.cost_subtotal, number_format)
+                total_cost_bahan += b.cost_subtotal
+                row += 1
+                idx += 1
+            worksheet.merge_range(row, 0, row, 5, 'Total Bahan Consumable', section_format)
+            worksheet.write(row, 6, 0, number_format)
+            worksheet.write(row, 7, srv.cost_bahan, number_format)
+            worksheet.write(row, 8, srv.cost_bahan, number_format)
+
+            row += 1
+            worksheet.merge_range(row, 0, row, 8, 'OTHERS', section_format)
+            row += 1
+            idx = 1
+            total_others = 0
+            total_cost_others = 0
+            for t in srv.others_lines:
+                if t.name == 'Own Risk':
+                    continue
+                worksheet.write(row, 0, idx, border_format)
+                worksheet.write(row, 1, t.product_id.name, border_format)
+                worksheet.merge_range(row, 2, row, 3, t.name, border_format)
+                worksheet.write(row, 4, t.product_uom_qty, border_format)
+                worksheet.write(row, 5, t.price_unit, number_format)
+                worksheet.write(row, 6, t.price_subtotal, number_format)
+                worksheet.write(row, 7, t.cost_subtotal, number_format)
+                worksheet.write(row, 8, t.price_subtotal - t.cost_subtotal, number_format)
+                total_others += t.price_subtotal
+                total_cost_others += t.cost_subtotal
+                row += 1
+                idx += 1
+            worksheet.merge_range(row, 0, row, 5, 'Total Others', section_format)
+            worksheet.write(row, 6, total_others, number_format)
+            worksheet.write(row, 7, srv.cost_others, number_format)
+            worksheet.write(row, 8, total_others - srv.cost_others, number_format)
+
+            total = total_spareparts + total_jasa + total_others
+            total_cost = srv.cost_operations + srv.cost_fees + srv.cost_bahan + srv.cost_others
+            row += 1
+            worksheet.merge_range(row, 0, row, 5, 'GRAND TOTAL', section_format)
             worksheet.write(row, 6, total, number_format)
             worksheet.write(row, 7, total_cost, number_format)
             worksheet.write(row, 8, total - total_cost, number_format)
@@ -178,6 +227,6 @@ class FormServiceXlsx(models.AbstractModel):
 
             # row += 1
             # worksheet.merge_range(row, 0, row + 2, 1, 'Catatan', merged_format_top)
-            # worksheet.merge_range(row, 2, row + 2, 4, service.quotation_notes or '', wrap_format_top)
-            # worksheet.merge_range(row, 5, row + 2, 6, service.service_advisor or '', merged_format_bottom)
+            # worksheet.merge_range(row, 2, row + 2, 4, srv.quotation_notes or '', wrap_format_top)
+            # worksheet.merge_range(row, 5, row + 2, 6, srv.service_advisor or '', merged_format_bottom)
             row += 3
