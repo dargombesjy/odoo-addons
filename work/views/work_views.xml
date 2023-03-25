@@ -240,7 +240,7 @@
 											groups="uom.group_uom" />
 										<field name="cost_unit" />
 										<field name="cost_subtotal" widget="monetary" />
-										<field name="requested" string="Req" />
+										<field name="requested" string="Req" attrs="{'readonly':1}" />
 										<field name="received" string="Rcv"
 											attrs="{'readonly': 1}" />
 									</tree>

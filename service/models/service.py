@@ -1127,3 +1127,27 @@ class ServiceConsumable(models.Model):
         #     self.tax_id = False
         #     self.location_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
         #     self.location_dest_id = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
+
+    @api.multi
+    def unlink(self):
+        for serv_line in self:
+            if serv_line.invoice_line_id:
+                raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+            # transfer_line = self.env['stock.move'].search([('service_line_id', '=', serv_line.id)], limit=1)
+            if self.move_id:
+                serv_line.delete_flag = True
+                self.move_id.write({'delete_flag': True})
+                # raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+                return {
+                    'name': _('Warning'),
+                    'view_mode': 'form',
+                    'view_type': 'form',
+                    'view_id': self.env.ref('service.view_warning_message').id,
+                    'res_model': 'service.warning.message.wizard',
+                    # 'res_id': self.id,
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                }
+            else:
+                return super(ServiceConsumable, self).unlink()
+                # return models.Model.unlink(self)
