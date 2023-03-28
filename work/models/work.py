@@ -5,8 +5,10 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
 from passlib.tests.utils import limit
 
+
 class ServiceOrder(models.Model):
     _inherit = 'service.order'
+    _description = 'Production Order'
 
     sparepart_picking_id = fields.Many2one('stock.picking', 'Sparepart Pick ID',
         readonly=True, copy=False, index=True)
@@ -268,33 +270,30 @@ class ServiceOrder(models.Model):
 #     def action_service_cancel_draft(self):
 #         return self.write({'state': 'draft'})
 
-# class ServiceLine(models.Model):
-#     _inherit = 'service.line'
 
-    # @api.one
-    # def _compute_cost_subtotal(self):
-    #     pass
+# class ServiceEntry(models.Model):
+#     _name = 'service.fee.entry'
+#     _description = 'Service Entry Sheet'
+#     _order = 'create_date_desc'
 
-    # @api.onchange('received')
-    # def onchange_received(self):
-    #     precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-    #     available_qty_owner = self.env['stock.quant']._get_available_quantity(self.product_id, self.location_id, self.lot_id, owner_id=self.service_id.partner_id, strict=True)
-    #     available_qty_noown = self.env['stock.quant']._get_available_quantity(self.product_id, self.location_id, self.lot_id, strict=True)
-    #     for available_qty in [available_qty_owner, available_qty_noown]:
-    #         if float_compare(available_qty, self.product_uom_qty, precision_digits=precision) >= 0:
-    #             return True
-    #         else:
-    #             return {
-    #                 'name': _('Insufficient Quantity'),
-    #                 'view_type': 'form',
-    #                 'view_mode': 'form',
-    #                 'res_model': 'stock.warn.insufficient.qty.service',
-    #                 'view_id': self.env.ref('work.stock_warn_insufficient_qty_form_view').id,
-    #                 'type': 'ir.actions.act_window',
-    #                 'context': {
-    #                     'default_product_id': self.product_id.id,
-    #                     'default_location_id': self.location_id.id,
-    #                     'default_service_id': self.service_id
-    #                 },
-    #                 'target': 'new'
-    #             }
+#     name = fields.Char('Service Entry Sheet')
+#     service_fee_id = fields.Many2one('service.fee', 'Service Fee Reference', index=True, ondelete='cascade', required=True)
+#     vendor_id = fields.Many2one()
+
+#     @api.multi
+#     def action_show_details(self):
+#         self.ensure_one()
+#         view = self.env.ref('module.record_form_view')
+#         return {
+#             'name': _('%s') % self.name,
+#             'type': 'ir.actions.act_window',
+#             'view_type': 'form',
+#             'view_model': 'form',
+#             'res_model': 'model',
+#             'views': [(view.id, 'form')],
+#             'view_id': view.id,
+#             'target': 'current',
+#             'res_id': self.id,
+#             'context': dict(self.env.context),
+#         }
+    

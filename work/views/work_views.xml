@@ -148,30 +148,24 @@
 											<label for="product_uom_qty" />
 											<div class="o_row">
 												<field name="product_uom_qty" string="Quantity" />
-												<field name="product_uom" string="Unit of Measure"
-													groups="uom.group_uom" />
+												<field name="product_uom" string="Unit of Measure" groups="uom.group_uom" />
 											</div>
 											<field name="cost_unit" />
 											<field name="cost_subtotal" widget="monetary" />
-											<field name="vendor_ids"
-												domain="[('supplier', '=', True)]" />
-											<field name="approved" string="Acc?"
-												attrs="{'readonly': 1}" />
+											<field name="vendor_ids" domain="[('supplier', '=', True)]" />
+											<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
 										</group>
 									</form>
-									<tree string="Fees" editable="bottom">
-										<field name="product_id"
-											domain="[('type','=','service')]" required="True" />
+									<tree string="Fees" editable="bottom" delete="0">
+										<field name="product_id" domain="[('type','=','service')]" required="True" />
 										<field name="name" />
 										<field name="product_uom_qty" string="Quantity" />
-										<field name="product_uom" string="Unit of Measure"
-											groups="uom.group_uom" />
+										<field name="product_uom" string="Unit of Measure" groups="uom.group_uom" />
 										<field name="cost_unit" />
 										<field name="cost_subtotal" widget="monetary" />
-										<field name="vendor_ids" widget="many2many_tags"
-											domain="[('supplier', '=', True)]" />
-										<field name="approved" string="Acc?"
-											attrs="{'readonly': 1}" />
+										<field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]" />
+										<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
+										<button name="action_edit_detail" type="object" icon="fa-pencil-square-o" class="oe_edit_only" />
 									</tree>
 								</field>
 							</page>

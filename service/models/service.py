@@ -909,9 +909,9 @@ class ServiceLine(models.Model):
             if serv_line.invoice_line_id:
                 raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
             # transfer_line = self.env['stock.move'].search([('service_line_id', '=', serv_line.id)], limit=1)
-            if self.move_id:
+            if serv_line.move_id:
                 serv_line.delete_flag = True
-                self.move_id.write({'delete_flag': True})
+                serv_line.move_id.write({'delete_flag': True})
                 # raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
                 return {
                     'name': _('Warning'),
@@ -994,6 +994,20 @@ class ServiceFee(models.Model):
 
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
+
+    @api.multi
+    def action_edit_detail(self):
+        # self.ensure_one()
+        return {
+            'name': _('%s') % self.name,
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'service.fee',
+            'res_id': self.id,
+            'target': 'new'
+
+        }
 
 class ServiceOther(models.Model):
     _name = 'service.other'
@@ -1085,6 +1099,7 @@ class ServiceConsumable(models.Model):
     move_id = fields.Many2one(
         'stock.move', 'Inventory Move', copy=False, readonly=True)
     lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial')
+    # delete_flag = fields.Boolean('To Be Deleted', copy=False)
 
     @api.one
     @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -1131,23 +1146,23 @@ class ServiceConsumable(models.Model):
     @api.multi
     def unlink(self):
         for serv_line in self:
-            if serv_line.invoice_line_id:
-                raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+            # if serv_line.invoice_line_id:
+            #     raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
             # transfer_line = self.env['stock.move'].search([('service_line_id', '=', serv_line.id)], limit=1)
-            if self.move_id:
-                serv_line.delete_flag = True
-                self.move_id.write({'delete_flag': True})
-                # raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
-                return {
-                    'name': _('Warning'),
-                    'view_mode': 'form',
-                    'view_type': 'form',
-                    'view_id': self.env.ref('service.view_warning_message').id,
-                    'res_model': 'service.warning.message.wizard',
-                    # 'res_id': self.id,
-                    'type': 'ir.actions.act_window',
-                    'target': 'new',
-                }
+            if serv_line.move_id:
+                # serv_line.delete_flag = True
+                # serv_line.move_id.write({'delete_flag': True})
+                raise UserError(_('Barang sudah diambil, tidak boleh dihapus'))
+                # return {
+                #     'name': _('Warning'),
+                #     'view_mode': 'form',
+                #     'view_type': 'form',
+                #     'view_id': self.env.ref('service.view_warning_message').id,
+                #     'res_model': 'service.warning.message.wizard',
+                #     # 'res_id': self.id,
+                #     'type': 'ir.actions.act_window',
+                #     'target': 'new',
+                # }
             else:
                 return super(ServiceConsumable, self).unlink()
                 # return models.Model.unlink(self)
