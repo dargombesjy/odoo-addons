@@ -12,15 +12,6 @@
                     <field name="vendor_id" />
                     <field name="amount" />
                 </tree>
-                <form string="">
-                    <sheet>
-                        <group>
-                            <field name="name" />
-                            <field name="vendor_id" />
-                            <field name="amount" />
-                        </group>
-                    </sheet>
-                </form>
             </field>
         </record>
 
