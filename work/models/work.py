@@ -103,69 +103,6 @@ class ServiceOrder(models.Model):
             # service.write({'purchased': True, 'purchase_ids': [(6, 0, [x.id for x in po_ids])]})
             service.write({'purchased': True})
 
-    # @api.multi
-    # def action_create_sparepart_transfer(self):
-        # # precission = self.env['decimal_precision'].precision_get('Product Unit of Measure')
-        # Picking = self.env['stock.picking']
-        # Move_Line = self.env['stock.move']
-        # partner = self.partner_id
-        # for service in self:
-            # if not service.operations:
-                # raise UserError(_('No Sparepart items to transfer'))
-                #
-            # outs_all = service.operations.filtered(lambda line: line.approved == True and line.requested == False and line.is_robbing == False)
-            # outs_bhn = service.operations.filtered(lambda line: line.approved == True and line.product_id.categ_id == 8 and line.supply_type == 'self')
-            #
-            # outs = [item for item in outs_all if item not in outs_bhn]
-# #             outs = outs_all
-            # if not outs:
-                # raise UserError(_('No Requested item(s) left to transfer'))
-                #
-            # if not service.sparepart_picking_id:
-                # # raise UserError('Sparepart request already created')
-                # picking = Picking.create({
-                    # # 'name': '',
-                    # 'service_id': service.id,
-                    # 'origin': "Part-%s" % service.name,
-                    # 'eq_name': service.equipment_id.name,
-                    # 'eq_make': service.make,
-                    # 'eq_model': service.model,
-                    # 'move_type': 'one',
-                    # 'partner_id': partner.id,
-                    # 'picking_type_id': 2,
-                    # 'location_id': service.location_id.id,  # 12,
-                    # 'location_dest_id': 9,
-                    # 'state': 'draft',
-                # })
-                # service.write({'sparepart_picking_id': picking.id})
-            # else:
-                # picking = service.sparepart_picking_id
-                #
-            # if outs:
-                # for operation in outs:
-                    # if operation.product_id:
-                        # uom_id = operation.product_uom.id
-                    # else:
-                        # uom_id = 1
-                    # moving = Move_Line.create({
-                        # 'service_id': service.id,
-                        # 'service_line_id': operation.id,
-                        # 'name': operation.name,
-                        # 'product_category': 'Sparepart',
-                        # 'supply_type': operation.supply_type,
-                        # 'picking_id': picking.id,
-                        # 'picking_type_id': 2,
-                        # 'product_id': operation.product_id.id,
-                        # 'product_uom_qty': operation.product_uom_qty,
-                        # 'product_uom': uom_id, # operation.product_uom.id,
-                        # 'package_id': False,
-                        # 'package_level_id': False,
-                        # 'location_id': operation.service_id.location_id.id, # 12,  # operation.location_id.id,
-                        # 'location_dest_id': 9,
-                        # 'state': 'draft'
-                    # })
-                    # operation.write({'move_id': moving.id, 'requested': True})
-
     @api.multi
     def action_print_sparepart_request(self):
         return self.env.ref('work.action_work_sparepart_request').report_action(self)
@@ -269,31 +206,3 @@ class ServiceOrder(models.Model):
 #     @api.multi
 #     def action_service_cancel_draft(self):
 #         return self.write({'state': 'draft'})
-
-
-# class ServiceEntry(models.Model):
-#     _name = 'service.fee.entry'
-#     _description = 'Service Entry Sheet'
-#     _order = 'create_date_desc'
-
-#     name = fields.Char('Service Entry Sheet')
-#     service_fee_id = fields.Many2one('service.fee', 'Service Fee Reference', index=True, ondelete='cascade', required=True)
-#     vendor_id = fields.Many2one()
-
-#     @api.multi
-#     def action_show_details(self):
-#         self.ensure_one()
-#         view = self.env.ref('module.record_form_view')
-#         return {
-#             'name': _('%s') % self.name,
-#             'type': 'ir.actions.act_window',
-#             'view_type': 'form',
-#             'view_model': 'form',
-#             'res_model': 'model',
-#             'views': [(view.id, 'form')],
-#             'view_id': view.id,
-#             'target': 'current',
-#             'res_id': self.id,
-#             'context': dict(self.env.context),
-#         }
-    

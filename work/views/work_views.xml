@@ -153,6 +153,7 @@
 											<field name="cost_unit" />
 											<field name="cost_subtotal" widget="monetary" />
 											<field name="vendor_ids" domain="[('supplier', '=', True)]" />
+											<!-- <field name="service_entry_ids" /> -->
 											<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
 										</group>
 									</form>
@@ -165,7 +166,8 @@
 										<field name="cost_subtotal" widget="monetary" />
 										<field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]" />
 										<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
-										<button name="action_edit_detail" type="object" icon="fa-pencil-square-o" class="oe_edit_only" />
+										<!-- <field name="service_entry_ids" />
+										<button name="action_edit_detail" type="object" icon="fa-pencil-square-o" class="oe_edit_only" /> -->
 									</tree>
 								</field>
 							</page>
@@ -276,7 +278,7 @@
 					<field name="amount_own_risk" invisible="1"/>
 				</pivot>
 			</field>
-		</record>
+		</record>	
 
 		<record id="action_work_order_list"
 			model="ir.actions.act_window">

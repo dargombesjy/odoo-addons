@@ -70,12 +70,12 @@
 			<field name="arch" type="xml">
 				<form string="Service Order">
 					<header>
-						<!-- <button name="action_send_mail" states="draft" string="Send Quotation" 
-							type="object"/> -->
 						<button name="action_create_sparepart_transfer"
 							string="Req. Sparepart" type="object" states="draft"/>
 						<button name="action_print_service_order" states="draft"
 							string="Print Quotation" type="object" />
+						<button name="action_print_service_order" states="confirmed"
+							string="Print SPK" type="object" />
 						<button name="action_service_confirm" states="draft"
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"

@@ -24,3 +24,4 @@ access_service_consum_manager,service.consum manager,model_service_consumable,gr
 access_equipment_manager,equipment manager,model_service_equipment,group_service_manager,1,1,1,1
 access_equipment_make_manager,equipment.make manager,model_service_equipment_make,group_service_manager,1,1,1,1
 access_equipment_variant_manager,equipment.variant manager,model_service_equipment_variant,group_service_manager,1,1,1,1
+access_service_entry_user,service.entry.user,model_service_entry,group_service_entry_user,1,1,1,1

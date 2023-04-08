@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <record id="service_entry_view_tree" model="ir.ui.view">
+            <field name="name">service_entry.view.tree</field>
+            <field name="model">service.entry</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name" />
+                    <field name="service_fee_id" />
+                    <field name="vendor_id" />
+                    <field name="amount" />
+                </tree>
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name" />
+                            <field name="vendor_id" />
+                            <field name="amount" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="service_entry_view_form" model="ir.ui.view">
+            <field name="name">service_entry.view.form</field>
+            <field name="model">service.entry</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name" />
+                            <field name="vendor_id" />
+                            <field name="amount" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        
+    </data>
+    
+</odoo>

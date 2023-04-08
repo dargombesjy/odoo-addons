@@ -21,6 +21,10 @@
 			<field name="name">Service / Superadmin</field>
 		</record>
 
+		<record id="group_service_entry_user" model="res.groups">
+			<field name="name">Service Entry / User</field>
+		</record>
+
 		<!-- <record model="ir.rule" id="service_rule"> <field name="name">service 
 			multi-company</field> <field name="model_id" search="[('model','=','service.order')]" 
 			model="ir.model"/> <field name="global" eval="True"/> <field name="domain_force">['|',('company_id','child_of',['user.company_id']),('company_id','=','False')]</field> 

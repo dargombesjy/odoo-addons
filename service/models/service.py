@@ -115,6 +115,12 @@ class ServiceOrder(models.Model):
              "* The \'To be Invoiced\' status is used to generate the invoice before or after repairing done.\n"
              "* The \'Done\' status is set when repairing is completed.\n"
              "* The \'Cancelled\' status is used when user cancel repair order.")
+    user_state = fields.Selection(
+        [('spk_prt', 'SPK Printed')],
+        string='User Status',
+        copy=False,
+        readonly=True,
+        track_visibility='onchange')
     has_confirmed = fields.Boolean('Has Confirmed')
     operations = fields.One2many(
         'service.line', 'service_id', 'Part', copy=True)
@@ -351,7 +357,14 @@ class ServiceOrder(models.Model):
 
     @api.multi
     def action_print_service_order(self):
+        self._set_user_state('spk_prt')
         return self.env.ref('service.action_report_service_order').with_context(discard_logo_check=True).report_action(self)
+    
+    def _set_user_state(self, state):
+        if not self.user_state or self.user_state != state:
+            self.write({'user_state': state})
+        # elif state not in self.user_state:
+
 
     @api.multi
     def action_print_pass_keluar(self):
@@ -955,6 +968,8 @@ class ServiceFee(models.Model):
     purchase_line_id = fields.Many2one(
         'purchase.order.line', 'Purchase Line', copy=False)
     vendor_ids = fields.Many2many('res.partner', 'service_fee_vendor', 'service_fee_id', 'vendor_id', 'Vendors')
+    # service_entry_ids = fields.Many2many('service.entry', string='Service Entry')
+    service_entry_ids = fields.One2many('service.entry', 'service_fee_id', string='Service Entry')
 
     @api.one
     @api.depends('price_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -995,19 +1010,48 @@ class ServiceFee(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
+    # @api.multi
+    # def action_edit_detail(self):
+    #     self.ensure_one()
+    #     # context = dict(self.env.context)
+    #     context = {
+    #         'form_view_initial_mode': 'edit',
+    #         'force_detailed_view': 'true',
+    #     }
+    #     return {
+    #         'name': _('%s') % self.name,
+    #         'type': 'ir.actions.act_window',
+    #         'view_type': 'form',
+    #         'view_mode': 'form',
+    #         'res_model': 'service.entry',
+    #         'res_id': self.id,
+    #         'target': 'new',
+    #         'context': context,
+
+    #     }
+
     @api.multi
     def action_edit_detail(self):
-        # self.ensure_one()
+        self.ensure_one()
+        view = self.env.ref('service.service_entry_view_tree')
+        # context = dict(self.env.context)
+        context = {
+            'form_view_initial_mode': 'edit',
+            'force_detailed_view': 'true',
+        }
         return {
             'name': _('%s') % self.name,
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'service.fee',
+            'res_model': 'service.entry',
+            'views': [(view.id, 'tree')],
+            'view_id': view.id,
+            'target': 'new',
             'res_id': self.id,
-            'target': 'new'
-
+            'context': context,
         }
+
 
 class ServiceOther(models.Model):
     _name = 'service.other'
@@ -1166,3 +1210,16 @@ class ServiceConsumable(models.Model):
             else:
                 return super(ServiceConsumable, self).unlink()
                 # return models.Model.unlink(self)
+
+
+class ServiceEntry(models.Model):
+    _name = 'service.entry'
+    _description = 'Service Entry Sheet'
+    # _order = 'create_date_desc'
+
+    name = fields.Char('Service Entry Sheet')
+    service_fee_id = fields.Many2one('service.fee', 'Service Fee Reference', index=True, ondelete='cascade', required=True)
+    vendor_id = fields.Many2one('res.partner', 'Vendor', ondelete='cascade')
+    amount = fields.Float('amount', digits=(12,0))
+    # create_date = fields.Date('Create Date')
+    
