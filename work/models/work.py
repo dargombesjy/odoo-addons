@@ -42,24 +42,43 @@ class ServiceOrder(models.Model):
         for po in self.purchase_ids:
             purchased_vendors.append(po.partner_id)
         po_vendor = {}
+        
         for fee in self.fees_lines:
             if not fee.approved:  # or fee.cost_unit == 0:
-                continue
-            for vendor in fee.vendor_ids:
-                if fee.purchased:
-                    if vendor in purchased_vendors:
-                        continue
-                if vendor not in po_vendor:
-                    po_vendor[vendor] = [fee,]
-                else:
-                    po_vendor[vendor].append(fee)
+                    continue
+            if fee.service_entry_ids:
+                for entry in fee.service_entry_ids:
+                    if fee.purchased:
+                        if entry.vendor_id in purchased_vendors:
+                            continue
+                    fee_dict = {
+                        'fee': fee,
+                        'cost_unit': entry.amount
+                    }
+                    if entry.vendor_id not in po_vendor:
+                        po_vendor[entry.vendor_id] = [fee_dict,]
+                    else:
+                        po_vendor[entry.vendor_id].append(fee_dict)
+            else:
+                for vendor in fee.vendor_ids:
+                    if fee.purchased:
+                        if vendor in purchased_vendors:
+                            continue
+                    fee_dict = {
+                        'fee': fee,
+                        'cost_unit': fee.cost_unit
+                    }
+                    if vendor not in po_vendor:
+                        po_vendor[vendor] = [fee_dict,]
+                    else:
+                        po_vendor[vendor].append(fee_dict)
                     
-            # if not fee.purchased:
-            #     for vendor in fee.vendor_ids:
-            #         if vendor not in po_vendor:
-            #             po_vendor[vendor] = [fee,]
-            #         else:
-            #             po_vendor[vendor].append(fee)
+                # if not fee.purchased:
+                #     for vendor in fee.vendor_ids:
+                #         if vendor not in po_vendor:
+                #             po_vendor[vendor] = [fee,]
+                #         else:
+                #             po_vendor[vendor].append(fee)
 
         if not po_vendor:
             raise UserError(_('All items have been purchased or have not been approved'))
@@ -71,7 +90,7 @@ class ServiceOrder(models.Model):
         Purchase_Line = self.env['purchase.order.line']
         po_dict = self.create_po_dict()
         items = list(po_dict.items())
-        po_ids = []
+        # po_ids = []
 
         for service in self:
             if self.filtered(lambda service: service.work_stage in ('bongkar', 'ketok')):
@@ -89,18 +108,20 @@ class ServiceOrder(models.Model):
                 for v in item[1]:
                     purchase_line = Purchase_Line.create({
                         'order_id': purchase.id,
-                        'name': v.product_id.name,
+                        'name': v['fee'].product_id.name,
                         'date_planned': datetime.today(),
-                        'product_id': v.product_id.id,
-                        'product_qty': v.product_uom_qty,
-                        'product_uom': v.product_uom.id,
-                        'price_unit': v.cost_unit,
-                        'qty_received': v.product_uom_qty  # all services were received
+                        'product_id': v['fee'].product_id.id,
+                        'product_qty': v['fee'].product_uom_qty,
+                        'product_uom': v['fee'].product_uom.id,
+                        'price_unit': v['cost_unit'],
+                        'qty_received': v['fee'].product_uom_qty  # all services were received
                     })
-                    v.write({'purchased': True, 'purchase_line_id': purchase_line.id})
+
+                    v['fee'].write({'purchased': True, 'purchase_line_id': purchase_line.id})
                     service.write({'purchase_ids': [(4, purchase.id)]})
-                po_ids.append(purchase)
-            # service.write({'purchased': True, 'purchase_ids': [(6, 0, [x.id for x in po_ids])]})
+                    if item[0] not in service.vendor_ids:
+                        service.write({'vendor_ids': [(4, item[0].id)]})
+   
             service.write({'purchased': True})
 
     @api.multi

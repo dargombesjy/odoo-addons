@@ -74,8 +74,9 @@
 							string="Req. Sparepart" type="object" states="draft"/>
 						<button name="action_print_service_order" states="draft"
 							string="Print Quotation" type="object" />
-						<button name="action_print_service_order" states="confirmed"
-							string="Print SPK" type="object" />
+						<button name="action_print_service_order"
+							string="Print SPK" type="object"
+							attrs="{'invisible':[('state','=','draft')]}"/>
 						<button name="action_service_confirm" states="draft"
 							string="Confirm Service" type="object" class="oe_highlight" />
 						<button name="action_invoice_or_create" type="object"

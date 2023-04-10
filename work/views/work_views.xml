@@ -54,7 +54,6 @@
 							statusbar_visible="draft,confirmed,under_repair,ready,done" />
 					</header>
 					<sheet>
-						<!-- <div class="oe_button_box" name="button_box"/> -->
 						<div class="oe_button_box" name="button_box" />
 						<label for="name"/>
 						<h1>
@@ -78,7 +77,7 @@
 								<field name="work_stage" />
 								<field name="finish_date" />
 								<field name="vendor_ids" string="Repair Vendor"
-									domain="[('supplier', '=', True)]" widget="many2many_tags" />
+									domain="[('supplier', '=', True)]" widget="many2many_tags" attrs="{'readonly': 1}" />
 								<field name="purchase_ids" widget="many2many_tags"
 									attrs="{'readonly': 1}" />
 								<field name="sparepart_picking_id" />
@@ -152,8 +151,14 @@
 											</div>
 											<field name="cost_unit" />
 											<field name="cost_subtotal" widget="monetary" />
-											<field name="vendor_ids" domain="[('supplier', '=', True)]" />
-											<!-- <field name="service_entry_ids" /> -->
+											<!-- <field name="vendor_ids" domain="[('supplier', '=', True)]" /> -->
+											<field name="service_entry_ids">
+												<tree>
+													<field name="name" />
+													<field name="vendor_id" />
+													<field name="amount" />
+												</tree>
+											</field>
 											<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
 										</group>
 									</form>
@@ -164,10 +169,11 @@
 										<field name="product_uom" string="Unit of Measure" groups="uom.group_uom" />
 										<field name="cost_unit" />
 										<field name="cost_subtotal" widget="monetary" />
-										<field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]" />
+										<!-- <field name="vendor_ids" widget="many2many_tags" domain="[('supplier', '=', True)]" /> -->
 										<field name="approved" string="Acc?" attrs="{'readonly': 1}" />
-										<!-- <field name="service_entry_ids" />
-										<button name="action_edit_detail" type="object" icon="fa-pencil-square-o" class="oe_edit_only" /> -->
+										<field name="service_entry_ids" />
+										<button name="action_edit_detail" type="object" icon="fa-pencil-square-o" class="oe_edit_only"
+											attrs="{'invisible': [('parent.state', 'in', ('cancel', 'done', 'paid'))]}"/>
 									</tree>
 								</field>
 							</page>

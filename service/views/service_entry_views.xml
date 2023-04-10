@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
-        
+     
+    <data>
+
+        <record id="service_fee_view_form1_edit" model="ir.ui.view">
+            <field name="name">service.fee.view.form1</field>
+            <field name="model">service.fee</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="service_entry_ids">
+                                <tree editable="bottom">
+                                    <field name="name" />
+                                    <field name="vendor_id" domain="[('supplier', '=', True)]" />
+                                    <field name="amount"></field>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
         <record id="service_entry_view_tree" model="ir.ui.view">
             <field name="name">service_entry.view.tree</field>
             <field name="model">service.entry</field>
             <field name="arch" type="xml">
-                <tree string="">
+                <tree string="" editable="bottom">
                     <field name="name" />
-                    <field name="service_fee_id" />
+                    <!-- <field name="service_fee_id" /> -->
                     <field name="vendor_id" />
                     <field name="amount" />
                 </tree>

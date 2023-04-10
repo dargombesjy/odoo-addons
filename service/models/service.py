@@ -992,7 +992,7 @@ class ServiceFee(models.Model):
     def _onchange_product_uom(self):
         self.price_unit = self.product_id.list_price
         self.estimate_unit = self.product_id.list_price
-        self.cost_unit = self.product_id.standard_price
+        # self.cost_unit = self.product_id.standard_price
 
     @api.onchange('service_id', 'product_id', 'product_uom_qty')
     def onchange_product_id(self):
@@ -1010,42 +1010,49 @@ class ServiceFee(models.Model):
         if partner and self.product_id:
             self.tax_id = partner.property_account_position_id.map_tax(self.product_id.taxes_id, self.product_id, partner).ids
 
-    # @api.multi
-    # def action_edit_detail(self):
-    #     self.ensure_one()
-    #     # context = dict(self.env.context)
-    #     context = {
-    #         'form_view_initial_mode': 'edit',
-    #         'force_detailed_view': 'true',
-    #     }
-    #     return {
-    #         'name': _('%s') % self.name,
-    #         'type': 'ir.actions.act_window',
-    #         'view_type': 'form',
-    #         'view_mode': 'form',
-    #         'res_model': 'service.entry',
-    #         'res_id': self.id,
-    #         'target': 'new',
-    #         'context': context,
+    # @api.onchange('service_entry_ids')
+    # def onchange_service_entry(self):
+    #     self.cost_unit = 10000
+        # self.cost_unit = sum(entry.amount for entry in self.service_entry_ids)
+    
+    # @api.one
+    # @api.depends('service_entry_ids.amount')
+    # def _calculate_cost(self):
+    #     cost = 0
+    #     for entry in self.service_entry_ids:
+    #         cost += entry.amount
+    #     self.cost_unit = cost
 
-    #     }
-
+    @api.multi
+    def write(self, values):
+        res = super(ServiceFee, self).write(values)
+        if 'service_entry_ids' in values:
+            vendors = []
+            cost = 0
+            for entry in self.service_entry_ids:
+                vendors.append(entry.vendor_id.id)
+                cost += entry.amount
+            self.cost_unit = cost    #  sum([entry.amount for entry in self.service_entry_ids])
+            self.vendor_ids = [(6, 0, vendors)]
+        return res
+    
     @api.multi
     def action_edit_detail(self):
         self.ensure_one()
-        view = self.env.ref('service.service_entry_view_tree')
-        # context = dict(self.env.context)
-        context = {
-            'form_view_initial_mode': 'edit',
-            'force_detailed_view': 'true',
-        }
+        view = self.env.ref('service.service_fee_view_form1_edit')
+        # context = dict()
+        context = dict(self.env.context)
+        # context.update({
+        #     'form_view_initial_mode': 'edit',
+        #     'force_detailed_view': 'true',
+        # })
         return {
             'name': _('%s') % self.name,
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'service.entry',
-            'views': [(view.id, 'tree')],
+            'res_model': 'service.fee',
+            'views': [(view.id, 'form')],
             'view_id': view.id,
             'target': 'new',
             'res_id': self.id,
@@ -1220,6 +1227,5 @@ class ServiceEntry(models.Model):
     name = fields.Char('Service Entry Sheet')
     service_fee_id = fields.Many2one('service.fee', 'Service Fee Reference', index=True, ondelete='cascade', required=True)
     vendor_id = fields.Many2one('res.partner', 'Vendor', ondelete='cascade')
-    amount = fields.Float('amount', digits=(12,0))
+    amount = fields.Float('Amount', digits=(12,0))
     # create_date = fields.Date('Create Date')
-    
