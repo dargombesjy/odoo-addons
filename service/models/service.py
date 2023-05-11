@@ -1150,7 +1150,7 @@ class ServiceConsumable(models.Model):
     move_id = fields.Many2one(
         'stock.move', 'Inventory Move', copy=False, readonly=True)
     lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial')
-    # delete_flag = fields.Boolean('To Be Deleted', copy=False)
+    delete_flag = fields.Boolean('To Be Deleted', copy=False)
 
     @api.one
     @api.depends('cost_unit', 'service_id', 'product_uom_qty', 'product_id')
@@ -1197,23 +1197,23 @@ class ServiceConsumable(models.Model):
     @api.multi
     def unlink(self):
         for serv_line in self:
-            # if serv_line.invoice_line_id:
-            #     raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
+            if serv_line.service_id.invoiced:
+                raise UserError(_('Sudah ada Invoice untuk material ini, tidak boleh dihapus'))
             # transfer_line = self.env['stock.move'].search([('service_line_id', '=', serv_line.id)], limit=1)
             if serv_line.move_id:
-                # serv_line.delete_flag = True
-                # serv_line.move_id.write({'delete_flag': True})
-                raise UserError(_('Barang sudah diambil, tidak boleh dihapus'))
-                # return {
-                #     'name': _('Warning'),
-                #     'view_mode': 'form',
-                #     'view_type': 'form',
-                #     'view_id': self.env.ref('service.view_warning_message').id,
-                #     'res_model': 'service.warning.message.wizard',
-                #     # 'res_id': self.id,
-                #     'type': 'ir.actions.act_window',
-                #     'target': 'new',
-                # }
+                serv_line.delete_flag = True
+                serv_line.move_id.write({'delete_flag': True})
+                # raise UserError(_('Barang sudah direquest ke gudang, silakan minta gudang untuk menghapus'))
+                return {
+                    'name': _('Warning'),
+                    'view_mode': 'form',
+                    'view_type': 'form',
+                    'view_id': self.env.ref('service.view_warning_message').id,
+                    'res_model': 'service.warning.message.wizard',
+                    # 'res_id': self.id,
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                }
             else:
                 return super(ServiceConsumable, self).unlink()
                 # return models.Model.unlink(self)

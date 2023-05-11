@@ -425,16 +425,22 @@ class StockMove(models.Model):
     @api.multi
     def unlink(self):
         for item in self:
-            service_line = item.env['service.line'].search([('id', '=', item.service_line_id)], limit=1)
             if item.product_category == 'Sparepart' or item.product_category == 'Bahan':
+                service_line = item.env['service.line'].search([('id', '=', item.service_line_id)], limit=1)
                 if service_line and not service_line.delete_flag:
                     raise UserError(_('Silakan meminta bagian Produksi agar menandai item ini untuk dihapus,'
                                         ' dengan klik icon Delete'))
 
-            res = super(StockMove, item).unlink()
-            if service_line:
-                service_line.unlink()
-            return res
+                res = super(StockMove, item).unlink()
+                if service_line:
+                    service_line.unlink()
+                return res
+            elif item.product_category == 'Consumable':
+                service_cons = item.env['service.consumable'].search([('id', '=', item.service_line_id)], limit=1)
+                res = super(StockMove, item).unlink()
+                if service_cons:
+                    service_cons.unlink()
+                return res
 
     def _action_assign(self):
         """ Reserve stock moves by creating their stock move lines. A stock move is
