@@ -90,7 +90,7 @@
 							<page string="Spareparts">
 								<field name="operations"
 									attrs="{'readonly':[('state', 'not in', ('confirmed', 'under_repair', 'ready'))]}">
-									<form string="Sparepartsss">
+									<form string="Spareparts">
 										<notebook>
 											<page string="Sparepart Line">
 												<group>
@@ -233,7 +233,7 @@
 											<field name="received" invisible="0" />
 										</group>
 									</form>
-									<tree string="Consumables" editable="bottom">
+									<tree string="Consumables" editable="bottom" delete="0">
 										<field name="product_id" string="Bahan"
 											domain="[('type', '=', 'product'), ('categ_id', 'in', (7, 8))]" />
 										<field name="name" invisible="1" />
@@ -245,6 +245,7 @@
 										<field name="requested" string="Req" attrs="{'readonly':1}" />
 										<field name="received" string="Rcv"
 											attrs="{'readonly': 1}" />
+										<button name="unlink" type="object" icon="fa-trash-o" class="oe_edit_only"/>
 									</tree>
 								</field>
 							</page>
