@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="zaccount_journal_item_search" model="ir.ui.view">
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='receivable']" position="after">
+                <filter name="income" string="Group - Income" domain="[('account_id.internal_group', '=', 'income')]" />
+                <filter name="expense" string="Group - Expense" domain="[('account_id.internal_group', '=', 'expense')]" />
+                <filter name="asset" string="Group - Asset" domain="[('account_id.internal_group', '=', 'asset')]" />
+                <filter name="liability" string="Group - Liability" domain="[('account_id.internal_group', '=', 'liability')]" />
+            </xpath>
+            <!-- <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="" />
+            </xpath> -->    
+        </field>
+    </record>
+
+</odoo>

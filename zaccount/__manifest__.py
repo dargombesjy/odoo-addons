@@ -15,6 +15,7 @@
         'views/zaccount_invoice_views.xml',
         'views/zaccount_move_views.xml',
         'views/zreport_invoice.xml',
+        'views/zaccount_journal_items_search.xml',
         'reports/paperformat.xml',
         'reports/reports.xml',
         'reports/report_invoice_customer.xml',
