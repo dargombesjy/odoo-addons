@@ -273,16 +273,16 @@
 					<field name="cost_fees" type="measure" groups="work.group_work_user"/>
 					<field name="cost_others" type="measure" groups="work.group_work_user"/>
 					<field name="cost_bahan" type="measure" groups="work.group_work_user"/> -->
-					<field name="amount_sparepart" invisible="1"/>
-					<field name="amount_jasa" invisible="1"/>
-					<field name="amount_others" invisible="1"/>
-					<field name="amount_total" invisible="1"/>
-					<field name="amount_untaxed" invisible="1"/>
-					<field name="amount_tax" invisible="1"/>
+					<!-- <field name="amount_sparepart" invisible="1"/> -->
+					<!-- <field name="amount_jasa" invisible="1"/> -->
+					<!-- <field name="amount_others" invisible="1"/> -->
+					<!-- <field name="amount_total" invisible="1"/> -->
+					<!-- <field name="amount_untaxed" invisible="1"/> -->
+					<!-- <field name="amount_tax" invisible="1"/> -->
 					<field name="amount_tax_sparepart" invisible="1"/>
 					<field name="amount_tax_jasa" invisible="1"/>
 					<field name="amount_tax_others" invisible="1"/>
-					<field name="amount_own_risk" invisible="1"/>
+					<!-- <field name="amount_own_risk" invisible="1"/> -->
 				</pivot>
 			</field>
 		</record>	
