@@ -250,7 +250,7 @@ class ReportServiceIncome(models.AbstractModel):
                 s = line_c[1]['aggregates']
                 if s['amount_sparepart'] >= 0 and s['cost_operations'] >= 0:
                     ss_spart = s['amount_sparepart'] - s['cost_operations']
-                sp_all = s['amount_untaxed'] + s['amount_tax'] + s['amount_own_risk']
+                sp_all = s['amount_untaxed']   #  + s['amount_tax'] + s['amount_own_risk']
                 ss_all = sp_all - s['cost_total']
                 
                 sheet.write(row, col + 1, s['jml_spk'], number_bold)
