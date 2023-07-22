@@ -206,7 +206,7 @@ class ReportServiceIncome(models.AbstractModel):
             agg = order[1]['aggregates']
             if agg['amount_sparepart'] >= 0 and agg['cost_operations'] >= 0:
                 s_spart = agg['amount_sparepart'] - agg['cost_operations']
-            p_all = agg['amount_untaxed'] + agg['amount_tax'] + agg['amount_own_risk']
+            p_all = agg['amount_untaxed']   #  + agg['amount_tax'] + agg['amount_own_risk']
             s_all = p_all - agg['cost_total']
 
             sheet.write(row, col + 1, agg['jml_spk'], bold_h4)
@@ -287,7 +287,7 @@ class ReportServiceIncome(models.AbstractModel):
                     for o in line_c[1]['order_lines']:
                         if o['amount_sparepart'] >= 0 and o['cost_operations'] >= 0:
                             os_spart = o['amount_sparepart'] - o['cost_operations']
-                        op_all = o['amount_untaxed'] + o['amount_tax'] + o['amount_own_risk']
+                        op_all = o['amount_untaxed']   #  + o['amount_tax'] + o['amount_own_risk']
                         os_all = op_all - o['cost_total']
                         op_est_part = op_est_jasa = 0
                         if not o['est_part'] is None:
